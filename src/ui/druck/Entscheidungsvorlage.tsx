@@ -6,6 +6,7 @@
 import { angebotsname } from '../../bewertung/nutzwert'
 import { stabilitaetText } from '../../bewertung/sensitivitaet'
 import { begruendungsEntwurf } from '../../entscheidung/begruendung'
+import { RECHTSSTAND } from '../../lastenheft/katalog'
 import { ausgangslagePunkte, REGEL_NAME, vorgehenPunkte } from '../../export/vorlagen'
 import type { Gruppe } from '../../modell/typen'
 import { datum, euro, nutzwert } from '../../modell/zahlformat'
@@ -182,7 +183,7 @@ export function Entscheidungsvorlage() {
             ))}
           </tbody>
         </table>
-        <p className="druck-klein">Rechtliche Hinweise ohne Gewähr, keine Rechtsberatung. Alle Beträge netto.</p>
+        <p className="druck-klein">Rechtliche Anforderungen ohne Gewähr, keine Rechtsberatung, Stand {RECHTSSTAND}. Alle Beträge netto.</p>
       </section>
     </article>
   )

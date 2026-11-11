@@ -9,6 +9,7 @@ test('Beispiel durch alle sieben Schritte bis zur Vorlage (E1)', async ({ page }
   const vorlage = page.locator('.druck-dokument')
   await expect(vorlage).toContainText('Empfohlen wird Anbieter Nord (Warenwirtschaft Nord).')
   await expect(vorlage.locator('.empfehlung-name')).toContainText('Anbieter Nord')
+  await expect(vorlage).toContainText('Rechtliche Anforderungen ohne Gewähr, keine Rechtsberatung, Stand 11.11.2026.')
 })
 
 test('Prozesslotse-Datei einlesen und Umfang zeigen (E2)', async ({ page }) => {

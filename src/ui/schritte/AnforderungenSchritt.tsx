@@ -76,6 +76,7 @@ export function AnforderungenSchritt() {
       </h1>
       <p className="einleitung">Prüfen Sie die Vorschläge, passen Sie Texte und Prioritäten an und ergänzen Sie eigene Anforderungen. Aktive Anforderungen kommen ins Lastenheft.</p>
       <Lernhinweis thema="moscow" />
+      <Lernhinweis thema="abnahme" />
 
       <section className="karte kopfzahlen" id="anforderungen-kopf" aria-labelledby="kopf-titel">
         <h2 id="kopf-titel" className="sr">
