@@ -6,7 +6,7 @@ import { abcKosten, abcProjekt } from '../testhilfen/abc'
 import { werteAus } from './auswertung'
 import { bewerteAngebote, KEINE_KOSTEN, kostenbasisVon } from './nutzwert'
 
-const ergebnis = (p: AuswahlProjekt, id: string) => werteAus(p, abcKosten()).ergebnisse.find((r) => r.angebotId === id)!
+const ergebnis = (p: AuswahlProjekt, id: string) => werteAus(p).ergebnisse.find((r) => r.angebotId === id)!
 
 function mitBewertung(p: AuswahlProjekt, angebot: string, anforderung: string, werte: { ko?: 'erfuellt' | 'nicht_erfuellt' | 'offen' | null; punkte?: number | null }): AuswahlProjekt {
   return {
@@ -32,7 +32,7 @@ describe('Nutzwertanalyse mit K.-o.-Prüfung (N1 bis N7)', () => {
   })
 
   it('empfiehlt nach der Regel Nutzwert A vor B (T-N2)', () => {
-    const w = werteAus(abcProjekt(), abcKosten())
+    const w = werteAus(abcProjekt())
     expect(w.ergebnisse.map((r) => [r.angebotId, r.rang])).toEqual([
       ['angebot-a', 1],
       ['angebot-b', 2],
@@ -49,18 +49,18 @@ describe('Nutzwertanalyse mit K.-o.-Prüfung (N1 bis N7)', () => {
     expect(b.gruppenwerte.funktion).toBeCloseTo(6.666667, 6)
     expect(b.nutzwert).toBeCloseTo(5.533333, 6)
     expect(b.fehlend).toBe(1)
-    expect(werteAus(p, abcKosten()).vorlaeufig).toBe(true)
+    expect(werteAus(p).vorlaeufig).toBe(true)
   })
 
   it('lässt ein Angebot mit offenem K.-o.-Kriterium gültig, aber vorläufig (T-N4)', () => {
     for (const ko of ['offen', null] as const) {
       const p = mitBewertung(abcProjekt(), 'angebot-a', 'eigene:f-03', { ko })
       expect(ergebnis(p, 'angebot-a')).toMatchObject({ gueltig: true, koOffen: 1 })
-      expect(werteAus(p, abcKosten()).vorlaeufig).toBe(true)
+      expect(werteAus(p).vorlaeufig).toBe(true)
     }
     // ein ungültiges Angebot macht nichts vorläufig
     const c = mitBewertung(abcProjekt(), 'angebot-c', 'eigene:f-01', { punkte: null })
-    expect(werteAus(c, abcKosten()).vorlaeufig).toBe(false)
+    expect(werteAus(c).vorlaeufig).toBe(false)
   })
 
   it('gibt Angeboten mit weniger als 0,005 Punkten Abstand denselben Rang (T-N5)', () => {
@@ -84,18 +84,18 @@ describe('Nutzwertanalyse mit K.-o.-Prüfung (N1 bis N7)', () => {
     const p = abcProjekt()
     p.wirtschaftlichkeit.budgetEuro = 35000
     p.wirtschaftlichkeit.budgetAlsKo = true
-    const w = werteAus(p, abcKosten())
+    const w = werteAus(p)
     expect(w.ergebnisse[0]).toMatchObject({ angebotId: 'angebot-a', gueltig: false, ausschluss: ['über Budget'], kostenbasis: 39140 })
     expect(w.empfehlungId).toBe('angebot-b')
     // ohne K.-o. nur ein Hinweis
     p.wirtschaftlichkeit.budgetAlsKo = false
-    const hinweis = werteAus(p, abcKosten())
+    const hinweis = werteAus(p)
     expect(hinweis.empfehlungId).toBe('angebot-a')
     expect(hinweis.befunde.filter((b) => b.code === 'N2').map((b) => b.text.replace(/\s/g, ' '))).toEqual(['Anbieter A: über Budget (39.140 € statt höchstens 35.000 €).'])
   })
 
   it('rechnet € je Nutzwertpunkt und lässt ihn bei Nutzwert 0 offen (N7)', () => {
-    const w = werteAus(abcProjekt(), abcKosten())
+    const w = werteAus(abcProjekt())
     expect(w.ergebnisse[0].euroJePunkt).toBeCloseTo(5361.643836, 5)
     expect(w.ergebnisse[1].euroJePunkt).toBeCloseTo(4305.555556, 5)
     const null0 = abcProjekt().angebote.map((a) => ({ ...a, bewertungen: {} }))
@@ -107,7 +107,7 @@ describe('Nutzwertanalyse mit K.-o.-Prüfung (N1 bis N7)', () => {
     const p = abcProjekt()
     p.wirtschaftlichkeit.kostenbasis = 'barwert'
     expect(kostenbasisVon(abcKosten().get('angebot-a')!, 'barwert')).toBeNull()
-    expect(werteAus(p, abcKosten()).befunde.filter((b) => b.code === 'K8').map((b) => b.schwere)).toEqual(['fehler'])
+    expect(werteAus(p).befunde.filter((b) => b.code === 'K8').map((b) => b.schwere)).toEqual(['fehler'])
     const mitBarwert = new Map([...abcKosten()].map(([id, k]) => [id, { ...k, barwert: k.tco - 1000 }]))
     expect(werteAus(p, mitBarwert).ergebnisse[0].kostenbasis).toBe(38140)
   })
@@ -126,7 +126,7 @@ describe('Entscheidungsregeln (D1 bis D3)', () => {
   it('empfiehlt nach Preis-Leistung das Angebot mit den wenigsten € je Punkt (T-R2)', () => {
     const p = abcProjekt()
     p.entscheidung.regel = 'preis_leistung'
-    const w = werteAus(p, abcKosten())
+    const w = werteAus(p)
     expect(w.empfehlungId).toBe('angebot-b')
     expect(w.ergebnisse.map((r) => r.rang)).toEqual([2, 1, null])
   })
@@ -135,11 +135,11 @@ describe('Entscheidungsregeln (D1 bis D3)', () => {
     const p = abcProjekt()
     p.entscheidung.regel = 'preis_leistung'
     p.entscheidung.mindestNutzwert = 7.25
-    const w = werteAus(p, abcKosten())
+    const w = werteAus(p)
     expect(w.empfehlungId).toBe('angebot-a')
     expect(w.ergebnisse.map((r) => r.rang)).toEqual([1, null, null])
     p.entscheidung.mindestNutzwert = 9
-    const keins = werteAus(p, abcKosten())
+    const keins = werteAus(p)
     expect(keins.empfehlungId).toBeNull()
     expect(keins.befunde.find((b) => b.code === 'D2')).toMatchObject({ schwere: 'warnung', text: 'Kein Angebot erreicht den Mindestnutzwert.' })
   })
@@ -147,7 +147,7 @@ describe('Entscheidungsregeln (D1 bis D3)', () => {
   it('gibt ohne gültiges Angebot keine Empfehlung (T-R4)', () => {
     let p = mitBewertung(abcProjekt(), 'angebot-a', 'eigene:f-03', { ko: 'nicht_erfuellt' })
     p = mitBewertung(p, 'angebot-b', 'eigene:f-03', { ko: 'nicht_erfuellt' })
-    const w = werteAus(p, abcKosten())
+    const w = werteAus(p)
     expect(w.empfehlungId).toBeNull()
     expect(w.befunde.find((b) => b.code === 'D3')).toMatchObject({ schwere: 'fehler', text: 'Kein Angebot erfüllt alle Muss-Kriterien.' })
     expect(w.stabilitaet).toEqual([])
@@ -156,7 +156,7 @@ describe('Entscheidungsregeln (D1 bis D3)', () => {
   it('gibt bei fehlerhaften Gewichten keine Empfehlung', () => {
     const p = abcProjekt()
     p.gewichtung.direktProzent = { funktion: 50, betrieb: 30, anbieter: 10 }
-    const w = werteAus(p, abcKosten())
+    const w = werteAus(p)
     expect(w.empfehlungId).toBeNull()
     expect(w.ergebnisse.every((r) => r.rang === null)).toBe(true)
     expect(w.befunde[0]).toMatchObject({ code: 'G2', text: 'Summe ist 90 %' })

@@ -6,7 +6,7 @@
 import { ermittleMedienbrueche } from '../lastenheft/schnittstellen'
 import { aufgabenImUmfang } from '../lastenheft/umfang'
 import type { Befund, Ende, Mengengeruest, RollenMenge } from '../modell/ergebnisse'
-import type { Rahmen, Umfang } from '../modell/typen'
+import type { ProzessQuelle, Rahmen, Umfang } from '../modell/typen'
 import type { PlId, PlProjekt, PlProzess } from './format'
 import { berechneHaeufigkeiten } from './haeufigkeit'
 import { aufgabenVon, grundlageVon, rolleVon } from './struktur'
@@ -85,4 +85,9 @@ export function berechneMengengeruest(projekt: PlProjekt, umfang: Umfang, rahmen
     datenbestand: vorgaengeProJahr * rahmen.richtwerte.aufbewahrungJahre,
     befunde,
   }
+}
+
+/** Mengengerüst des Auswahl-Projekts; ohne Prozessmodell oder Umfang null. */
+export function mengengeruestVon(p: { prozess: ProzessQuelle | null; umfang: Umfang | null; rahmen: Rahmen }): Mengengeruest | null {
+  return p.prozess && p.umfang ? berechneMengengeruest(p.prozess.projekt, p.umfang, p.rahmen) : null
 }

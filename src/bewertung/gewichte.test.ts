@@ -1,10 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import abcDatei from '../../testdaten/bewertung-abc.auswahllotse?raw'
+import { begruendungsSaetze } from '../entscheidung/begruendung'
 import { abgeleitet } from '../lastenheft/ableitung'
 import { leseProjektText } from '../modell/speicher'
 import type { Anforderung, AuswahlProjekt, Gewichtung } from '../modell/typen'
 import { abcProjekt } from '../testhilfen/abc'
 import { lieferdienstAuswahl } from '../testhilfen/projekte'
+import { werteAus } from './auswertung'
 import { aufHundertBringen, berechneGewichte, gleichVerteilen, globaleGewichte, groessterRest, hauptkriterien } from './gewichte'
 import { legeFest, setzeBewertung, setzeBudget, setzeBudgetAlsKo, setzeDirektAlle, setzeDirektProzent, setzeMethode, setzeMindestNutzwert, setzePaarurteil, setzeRegel } from './operationen'
 
@@ -112,8 +114,10 @@ describe('Festlegen und Änderungen nach Bewertungsbeginn (G5, T-G4)', () => {
     expect(p.gewichtung.festgelegtAm).toBe('2026-11-12T08:00:00.000Z')
     p = setzeBewertung(p, 'angebot-a', 'eigene:f-01', { punkte: 7 }, '2026-11-12T09:00:00.000Z')
     expect(p.bewertungBegonnenAm).toBe('2026-11-12T09:00:00.000Z')
-    p = setzeDirektProzent(p, 'funktion', 50)
+    p = setzeDirektAlle(p, { funktion: 50, betrieb: 30, anbieter: 20 })
     expect(p.gewichtung.aenderungenNachBewertung).toBe(1)
+    // Satz 8 des Begründungsentwurfs (6.13)
+    expect(begruendungsSaetze(p, werteAus(p))).toContain('Hinweis: Gewichte oder Regel wurden nach Beginn der Bewertung 1-mal geändert.')
   })
 
   it('zählt Methode, Paarurteile, Regel, Mindestnutzwert und Budget, aber keine Wiederholungen desselben Werts', () => {

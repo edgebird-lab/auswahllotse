@@ -1,17 +1,18 @@
 /**
  * Gesamtauswertung (Spezifikation 4.4 `Auswertung`): Gewichte, K.-o.,
  * Nutzwert, Rang, Empfehlung, „vorläufig“ und Sensitivität aus einem
- * Projekt. Die Kosten je Angebot kommen von außen (Phase 5, kosten.ts);
- * so bleibt diese Rechnung unabhängig vom Kostenmodell.
+ * Projekt. Die Kosten je Angebot rechnet kosten.ts (K1 bis K7); Tests können
+ * sie auch von außen vorgeben.
  */
 import type { Auswertung, Befund, KostenErgebnis } from '../modell/ergebnisse'
 import type { AuswahlProjekt, Id } from '../modell/typen'
 import { rangfolge } from '../entscheidung/regel'
+import { kostenJeAngebot, pruefeKosten } from '../kosten/kosten'
 import { berechneGewichte, globaleGewichte, hauptkriterien } from './gewichte'
 import { bewerteAngebote, istVorlaeufig } from './nutzwert'
 import { berechneSensitivitaet } from './sensitivitaet'
 
-export function werteAus(projekt: AuswahlProjekt, kosten: ReadonlyMap<Id, KostenErgebnis>): Auswertung {
+export function werteAus(projekt: AuswahlProjekt, kosten: ReadonlyMap<Id, KostenErgebnis> = kostenJeAngebot(projekt)): Auswertung {
   const { haupt } = hauptkriterien(projekt.anforderungen)
   const gewichtung = berechneGewichte(projekt.gewichtung, haupt)
   const unterpunkte = globaleGewichte(projekt.anforderungen, gewichtung.gewichte)
@@ -23,7 +24,7 @@ export function werteAus(projekt: AuswahlProjekt, kosten: ReadonlyMap<Id, Kosten
     kosten,
     wirtschaftlichkeit: projekt.wirtschaftlichkeit,
   })
-  befunde.push(...nutzwert.befunde)
+  befunde.push(...nutzwert.befunde, ...pruefeKosten(projekt))
 
   // Ohne gültige Gewichte gibt es keinen Nutzwert, also weder Rang noch Empfehlung.
   const gewichteFehlen = befunde.some((b) => b.schwere === 'fehler' && b.code.startsWith('G'))

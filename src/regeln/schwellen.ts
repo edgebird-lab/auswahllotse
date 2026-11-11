@@ -35,6 +35,10 @@ export const JAHRE_MAX = 10
 export const STUNDENSATZ_OHNE_MODELL = 45
 /** Stunden je Personentag ohne Prozessmodell. */
 export const STUNDEN_PRO_PERSONENTAG_STANDARD = 8
+/** K9: kleinster Kalkulationszins in Prozent; für die Preissteigerung gilt dieselbe Grenze (U35). */
+export const PROZENT_MIN = -50
+/** Lizenzbedarf ohne Prozessmodell (neues Projekt). */
+export const BENUTZER_STANDARD = 1
 
 /** Richtwerte für Anforderungstexte (4.2). */
 export const RICHTWERTE_STANDARD = {

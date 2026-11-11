@@ -2,7 +2,7 @@
 
 Checkliste aller Phasen und Schritte aus [spezifikation.md](spezifikation.md), Abschnitt 11. Nach jedem Schritt aktualisieren, damit ein Nachfolger hier weitermachen kann. Annahmen stehen in [entscheidungen.md](entscheidungen.md).
 
-Letzte Aktualisierung: 11.11.2026, nach Phase 4
+Letzte Aktualisierung: 11.11.2026, nach Phase 5
 
 ## Phase 0 – Einrichten
 
@@ -44,10 +44,10 @@ Letzte Aktualisierung: 11.11.2026, nach Phase 4
 
 ## Phase 5 – Kosten und Entscheidung
 
-- [ ] **5.1** Gesamtkosten K1 bis K4 (T-K1, T-K2). Hinweis: `werteAus(projekt, kosten)` erwartet die Kosten je Angebot als Map; die ABC-Tests nutzen bis dahin von Hand gerechnete Werte (`testhilfen/abc.ts`), die `kosten.ts` dann aus `testdaten/bewertung-abc.auswahllotse` nachrechnen soll. K8 (Kostenbasis, „Zins fehlt“) steht schon in `nutzwert.ts`.
-- [ ] **5.2** Barwert, Kapitalwert, Amortisation, Prüfungen, Vorschläge K5 bis K10 (T-K3 bis T-K7)
-- [ ] **5.3** Entscheidungsregeln und Begründungsentwurf 6.12, 6.13 (T-R1 bis T-R5). **Teilweise:** D1 bis D3 stehen in `entscheidung/regel.ts`, T-R2 bis T-R4 grün. Offen: D4, D5, `begruendung.ts` (6.13), T-R1, T-R5, Satz 8 aus T-G4.
-- [ ] **5.4** Fallbeispiel „Lieferdienst sucht Warenwirtschaft“ mit drei erfundenen Angeboten (T-B1)
+- [x] **5.1** `kosten/kosten.ts`: K1 bis K4 mit Preissteigerung; `werteAus(projekt)` rechnet die Kosten selbst (T-K1, T-K2 grün; dazu B und C des Beispiels ABC)
+- [x] **5.2** K5 bis K7 (Barwert, Kapitalwert, Amortisation), K9 in `pruefeKosten`, Vorschläge K10 und Standardwerte aus dem Modell in `kosten/vorschlaege.ts` (T-K3 bis T-K7 grün)
+- [x] **5.3** `entscheidung/begruendung.ts` (Sätze 1 bis 9), `entscheidung/entscheidung.ts` (D4, D5, Wahl, Risiken, Status), `entscheidung/gesamt.ts` (alle Ergebnisse und Befunde für die Oberfläche) (T-R1 bis T-R5 grün, Satz 8 in T-G4)
+- [x] **5.4** Fallbeispiel `testdaten/beispiel-lieferdienst.auswahllotse` aus `testhilfen/fallbeispiel.ts` (Anbieter Nord, Süd, West); die App lädt es über `beispiel/beispiel.ts`; README-Abschnitt mit den Zahlen (T-B1 grün, prüft auch die README)
 
 ## Phase 6 – Oberfläche
 
@@ -85,6 +85,6 @@ Letzte Aktualisierung: 11.11.2026, nach Phase 4
 
 - **Repo:** Lokal liegen alle Commits auf `main`. Das private GitHub-Repo `edgebird-lab/auswahllotse` ist noch nicht angelegt, weil die Rechteprüfung der Sitzung `gh repo create` abgelehnt hat. Sobald Robin es anlegt oder freigibt: `gh repo create edgebird-lab/auswahllotse --private --source . --remote origin` und `git push -u origin main`; danach den ersten CI-Lauf prüfen (Schritt 0.3).
 - **Prüfen vor jedem Commit:** `npm run lint`, `npm test`, `npm run build`, `npm run e2e` (Edge, Port 4183 fest).
-- **Nächster Schritt:** Phase 5. `src/kosten/kosten.ts` mit K1 bis K10 schreiben und in `werteAus` einspeisen (Map je Angebot); `testhilfen/abc.ts` → `abcKosten()` durch die echte Rechnung ersetzen. Danach `entscheidung/begruendung.ts` (6.13) und das Fallbeispiel (5.4).
+- **Nächster Schritt:** Phase 6, Oberfläche. Alle Zahlen und Befunde liefert `berechneGesamt(projekt)` aus `entscheidung/gesamt.ts`.
 - **Bausteine der Fachlogik:** Einlesen `prozessdatei/einlesen.ts` → `lastenheft/abgleich.ts` (`liesProzessEin`, `ohneProzessmodell`, `gleicheAb`) → Prüfungen `lastenheft/pruefung.ts` → Bewertung `bewertung/auswertung.ts` (`werteAus`). Alle Funktionen sind rein und geben neue Objekte zurück; die Oberfläche (Phase 6) braucht nur noch Zustand, Plattform und Darstellung.
 - **Testhilfen:** `src/testhilfen/` (Testdateien per `?raw`, Testprozesse, Projekte mit Rahmen L, Beispiel ABC).

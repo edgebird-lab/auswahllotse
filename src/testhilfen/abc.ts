@@ -7,6 +7,7 @@
 import type { KostenErgebnis } from '../modell/ergebnisse'
 import { neueKosten, neuesProjekt } from '../modell/projekt'
 import type { Anforderung, Angebot, AuswahlProjekt, Bewertung, Gruppe, Prioritaet } from '../modell/typen'
+import { kostenJeAngebot } from '../kosten/kosten'
 import { PUNKTE_STANDARD } from '../regeln/schwellen'
 
 export const ABC_JETZT = '2026-11-11T10:00:00.000Z'
@@ -86,20 +87,13 @@ export function abcProjekt(): AuswahlProjekt {
   return p
 }
 
-/** Gesamtkosten über 5 Jahre, von Hand nach K1 bis K4 (bis kosten.ts in Phase 5 sie rechnet). */
-function nominal(einmalig: number, laufendJahr: number): KostenErgebnis {
-  return { einmalig, laufend: Array(5).fill(laufendJahr), tco: einmalig + 5 * laufendJahr, barwert: null, kapitalwert: null, amortisationJahr: null }
-}
-
 /**
+ * Kosten der drei Angebote, gerechnet von kosten.ts. Von Hand nach K1 bis K4
+ * (kosten.test.ts prüft genau diese Werte):
  * A: E = 6.000 + 2.000 + 1.500 + 10 · 8 · 45 + 4 · 7 · 45 = 14.360 €;
  * L = 600 + 39 · 7 · 12 + 2 · 12 · 45 = 4.956 €; TCO = 14.360 + 5 · 4.956 = 39.140 €.
  * B: 8.000 + 5 · 4.600 = 31.000 €. C: 5.000 + 5 · 3.000 = 20.000 €.
  */
 export function abcKosten(): Map<string, KostenErgebnis> {
-  return new Map([
-    ['angebot-a', nominal(14360, 4956)],
-    ['angebot-b', nominal(8000, 4600)],
-    ['angebot-c', nominal(5000, 3000)],
-  ])
+  return kostenJeAngebot(abcProjekt())
 }

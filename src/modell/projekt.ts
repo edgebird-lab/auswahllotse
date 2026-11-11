@@ -2,6 +2,7 @@
  * Standardwerte und Grundbausteine des Projekts (Spezifikation 4.2, 5.2).
  */
 import {
+  BENUTZER_STANDARD,
   BETRIEBSTAGE_STANDARD,
   JAHRE_STANDARD,
   MINDESTNUTZWERT_STANDARD,
@@ -73,7 +74,7 @@ export function neuesProjekt(jetzt: string = new Date().toISOString()): AuswahlP
     bewertungBegonnenAm: null,
     wirtschaftlichkeit: {
       jahre: JAHRE_STANDARD,
-      benutzer: 1,
+      benutzer: BENUTZER_STANDARD,
       internerStundensatzEuro: STUNDENSATZ_OHNE_MODELL,
       stundenProPersonentag: STUNDEN_PRO_PERSONENTAG_STANDARD,
       preissteigerungProzent: 0,

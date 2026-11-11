@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type { Stabilitaet } from '../modell/ergebnisse'
 import type { AuswahlProjekt } from '../modell/typen'
 import { normalisiereLeerraum } from '../modell/zahlformat'
-import { abcKosten, abcProjekt } from '../testhilfen/abc'
+import { abcProjekt } from '../testhilfen/abc'
 import { werteAus } from './auswertung'
 import { stabilitaetText } from './sensitivitaet'
 
@@ -16,7 +16,7 @@ function erwarte(s: Stabilitaet | undefined, von: number, bis: number, abstand: 
 }
 
 const stabil = (p: AuswahlProjekt) => {
-  const w = werteAus(p, abcKosten())
+  const w = werteAus(p)
   return { w, nach: (g: string) => w.stabilitaet.find((s) => s.gruppe === g) }
 }
 

@@ -1,0 +1,2604 @@
+{
+  "app": "auswahllotse",
+  "formatVersion": 1,
+  "id": "beispiel-lieferdienst",
+  "angelegtAm": "2026-10-15T09:00:00.000Z",
+  "geaendertAm": "2026-11-10T16:00:00.000Z",
+  "rahmen": {
+    "vorhaben": "Neue Warenwirtschaft",
+    "betrieb": "Lieferdienst Beispiel GmbH",
+    "ersteller": "Muster-Beratung",
+    "softwareart": "erp",
+    "personenbezogen": "ja",
+    "steuerrelevant": "ja",
+    "betriebsform": "cloud",
+    "verbraucherverkauf": "nein",
+    "kleinstunternehmen": "nein",
+    "betriebstageProJahr": 250,
+    "spitzenfaktor": 2,
+    "richtwerte": {
+      "antwortzeitSek": 2,
+      "aufbewahrungJahre": 10,
+      "wiederherstellungStunden": 24,
+      "verfuegbarkeitProzent": 99.5,
+      "reaktionStunden": 4,
+      "referenzen": 2,
+      "einfuehrungWochen": 12
+    }
+  },
+  "prozess": {
+    "dateiname": "lieferdienst.prozesslotse",
+    "dateiart": "json",
+    "formatVersionGelesen": 3,
+    "exporterVersion": null,
+    "sha256": "3e300804605ec4d80f7789e4323aae8b2b7806519c21c074fbf7c7653f5fce8c",
+    "eingelesenAm": "2026-10-15T09:05:00.000Z",
+    "projekt": {
+      "formatVersion": 3,
+      "ist": {
+        "id": "pro_lieferdienst",
+        "name": "Bestellung bis Rechnung (Lieferdienst)",
+        "beschreibung": "Ein regionaler Lieferdienst nimmt Bestellungen telefonisch an, liefert am Folgetag aus und stellt danach die Rechnung.",
+        "ausloeser": {
+          "art": "nachricht",
+          "text": "Kunde bestellt telefonisch",
+          "von": "tln_kunde"
+        },
+        "ergebnis": "Ware zugestellt und berechnet",
+        "vorgaengeProTag": 120,
+        "arbeitsstundenProTag": 8,
+        "rollen": [
+          {
+            "id": "rol_innendienst",
+            "name": "Innendienst",
+            "stundensatz": 38,
+            "personen": 4,
+            "verfuegbarProzent": 100
+          },
+          {
+            "id": "rol_lager",
+            "name": "Lager",
+            "stundensatz": 34,
+            "personen": 5,
+            "verfuegbarProzent": 100
+          },
+          {
+            "id": "rol_disposition",
+            "name": "Disposition",
+            "stundensatz": 45,
+            "personen": 1,
+            "verfuegbarProzent": 100
+          },
+          {
+            "id": "rol_fahrer",
+            "name": "Fahrer",
+            "stundensatz": 32,
+            "personen": 6,
+            "verfuegbarProzent": 100
+          },
+          {
+            "id": "rol_buchhaltung",
+            "name": "Buchhaltung",
+            "stundensatz": 48,
+            "personen": 1,
+            "verfuegbarProzent": 60
+          },
+          {
+            "id": "rol_leitung",
+            "name": "Niederlassungsleitung",
+            "stundensatz": 65,
+            "personen": 1,
+            "verfuegbarProzent": 25
+          }
+        ],
+        "medien": [
+          {
+            "id": "med_papier",
+            "name": "Papier",
+            "art": "papier"
+          },
+          {
+            "id": "med_telefon",
+            "name": "Telefon",
+            "art": "telefon"
+          },
+          {
+            "id": "med_excel",
+            "name": "Excel-Tourenliste",
+            "art": "tabelle"
+          },
+          {
+            "id": "med_erp",
+            "name": "Warenwirtschaft",
+            "art": "erp"
+          }
+        ],
+        "teilnehmer": [
+          {
+            "id": "tln_kunde",
+            "name": "Kunde"
+          }
+        ],
+        "ablauf": {
+          "id": "haupt",
+          "schritte": [
+            {
+              "typ": "aufgabe",
+              "id": "auf_annehmen",
+              "name": "Bestellung telefonisch annehmen",
+              "rolleId": "rol_innendienst",
+              "mediumId": "med_papier",
+              "bearbeitungMin": 6,
+              "liegezeitMin": 0,
+              "art": "normal",
+              "freigabeQuote": 0.9,
+              "brauchtVorgaenger": null,
+              "uebertragung": null,
+              "nachrichtAn": null,
+              "nachrichtVon": null
+            },
+            {
+              "typ": "aufgabe",
+              "id": "auf_erfassen",
+              "name": "Bestellung in Warenwirtschaft erfassen",
+              "rolleId": "rol_innendienst",
+              "mediumId": "med_erp",
+              "bearbeitungMin": 4,
+              "liegezeitMin": 90,
+              "art": "normal",
+              "freigabeQuote": 0.9,
+              "brauchtVorgaenger": true,
+              "uebertragung": {
+                "quelleMediumId": "med_papier",
+                "minuten": 3
+              },
+              "nachrichtAn": null,
+              "nachrichtVon": null
+            },
+            {
+              "typ": "entscheidung",
+              "id": "ent_vorrat",
+              "art": "daten",
+              "frage": "Ware vorrätig?",
+              "zweige": [
+                {
+                  "id": "zw_vorrat_ja",
+                  "bezeichnung": "Ja",
+                  "anteil": 0.92,
+                  "schritte": [],
+                  "ende": null,
+                  "zurueckZu": null,
+                  "ereignis": null
+                },
+                {
+                  "id": "zw_vorrat_nein",
+                  "bezeichnung": "Nein",
+                  "anteil": 0.08,
+                  "schritte": [
+                    {
+                      "typ": "aufgabe",
+                      "id": "auf_ersatz",
+                      "name": "Kunden anrufen und Ersatz anbieten",
+                      "rolleId": "rol_innendienst",
+                      "mediumId": "med_telefon",
+                      "bearbeitungMin": 5,
+                      "liegezeitMin": 60,
+                      "art": "normal",
+                      "freigabeQuote": 0.9,
+                      "brauchtVorgaenger": true,
+                      "uebertragung": null,
+                      "nachrichtAn": null,
+                      "nachrichtVon": null
+                    },
+                    {
+                      "typ": "entscheidung",
+                      "id": "ent_ersatz",
+                      "art": "daten",
+                      "frage": "Ersatz angenommen?",
+                      "zweige": [
+                        {
+                          "id": "zw_ersatz_ja",
+                          "bezeichnung": "Ja",
+                          "anteil": 0.7,
+                          "schritte": [
+                            {
+                              "typ": "aufgabe",
+                              "id": "auf_aendern",
+                              "name": "Bestellung ändern",
+                              "rolleId": "rol_innendienst",
+                              "mediumId": "med_erp",
+                              "bearbeitungMin": 3,
+                              "liegezeitMin": 0,
+                              "art": "normal",
+                              "freigabeQuote": 0.9,
+                              "brauchtVorgaenger": true,
+                              "uebertragung": null,
+                              "nachrichtAn": null,
+                              "nachrichtVon": null
+                            }
+                          ],
+                          "ende": null,
+                          "zurueckZu": null,
+                          "ereignis": null
+                        },
+                        {
+                          "id": "zw_ersatz_nein",
+                          "bezeichnung": "Nein",
+                          "anteil": 0.3,
+                          "schritte": [
+                            {
+                              "typ": "aufgabe",
+                              "id": "auf_stornieren",
+                              "name": "Bestellung stornieren",
+                              "rolleId": "rol_innendienst",
+                              "mediumId": "med_erp",
+                              "bearbeitungMin": 2,
+                              "liegezeitMin": 0,
+                              "art": "normal",
+                              "freigabeQuote": 0.9,
+                              "brauchtVorgaenger": true,
+                              "uebertragung": null,
+                              "nachrichtAn": null,
+                              "nachrichtVon": null
+                            }
+                          ],
+                          "ende": "Bestellung storniert",
+                          "zurueckZu": null,
+                          "ereignis": null
+                        }
+                      ]
+                    }
+                  ],
+                  "ende": null,
+                  "zurueckZu": null,
+                  "ereignis": null
+                }
+              ]
+            },
+            {
+              "typ": "wiederholung",
+              "id": "wdh_kommission",
+              "modus": "anteil",
+              "zweck": "nacharbeit",
+              "frage": "Fehler gefunden?",
+              "anteilWiederholung": 0.2,
+              "koerper": {
+                "id": "seq_kommission",
+                "schritte": [
+                  {
+                    "typ": "aufgabe",
+                    "id": "auf_kommissionieren",
+                    "name": "Ware kommissionieren",
+                    "rolleId": "rol_lager",
+                    "mediumId": "med_papier",
+                    "bearbeitungMin": 8,
+                    "liegezeitMin": 120,
+                    "art": "normal",
+                    "freigabeQuote": 0.9,
+                    "brauchtVorgaenger": null,
+                    "uebertragung": null,
+                    "nachrichtAn": null,
+                    "nachrichtVon": null
+                  },
+                  {
+                    "typ": "aufgabe",
+                    "id": "auf_kontrollieren",
+                    "name": "Kommissionierung kontrollieren",
+                    "rolleId": "rol_lager",
+                    "mediumId": "med_papier",
+                    "bearbeitungMin": 2,
+                    "liegezeitMin": 15,
+                    "art": "pruefung",
+                    "freigabeQuote": 0.9,
+                    "brauchtVorgaenger": true,
+                    "uebertragung": null,
+                    "nachrichtAn": null,
+                    "nachrichtVon": null
+                  }
+                ]
+              }
+            },
+            {
+              "typ": "aufgabe",
+              "id": "auf_tour",
+              "name": "Tour planen",
+              "rolleId": "rol_disposition",
+              "mediumId": "med_excel",
+              "bearbeitungMin": 1.5,
+              "liegezeitMin": 240,
+              "art": "normal",
+              "freigabeQuote": 0.9,
+              "brauchtVorgaenger": false,
+              "uebertragung": {
+                "quelleMediumId": "med_erp",
+                "minuten": 1
+              },
+              "nachrichtAn": null,
+              "nachrichtVon": null
+            },
+            {
+              "typ": "aufgabe",
+              "id": "auf_verladen",
+              "name": "Ware verladen",
+              "rolleId": "rol_lager",
+              "mediumId": "med_papier",
+              "bearbeitungMin": 3,
+              "liegezeitMin": 480,
+              "art": "normal",
+              "freigabeQuote": 0.9,
+              "brauchtVorgaenger": true,
+              "uebertragung": null,
+              "nachrichtAn": null,
+              "nachrichtVon": null
+            },
+            {
+              "typ": "aufgabe",
+              "id": "auf_ausliefern",
+              "name": "Ware ausliefern",
+              "rolleId": "rol_fahrer",
+              "mediumId": "med_papier",
+              "bearbeitungMin": 12,
+              "liegezeitMin": 180,
+              "art": "normal",
+              "freigabeQuote": 0.9,
+              "brauchtVorgaenger": true,
+              "uebertragung": null,
+              "nachrichtAn": null,
+              "nachrichtVon": null
+            },
+            {
+              "typ": "entscheidung",
+              "id": "ent_angetroffen",
+              "art": "daten",
+              "frage": "Kunde angetroffen?",
+              "zweige": [
+                {
+                  "id": "zw_angetroffen_ja",
+                  "bezeichnung": "Ja",
+                  "anteil": 0.9,
+                  "schritte": [
+                    {
+                      "typ": "aufgabe",
+                      "id": "auf_quittieren",
+                      "name": "Empfang quittieren lassen",
+                      "rolleId": "rol_fahrer",
+                      "mediumId": "med_papier",
+                      "bearbeitungMin": 2,
+                      "liegezeitMin": 0,
+                      "art": "normal",
+                      "freigabeQuote": 0.9,
+                      "brauchtVorgaenger": true,
+                      "uebertragung": null,
+                      "nachrichtAn": null,
+                      "nachrichtVon": null
+                    }
+                  ],
+                  "ende": null,
+                  "zurueckZu": null,
+                  "ereignis": null
+                },
+                {
+                  "id": "zw_angetroffen_nein",
+                  "bezeichnung": "Nein",
+                  "anteil": 0.1,
+                  "schritte": [
+                    {
+                      "typ": "aufgabe",
+                      "id": "auf_benachrichtigen",
+                      "name": "Benachrichtigung hinterlassen",
+                      "rolleId": "rol_fahrer",
+                      "mediumId": "med_papier",
+                      "bearbeitungMin": 1,
+                      "liegezeitMin": 0,
+                      "art": "normal",
+                      "freigabeQuote": 0.9,
+                      "brauchtVorgaenger": true,
+                      "uebertragung": null,
+                      "nachrichtAn": "tln_kunde",
+                      "nachrichtVon": null
+                    },
+                    {
+                      "typ": "warten",
+                      "id": "wrt_termin",
+                      "name": "Neuen Liefertermin abwarten",
+                      "art": "nachricht",
+                      "dauerMin": 480,
+                      "von": "tln_kunde"
+                    },
+                    {
+                      "typ": "aufgabe",
+                      "id": "auf_erneut",
+                      "name": "Ware erneut zustellen",
+                      "rolleId": "rol_fahrer",
+                      "mediumId": "med_papier",
+                      "bearbeitungMin": 12,
+                      "liegezeitMin": 120,
+                      "art": "normal",
+                      "freigabeQuote": 0.9,
+                      "brauchtVorgaenger": true,
+                      "uebertragung": null,
+                      "nachrichtAn": null,
+                      "nachrichtVon": null
+                    }
+                  ],
+                  "ende": null,
+                  "zurueckZu": null,
+                  "ereignis": null
+                }
+              ]
+            },
+            {
+              "typ": "aufgabe",
+              "id": "auf_abgeben",
+              "name": "Lieferscheine abgeben",
+              "rolleId": "rol_fahrer",
+              "mediumId": "med_papier",
+              "bearbeitungMin": 1,
+              "liegezeitMin": 300,
+              "art": "normal",
+              "freigabeQuote": 0.9,
+              "brauchtVorgaenger": true,
+              "uebertragung": null,
+              "nachrichtAn": null,
+              "nachrichtVon": null
+            },
+            {
+              "typ": "aufgabe",
+              "id": "auf_bestaetigen",
+              "name": "Zustellung im System bestätigen",
+              "rolleId": "rol_disposition",
+              "mediumId": "med_erp",
+              "bearbeitungMin": 1.5,
+              "liegezeitMin": 240,
+              "art": "normal",
+              "freigabeQuote": 0.9,
+              "brauchtVorgaenger": true,
+              "uebertragung": {
+                "quelleMediumId": "med_papier",
+                "minuten": 1
+              },
+              "nachrichtAn": null,
+              "nachrichtVon": null
+            },
+            {
+              "typ": "aufgabe",
+              "id": "auf_rechnung",
+              "name": "Rechnung erstellen",
+              "rolleId": "rol_buchhaltung",
+              "mediumId": "med_erp",
+              "bearbeitungMin": 1.5,
+              "liegezeitMin": 480,
+              "art": "normal",
+              "freigabeQuote": 0.9,
+              "brauchtVorgaenger": true,
+              "uebertragung": null,
+              "nachrichtAn": null,
+              "nachrichtVon": null
+            },
+            {
+              "typ": "aufgabe",
+              "id": "auf_freigeben",
+              "name": "Rechnung freigeben",
+              "rolleId": "rol_leitung",
+              "mediumId": "med_erp",
+              "bearbeitungMin": 1,
+              "liegezeitMin": 960,
+              "art": "freigabe",
+              "freigabeQuote": 0.98,
+              "brauchtVorgaenger": true,
+              "uebertragung": null,
+              "nachrichtAn": null,
+              "nachrichtVon": null
+            },
+            {
+              "typ": "aufgabe",
+              "id": "auf_versenden",
+              "name": "Rechnung versenden",
+              "rolleId": "rol_buchhaltung",
+              "mediumId": "med_erp",
+              "bearbeitungMin": 0.5,
+              "liegezeitMin": 60,
+              "art": "normal",
+              "freigabeQuote": 0.9,
+              "brauchtVorgaenger": true,
+              "uebertragung": null,
+              "nachrichtAn": "tln_kunde",
+              "nachrichtVon": null
+            }
+          ]
+        }
+      },
+      "soll": null,
+      "massnahmen": [],
+      "verworfen": []
+    }
+  },
+  "umfang": {
+    "grundlage": "ist",
+    "medien": {
+      "med_papier": "unberuehrt",
+      "med_telefon": "unberuehrt",
+      "med_excel": "abloesen",
+      "med_erp": "abloesen"
+    },
+    "aufgabenAus": [],
+    "aufgabenEin": []
+  },
+  "anforderungen": [
+    {
+      "id": "aufgabe:auf_erfassen",
+      "nummer": "F-01",
+      "gruppe": "funktion",
+      "titel": "Bestellung in Warenwirtschaft erfassen",
+      "text": "Die Software muss die Aufgabe „Bestellung in Warenwirtschaft erfassen“ für die Rolle Innendienst unterstützen.",
+      "abnahme": "Test mit Beispieldaten: Eine Person der Rolle Innendienst erledigt „Bestellung in Warenwirtschaft erfassen“ vollständig in der Software, ohne Daten abzutippen, in höchstens 4 Minuten.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "aufgabe",
+        "bezuege": [
+          "auf_erfassen",
+          "rol_innendienst",
+          "med_erp"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Aus dem Prozessmodell: 120 Ausführungen pro Tag, heute mit „Warenwirtschaft“.",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "aufgabe:auf_aendern",
+      "nummer": "F-02",
+      "gruppe": "funktion",
+      "titel": "Bestellung ändern",
+      "text": "Die Software sollte die Aufgabe „Bestellung ändern“ für die Rolle Innendienst unterstützen.",
+      "abnahme": "Test mit Beispieldaten: Eine Person der Rolle Innendienst erledigt „Bestellung ändern“ vollständig in der Software, ohne Daten abzutippen, in höchstens 3 Minuten.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "aufgabe",
+        "bezuege": [
+          "auf_aendern",
+          "rol_innendienst",
+          "med_erp"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Aus dem Prozessmodell: 6,7 Ausführungen pro Tag, heute mit „Warenwirtschaft“.",
+      "quelle": null,
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "aufgabe:auf_stornieren",
+      "nummer": "F-03",
+      "gruppe": "funktion",
+      "titel": "Bestellung stornieren",
+      "text": "Die Software sollte die Aufgabe „Bestellung stornieren“ für die Rolle Innendienst unterstützen.",
+      "abnahme": "Test mit Beispieldaten: Eine Person der Rolle Innendienst erledigt „Bestellung stornieren“ vollständig in der Software, ohne Daten abzutippen, in höchstens 2 Minuten.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "aufgabe",
+        "bezuege": [
+          "auf_stornieren",
+          "rol_innendienst",
+          "med_erp"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Aus dem Prozessmodell: 2,9 Ausführungen pro Tag, heute mit „Warenwirtschaft“.",
+      "quelle": null,
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "aufgabe:auf_tour",
+      "nummer": "F-04",
+      "gruppe": "funktion",
+      "titel": "Tour planen",
+      "text": "Die Software muss die Aufgabe „Tour planen“ für die Rolle Disposition unterstützen.",
+      "abnahme": "Test mit Beispieldaten: Eine Person der Rolle Disposition erledigt „Tour planen“ vollständig in der Software, ohne Daten abzutippen, in höchstens 1,5 Minuten.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "aufgabe",
+        "bezuege": [
+          "auf_tour",
+          "rol_disposition",
+          "med_excel"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Aus dem Prozessmodell: 117 Ausführungen pro Tag, heute mit „Excel-Tourenliste“.",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "aufgabe:auf_bestaetigen",
+      "nummer": "F-05",
+      "gruppe": "funktion",
+      "titel": "Zustellung im System bestätigen",
+      "text": "Die Software muss die Aufgabe „Zustellung im System bestätigen“ für die Rolle Disposition unterstützen.",
+      "abnahme": "Test mit Beispieldaten: Eine Person der Rolle Disposition erledigt „Zustellung im System bestätigen“ vollständig in der Software, ohne Daten abzutippen, in höchstens 1,5 Minuten.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "aufgabe",
+        "bezuege": [
+          "auf_bestaetigen",
+          "rol_disposition",
+          "med_erp"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Aus dem Prozessmodell: 117 Ausführungen pro Tag, heute mit „Warenwirtschaft“.",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "aufgabe:auf_rechnung",
+      "nummer": "F-06",
+      "gruppe": "funktion",
+      "titel": "Rechnung erstellen",
+      "text": "Die Software muss die Aufgabe „Rechnung erstellen“ für die Rolle Buchhaltung unterstützen.",
+      "abnahme": "Test mit Beispieldaten: Eine Person der Rolle Buchhaltung erledigt „Rechnung erstellen“ vollständig in der Software, ohne Daten abzutippen, in höchstens 1,5 Minuten.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "aufgabe",
+        "bezuege": [
+          "auf_rechnung",
+          "rol_buchhaltung",
+          "med_erp"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Aus dem Prozessmodell: 117 Ausführungen pro Tag, heute mit „Warenwirtschaft“.",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "aufgabe:auf_freigeben",
+      "nummer": "F-07",
+      "gruppe": "funktion",
+      "titel": "Rechnung freigeben",
+      "text": "Die Software muss die Aufgabe „Rechnung freigeben“ für die Rolle Niederlassungsleitung unterstützen.",
+      "abnahme": "Test mit Beispieldaten: Eine Person der Rolle Niederlassungsleitung erledigt „Rechnung freigeben“ vollständig in der Software, ohne Daten abzutippen, in höchstens 1 Minute.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "aufgabe",
+        "bezuege": [
+          "auf_freigeben",
+          "rol_leitung",
+          "med_erp"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Aus dem Prozessmodell: 117 Ausführungen pro Tag, heute mit „Warenwirtschaft“.",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "aufgabe:auf_versenden",
+      "nummer": "F-08",
+      "gruppe": "funktion",
+      "titel": "Rechnung versenden",
+      "text": "Die Software muss die Aufgabe „Rechnung versenden“ für die Rolle Buchhaltung unterstützen.",
+      "abnahme": "Test mit Beispieldaten: Eine Person der Rolle Buchhaltung erledigt „Rechnung versenden“ vollständig in der Software, ohne Daten abzutippen, in höchstens 0,5 Minuten.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "aufgabe",
+        "bezuege": [
+          "auf_versenden",
+          "rol_buchhaltung",
+          "med_erp"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Aus dem Prozessmodell: 117 Ausführungen pro Tag, heute mit „Warenwirtschaft“.",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "entscheidung:ent_vorrat",
+      "nummer": null,
+      "gruppe": "funktion",
+      "titel": "Ware vorrätig?",
+      "text": "Die Software kann die Angaben für die Entscheidung „Ware vorrätig?“ auf einen Blick zeigen.",
+      "abnahme": "Test: Alle Angaben für „Ware vorrätig?“ stehen auf einer Seite.",
+      "prioritaet": "kann",
+      "prioritaetVorschlag": "kann",
+      "status": "verworfen",
+      "herkunft": {
+        "art": "entscheidung",
+        "bezuege": [
+          "ent_vorrat",
+          "auf_erfassen"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Aus dem Prozessmodell: Entscheidung direkt nach „Bestellung in Warenwirtschaft erfassen“.",
+      "quelle": null,
+      "punkte": 1,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": true
+      },
+      "notiz": "Den Bestand zeigt schon die Bestandsführung (Baustein ERP-2)."
+    },
+    {
+      "id": "baustein:ERP-1",
+      "nummer": "F-09",
+      "gruppe": "funktion",
+      "titel": "Stammdaten an einer Stelle",
+      "text": "Die Software sollte Stammdaten für Kunden, Lieferanten und Artikel an einer Stelle führen und in allen Vorgängen verwenden.",
+      "abnahme": "Vorführung mit Beispieldaten des Betriebs.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "baustein",
+        "bezuege": [],
+        "katalogId": "ERP-1"
+      },
+      "begruendung": "Baustein ERP-1 für ERP-Systeme; Startbestand, bitte prüfen.",
+      "quelle": null,
+      "punkte": 3,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": true
+      },
+      "notiz": ""
+    },
+    {
+      "id": "baustein:ERP-2",
+      "nummer": "F-10",
+      "gruppe": "funktion",
+      "titel": "Bestandsführung je Lagerort",
+      "text": "Die Software sollte Bestände je Lagerort laufend führen; jede Bestandsänderung hat einen Beleg.",
+      "abnahme": "Vorführung mit Beispieldaten des Betriebs.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "baustein",
+        "bezuege": [],
+        "katalogId": "ERP-2"
+      },
+      "begruendung": "Baustein ERP-2 für ERP-Systeme; Startbestand, bitte prüfen.",
+      "quelle": null,
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": true
+      },
+      "notiz": ""
+    },
+    {
+      "id": "baustein:ERP-3",
+      "nummer": "F-11",
+      "gruppe": "funktion",
+      "titel": "Belegkette ohne Neueingabe",
+      "text": "Die Software muss aus einem Auftrag Lieferschein und Rechnung ohne erneute Eingabe erzeugen.",
+      "abnahme": "Vorführung mit Beispieldaten des Betriebs.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "baustein",
+        "bezuege": [],
+        "katalogId": "ERP-3"
+      },
+      "begruendung": "Baustein ERP-3 für ERP-Systeme; Startbestand, bitte prüfen.",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": true,
+        "status": true
+      },
+      "notiz": "Heute wird jede Rechnung aus dem Auftrag abgetippt."
+    },
+    {
+      "id": "baustein:ERP-4",
+      "nummer": "F-12",
+      "gruppe": "funktion",
+      "titel": "E-Rechnung",
+      "text": "Die Software sollte Rechnungen als strukturierte E-Rechnung (XRechnung oder ZUGFeRD) erzeugen und empfangen.",
+      "abnahme": "Vorführung mit Beispieldaten des Betriebs.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "baustein",
+        "bezuege": [],
+        "katalogId": "ERP-4"
+      },
+      "begruendung": "Baustein ERP-4 für ERP-Systeme; Startbestand, bitte prüfen. Hinweis: Gesetzliche Pflichten und Fristen im Projekt prüfen.",
+      "quelle": null,
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": true
+      },
+      "notiz": ""
+    },
+    {
+      "id": "baustein:ERP-6",
+      "nummer": "F-13",
+      "gruppe": "funktion",
+      "titel": "Auswertungen",
+      "text": "Die Software kann Umsatz, Bestand und offene Posten ohne Zusatzprogramm auswerten.",
+      "abnahme": "Vorführung mit Beispieldaten des Betriebs.",
+      "prioritaet": "kann",
+      "prioritaetVorschlag": "kann",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "baustein",
+        "bezuege": [],
+        "katalogId": "ERP-6"
+      },
+      "begruendung": "Baustein ERP-6 für ERP-Systeme; Startbestand, bitte prüfen.",
+      "quelle": null,
+      "punkte": 1,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": true
+      },
+      "notiz": ""
+    },
+    {
+      "id": "medienbruch:med_papier>med_erp",
+      "nummer": "S-01",
+      "gruppe": "schnittstelle",
+      "titel": "Erfassung ohne Papier",
+      "text": "Die Software muss die Erfassung direkt bei der Entstehung ermöglichen, damit niemand Daten von „Papier“ abtippt („Bestellung in Warenwirtschaft erfassen“ und „Zustellung im System bestätigen“).",
+      "abnahme": "Test: „Bestellung in Warenwirtschaft erfassen“ und „Zustellung im System bestätigen“ gelingen ohne Papier- oder Telefonnotiz.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "medienbruch",
+        "bezuege": [
+          "med_papier",
+          "med_erp",
+          "auf_erfassen",
+          "auf_bestaetigen"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Heute 237 Übertragungen und 477 Minuten pro Tag (316 € pro Tag).",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "medienbruch:med_erp>med_excel",
+      "nummer": "S-02",
+      "gruppe": "schnittstelle",
+      "titel": "Datenübernahme aus Warenwirtschaft",
+      "text": "Die Software muss Daten aus „Warenwirtschaft“ ohne erneute Eingabe für „Tour planen“ bereitstellen.",
+      "abnahme": "Test: Daten aus „Warenwirtschaft“ erscheinen in „Tour planen“, ohne sie abzutippen.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "medienbruch",
+        "bezuege": [
+          "med_erp",
+          "med_excel",
+          "auf_tour"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Heute 117 Übertragungen und 117 Minuten pro Tag (88 € pro Tag).",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "baustein:ERP-5",
+      "nummer": "S-03",
+      "gruppe": "schnittstelle",
+      "titel": "Übergabe an die Steuerkanzlei",
+      "text": "Die Software sollte Buchungsdaten an die Steuerkanzlei übergeben, zum Beispiel im DATEV-Format.",
+      "abnahme": "Vorführung mit Beispieldaten des Betriebs.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "baustein",
+        "bezuege": [],
+        "katalogId": "ERP-5"
+      },
+      "begruendung": "Baustein ERP-5 für ERP-Systeme; Startbestand, bitte prüfen.",
+      "quelle": null,
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": true
+      },
+      "notiz": ""
+    },
+    {
+      "id": "rollen",
+      "nummer": "R-01",
+      "gruppe": "benutzer",
+      "titel": "Rollen und Rechte",
+      "text": "Die Software muss 4 Rollen mit eigenen Rechten abbilden: Innendienst (4 Benutzer): „Bestellung in Warenwirtschaft erfassen“, „Bestellung ändern“ und „Bestellung stornieren“; Disposition (1 Benutzer): „Tour planen“ und „Zustellung im System bestätigen“; Buchhaltung (1 Benutzer): „Rechnung erstellen“ und „Rechnung versenden“; Niederlassungsleitung (1 Benutzer): „Rechnung freigeben“.",
+      "abnahme": "Test: Jede Rolle erledigt ihre Aufgaben; Aufgaben anderer Rollen sind gesperrt.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "rollen",
+        "bezuege": [
+          "rol_innendienst",
+          "rol_disposition",
+          "rol_buchhaltung",
+          "rol_leitung"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Aus dem Prozessmodell: 4 Rollen im Umfang, zusammen 7 Benutzer.",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "freigabe:auf_freigeben",
+      "nummer": "R-02",
+      "gruppe": "benutzer",
+      "titel": "Freigabe: Rechnung freigeben",
+      "text": "Die Software muss sicherstellen, dass nur die Rolle Niederlassungsleitung „Rechnung freigeben“ ausführt, und jede Freigabe mit Person und Zeitpunkt protokollieren.",
+      "abnahme": "Test: Eine Person ohne die Rolle Niederlassungsleitung kann nicht freigeben; das Protokoll zeigt Person und Zeitpunkt.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "freigabe",
+        "bezuege": [
+          "auf_freigeben",
+          "rol_leitung"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Aus dem Prozessmodell: Freigabe durch Niederlassungsleitung, 117 pro Tag.",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "menge:vorgaenge",
+      "nummer": "M-01",
+      "gruppe": "menge",
+      "titel": "Vorgänge pro Tag",
+      "text": "Die Software muss 120 Vorgänge pro Tag im Mittel und 240 an starken Tagen verarbeiten (30.000 pro Jahr).",
+      "abnahme": "Referenzbetrieb mit ähnlicher Menge oder Lasttest in der Teststellung.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "mengengeruest",
+        "bezuege": [],
+        "katalogId": null
+      },
+      "begruendung": "Aus dem Prozessmodell: 120 Vorgänge pro Tag, an starken Tagen 2-mal so viele, 250 Betriebstage im Jahr.",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "menge:benutzer",
+      "nummer": "M-02",
+      "gruppe": "menge",
+      "titel": "Benannte Benutzer",
+      "text": "Die Software muss 7 benannte Benutzer zulassen.",
+      "abnahme": "Das Lizenzangebot deckt 7 benannte Benutzer.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "mengengeruest",
+        "bezuege": [
+          "rol_innendienst",
+          "rol_disposition",
+          "rol_buchhaltung",
+          "rol_leitung"
+        ],
+        "katalogId": null
+      },
+      "begruendung": "Aus den Rollen im Umfang: Innendienst 4, Disposition 1, Buchhaltung 1, Niederlassungsleitung 1.",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "menge:antwortzeit",
+      "nummer": "M-03",
+      "gruppe": "menge",
+      "titel": "Antwortzeit",
+      "text": "Die Software sollte Standardaktionen (Öffnen, Speichern, Suchen) bei Spitzenlast in höchstens 2 Sekunden ausführen.",
+      "abnahme": "Messung in der Teststellung: keine von 10 Standardaktionen dauert länger als 2 Sekunden.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "mengengeruest",
+        "bezuege": [],
+        "katalogId": null
+      },
+      "begruendung": "Richtwert aus dem Rahmen.",
+      "quelle": null,
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "menge:datenbestand",
+      "nummer": "M-04",
+      "gruppe": "menge",
+      "titel": "Datenbestand",
+      "text": "Die Software sollte den Datenbestand von 10 Jahren vorhalten, rund 300.000 Vorgänge, und dabei die Antwortzeit einhalten.",
+      "abnahme": "Der Anbieter bestätigt die Antwortzeit bei 300.000 Vorgängen schriftlich.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "mengengeruest",
+        "bezuege": [],
+        "katalogId": null
+      },
+      "begruendung": "30.000 Vorgänge pro Jahr über die Aufbewahrungsdauer (längste Frist nach § 147 Abs. 3 AO).",
+      "quelle": null,
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-DS-1",
+      "nummer": "D-01",
+      "gruppe": "datenschutz",
+      "titel": "Auftragsverarbeitung",
+      "text": "Der Anbieter muss einen Vertrag zur Auftragsverarbeitung nach Art. 28 Abs. 3 DSGVO abschließen. Er legt seine technischen und organisatorischen Maßnahmen offen.",
+      "abnahme": "Unterschriebener Vertrag mit Anlage der Maßnahmen liegt vor Vertragsschluss vor.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-DS-1"
+      },
+      "begruendung": "Katalog N-DS-1: gilt bei Daten über Personen und Betrieb beim Anbieter.",
+      "quelle": "Art. 28 DSGVO, Stand 11.11.2026",
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-DS-2",
+      "nummer": "D-02",
+      "gruppe": "datenschutz",
+      "titel": "Orte der Verarbeitung und Unterauftragnehmer",
+      "text": "Der Anbieter muss alle Orte der Verarbeitung und alle Unterauftragnehmer nennen. Übermittlungen in Drittländer stützt er auf Kapitel V DSGVO.",
+      "abnahme": "Liste der Standorte und Unterauftragnehmer liegt schriftlich vor, mit Rechtsgrundlage je Drittland.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-DS-2"
+      },
+      "begruendung": "Katalog N-DS-2: gilt bei Daten über Personen und Betrieb beim Anbieter.",
+      "quelle": "Art. 28 Abs. 3, Art. 44–46 DSGVO, Stand 11.11.2026",
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-DS-3",
+      "nummer": "D-03",
+      "gruppe": "datenschutz",
+      "titel": "Löschen personenbezogener Daten",
+      "text": "Die Software muss personenbezogene Daten gezielt löschen. Daten, die noch aufbewahrt werden müssen, löscht sie erst nach Fristende.",
+      "abnahme": "Test: Testperson löschen; Suche und Auswertungen zeigen sie danach nicht mehr.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-DS-3"
+      },
+      "begruendung": "Katalog N-DS-3: gilt bei Daten über Personen.",
+      "quelle": "Art. 17 DSGVO; § 147 Abs. 3 AO, Stand 11.11.2026",
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-DS-4",
+      "nummer": "D-04",
+      "gruppe": "datenschutz",
+      "titel": "Datenübertragbarkeit",
+      "text": "Die Software sollte die Daten einer Person in einem strukturierten, gängigen und maschinenlesbaren Format ausgeben.",
+      "abnahme": "Export einer Testperson als CSV, JSON oder XML.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-DS-4"
+      },
+      "begruendung": "Katalog N-DS-4: gilt bei Daten über Personen.",
+      "quelle": "Art. 20 DSGVO, Stand 11.11.2026",
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-DS-5",
+      "nummer": "D-05",
+      "gruppe": "datenschutz",
+      "titel": "Rechte nach dem Bedarf der Rolle",
+      "text": "Die Software muss Rechte so vergeben, dass jede Rolle nur die Daten sieht, die sie für ihre Aufgaben braucht. Neue Benutzer haben zunächst keine Rechte.",
+      "abnahme": "Test mit zwei Rollen: Rolle A sieht die gesperrten Daten von Rolle B nicht.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-DS-5"
+      },
+      "begruendung": "Katalog N-DS-5: gilt bei Daten über Personen.",
+      "quelle": "Art. 25 Abs. 2 DSGVO, Stand 11.11.2026",
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-DS-6",
+      "nummer": "D-06",
+      "gruppe": "datenschutz",
+      "titel": "Verschlüsselung",
+      "text": "Die Software muss Daten verschlüsselt übertragen und verschlüsselt sichern.",
+      "abnahme": "Der Anbieter belegt Transportverschlüsselung und verschlüsselte Sicherungen schriftlich.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-DS-6"
+      },
+      "begruendung": "Katalog N-DS-6: gilt für jedes Vorhaben.",
+      "quelle": "Art. 32 Abs. 1 lit. a DSGVO, Stand 11.11.2026",
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-SI-1",
+      "nummer": "D-07",
+      "gruppe": "datenschutz",
+      "titel": "Zweiter Faktor bei der Anmeldung",
+      "text": "Die Software sollte eine Anmeldung mit zweitem Faktor anbieten.",
+      "abnahme": "Test: Anmeldung mit App-Code oder Sicherheitsschlüssel.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-SI-1"
+      },
+      "begruendung": "Katalog N-SI-1: gilt für jedes Vorhaben.",
+      "quelle": "Art. 32 Abs. 1 DSGVO, Stand 11.11.2026",
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-GB-1",
+      "nummer": "G-01",
+      "gruppe": "ordnung",
+      "titel": "Unveränderbarkeit gebuchter Daten",
+      "text": "Die Software muss verhindern, dass gebuchte Daten ihren ursprünglichen Inhalt verlieren. Änderungen protokolliert sie mit Person und Zeitpunkt.",
+      "abnahme": "Test: abgeschlossene Rechnung ändern; die Software verhindert es oder zeigt alten und neuen Wert.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-GB-1"
+      },
+      "begruendung": "Katalog N-GB-1: gilt bei steuerlich wichtige Unterlagen.",
+      "quelle": "§ 146 Abs. 4 AO, Stand 11.11.2026",
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-GB-2",
+      "nummer": "G-02",
+      "gruppe": "ordnung",
+      "titel": "Aufbewahrung",
+      "text": "Die Software muss Bücher 10 Jahre, Buchungsbelege 8 Jahre und Geschäftsbriefe 6 Jahre lesbar und maschinell auswertbar bereithalten, auch nach Vertragsende.",
+      "abnahme": "Der Vertrag regelt Aufbewahrung und Herausgabe; ein Test-Export ist maschinell auswertbar.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-GB-2"
+      },
+      "begruendung": "Katalog N-GB-2: gilt bei steuerlich wichtige Unterlagen.",
+      "quelle": "§ 147 Abs. 2 und 3 AO, Stand 11.11.2026",
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-GB-3",
+      "nummer": "G-03",
+      "gruppe": "ordnung",
+      "titel": "Datenzugriff der Finanzverwaltung",
+      "text": "Die Software muss den Datenzugriff der Finanzverwaltung unterstützen: Einsicht, Auswertung nach Vorgabe und Übergabe in maschinell auswertbarem Format.",
+      "abnahme": "Vorführung von Prüferzugang und Datenexport.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-GB-3"
+      },
+      "begruendung": "Katalog N-GB-3: gilt bei steuerlich wichtige Unterlagen.",
+      "quelle": "§ 147 Abs. 6 AO, Stand 11.11.2026",
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-GB-4",
+      "nummer": "G-04",
+      "gruppe": "ordnung",
+      "titel": "Unterlagen für die Verfahrensdokumentation",
+      "text": "Der Anbieter sollte Unterlagen für die Verfahrensdokumentation liefern: Systembeschreibung, Einstellungen, Schnittstellen, Datensicherung.",
+      "abnahme": "Die Unterlagen liegen vor dem Echtbetrieb vor.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-GB-4"
+      },
+      "begruendung": "Katalog N-GB-4: gilt bei steuerlich wichtige Unterlagen.",
+      "quelle": "§ 147 Abs. 1 Nr. 1 AO, Stand 11.11.2026; GoBD ungeprüft",
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-BT-1",
+      "nummer": "B-01",
+      "gruppe": "betrieb",
+      "titel": "Datensicherung und Wiederherstellung",
+      "text": "Die Software muss mindestens täglich gesichert werden. Die Wiederherstellung gelingt binnen 24 Stunden und wird jährlich getestet.",
+      "abnahme": "Sicherungskonzept und Protokoll eines Wiederherstellungstests liegen vor.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-BT-1"
+      },
+      "begruendung": "Katalog N-BT-1: gilt für jedes Vorhaben.",
+      "quelle": "Art. 32 Abs. 1 lit. c und d DSGVO, Stand 11.11.2026",
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-BT-2",
+      "nummer": "B-02",
+      "gruppe": "betrieb",
+      "titel": "Datenherausgabe bei Vertragsende",
+      "text": "Der Anbieter muss bei Vertragsende alle Daten und Belege vollständig in offenen, dokumentierten Formaten herausgeben. Frist und Kosten stehen im Vertrag.",
+      "abnahme": "Probeexport aller Testdaten; die Vertragsklausel liegt vor.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-BT-2"
+      },
+      "begruendung": "Katalog N-BT-2: gilt für jedes Vorhaben.",
+      "quelle": "eigene Festlegung; stützt § 147 Abs. 2 AO, Stand 11.11.2026",
+      "punkte": 0,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-BT-3",
+      "nummer": "B-03",
+      "gruppe": "betrieb",
+      "titel": "Verfügbarkeit",
+      "text": "Die Software sollte zu den Geschäftszeiten zu mindestens 99,5 % je Monat verfügbar sein.",
+      "abnahme": "Zusage im Vertrag mit Messung und Gutschrift.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-BT-3"
+      },
+      "begruendung": "Katalog N-BT-3: gilt bei Betrieb beim Anbieter.",
+      "quelle": "eigene Festlegung",
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-BT-4",
+      "nummer": "B-04",
+      "gruppe": "betrieb",
+      "titel": "Support",
+      "text": "Der Anbieter sollte Support auf Deutsch zu den Geschäftszeiten bieten. Bei Störungen, die die Arbeit verhindern, reagiert er binnen 4 Stunden.",
+      "abnahme": "Zusage im Vertrag.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-BT-4"
+      },
+      "begruendung": "Katalog N-BT-4: gilt für jedes Vorhaben.",
+      "quelle": "eigene Festlegung",
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-BT-5",
+      "nummer": "B-05",
+      "gruppe": "betrieb",
+      "titel": "Sicherheitsupdates und Änderungen",
+      "text": "Der Anbieter sollte Sicherheitsupdates ohne Aufpreis liefern und größere Änderungen vorher ankündigen.",
+      "abnahme": "Zusage im Vertrag; Änderungsprotokoll der letzten 12 Monate liegt vor.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-BT-5"
+      },
+      "begruendung": "Katalog N-BT-5: gilt für jedes Vorhaben.",
+      "quelle": "eigene Festlegung",
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-BF-2",
+      "nummer": "BF-01",
+      "gruppe": "barrierefreiheit",
+      "titel": "Bedienung mit Tastatur und Bildschirmleser",
+      "text": "Die Software kann für Beschäftigte vollständig mit Tastatur und Bildschirmleser bedienbar sein.",
+      "abnahme": "Test eines Arbeitsablaufs nur mit Tastatur.",
+      "prioritaet": "kann",
+      "prioritaetVorschlag": "kann",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-BF-2"
+      },
+      "begruendung": "Katalog N-BF-2: Vorschlag für jedes Vorhaben; bitte prüfen.",
+      "quelle": "eigene Festlegung; das BFSG zielt auf Leistungen an Verbraucher (§ 1 Abs. 3)",
+      "punkte": 1,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": true
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-AN-1",
+      "nummer": "A-01",
+      "gruppe": "anbieter",
+      "titel": "Referenzbetriebe",
+      "text": "Der Anbieter sollte mindestens 2 Referenzbetriebe ähnlicher Größe und Branche nennen.",
+      "abnahme": "Ein Gespräch mit einem Referenzbetrieb ist geführt.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-AN-1"
+      },
+      "begruendung": "Katalog N-AN-1: gilt für jedes Vorhaben.",
+      "quelle": "eigene Festlegung",
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-AN-2",
+      "nummer": "A-02",
+      "gruppe": "anbieter",
+      "titel": "Vorführung mit eigenen Daten",
+      "text": "Der Anbieter sollte die Muss-Aufgaben in einer Vorführung mit Beispieldaten des Betriebs zeigen.",
+      "abnahme": "Die Vorführung ist erfolgt und protokolliert.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-AN-2"
+      },
+      "begruendung": "Katalog N-AN-2: gilt für jedes Vorhaben.",
+      "quelle": "eigene Festlegung",
+      "punkte": 2,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "katalog:N-AN-3",
+      "nummer": "A-03",
+      "gruppe": "anbieter",
+      "titel": "Einführungsdauer",
+      "text": "Der Anbieter kann die Einführung bis zum Echtbetrieb in höchstens 12 Wochen abschließen.",
+      "abnahme": "Projektplan des Anbieters.",
+      "prioritaet": "kann",
+      "prioritaetVorschlag": "kann",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "katalog",
+        "bezuege": [],
+        "katalogId": "N-AN-3"
+      },
+      "begruendung": "Katalog N-AN-3: gilt für jedes Vorhaben.",
+      "quelle": "eigene Festlegung",
+      "punkte": 1,
+      "bearbeitet": {
+        "text": false,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    }
+  ],
+  "naechsteNummer": {
+    "funktion": 14,
+    "schnittstelle": 4,
+    "benutzer": 3,
+    "menge": 5,
+    "datenschutz": 8,
+    "ordnung": 5,
+    "betrieb": 6,
+    "anbieter": 4,
+    "barrierefreiheit": 2
+  },
+  "gewichtung": {
+    "methode": "direkt",
+    "direktProzent": {
+      "funktion": 35,
+      "schnittstelle": 10,
+      "menge": 5,
+      "datenschutz": 10,
+      "ordnung": 5,
+      "betrieb": 15,
+      "barrierefreiheit": 5,
+      "anbieter": 15
+    },
+    "paare": [],
+    "festgelegtAm": "2026-10-20T14:00:00.000Z",
+    "aenderungenNachBewertung": 0
+  },
+  "angebote": [
+    {
+      "id": "angebot-nord",
+      "anbieter": "Anbieter Nord",
+      "produkt": "Warenwirtschaft Nord",
+      "betriebsform": "cloud",
+      "angebotsdatum": "2026-10-28",
+      "notiz": "Cloud-Lösung mit Abo je Benutzer; Vorführung am 04.11. mit eigenen Daten.",
+      "bewertungen": {
+        "aufgabe:auf_erfassen": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_tour": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "Vorführung 04.11.",
+          "notiz": "Tourenliste direkt aus den Aufträgen."
+        },
+        "aufgabe:auf_bestaetigen": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_rechnung": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_freigeben": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_versenden": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-3": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "medienbruch:med_papier>med_erp": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "medienbruch:med_erp>med_excel": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "rollen": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "freigabe:auf_freigeben": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "menge:vorgaenge": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "menge:benutzer": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-1": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-2": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-3": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-5": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-6": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-GB-1": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-GB-2": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-GB-3": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "Angebot S. 6",
+          "notiz": ""
+        },
+        "katalog:N-BT-1": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BT-2": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_aendern": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_stornieren": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-1": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-2": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-4": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-6": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-5": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "Angebot S. 5",
+          "notiz": "DATEV-Export im Standard."
+        },
+        "menge:antwortzeit": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "menge:datenbestand": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-4": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-SI-1": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-GB-4": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BT-3": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BT-4": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BT-5": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BF-2": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-AN-1": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-AN-2": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-AN-3": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        }
+      },
+      "kosten": {
+        "einmalig": [
+          {
+            "id": "nord-einrichtung",
+            "art": "einrichtung",
+            "bezeichnung": "Einrichtung",
+            "betragEuro": 4800
+          },
+          {
+            "id": "nord-daten",
+            "art": "datenuebernahme",
+            "bezeichnung": "Datenübernahme",
+            "betragEuro": 2500
+          },
+          {
+            "id": "nord-schulung",
+            "art": "schulung",
+            "bezeichnung": "Schulung vor Ort",
+            "betragEuro": 1800
+          }
+        ],
+        "laufendJahr": [
+          {
+            "id": "nord-support",
+            "art": "support",
+            "bezeichnung": "Support-Paket",
+            "betragEuro": 1200
+          }
+        ],
+        "preisJeBenutzerMonatEuro": 59,
+        "internEinfuehrungTage": 15,
+        "internSchulungStundenJeBenutzer": 6,
+        "internBetriebStundenMonat": 2
+      }
+    },
+    {
+      "id": "angebot-sued",
+      "anbieter": "Anbieter Süd",
+      "produkt": "ERP Süd Start",
+      "betriebsform": "cloud",
+      "angebotsdatum": "2026-10-30",
+      "notiz": "Günstiges Einstiegspaket.",
+      "bewertungen": {
+        "aufgabe:auf_erfassen": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_tour": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_bestaetigen": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_rechnung": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_freigeben": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_versenden": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-3": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "medienbruch:med_papier>med_erp": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "medienbruch:med_erp>med_excel": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "rollen": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "freigabe:auf_freigeben": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "menge:vorgaenge": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "menge:benutzer": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-1": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-2": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-3": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-5": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-6": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-GB-1": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-GB-2": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-GB-3": {
+          "ko": "nicht_erfuellt",
+          "punkte": null,
+          "fundstelle": "Antwort per E-Mail 05.11.",
+          "notiz": "Kein Prüferzugang; Export nur als PDF."
+        },
+        "katalog:N-BT-1": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BT-2": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_aendern": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_stornieren": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-1": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-2": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-4": {
+          "ko": null,
+          "punkte": 3,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-6": {
+          "ko": null,
+          "punkte": 3,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-5": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "menge:antwortzeit": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "menge:datenbestand": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-4": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-SI-1": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-GB-4": {
+          "ko": null,
+          "punkte": 3,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BT-3": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BT-4": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BT-5": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BF-2": {
+          "ko": null,
+          "punkte": 3,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-AN-1": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-AN-2": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-AN-3": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        }
+      },
+      "kosten": {
+        "einmalig": [
+          {
+            "id": "sued-einrichtung",
+            "art": "einrichtung",
+            "bezeichnung": "Einrichtung",
+            "betragEuro": 2000
+          }
+        ],
+        "laufendJahr": [],
+        "preisJeBenutzerMonatEuro": 45,
+        "internEinfuehrungTage": 10,
+        "internSchulungStundenJeBenutzer": 4,
+        "internBetriebStundenMonat": 3
+      }
+    },
+    {
+      "id": "angebot-west",
+      "anbieter": "Anbieter West",
+      "produkt": "West Komplett",
+      "betriebsform": "eigener_server",
+      "angebotsdatum": "2026-11-03",
+      "notiz": "Kauflizenz auf eigenem Server, Wartung 20 % der Lizenz im Jahr.",
+      "bewertungen": {
+        "aufgabe:auf_erfassen": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_tour": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_bestaetigen": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_rechnung": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_freigeben": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_versenden": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-3": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "medienbruch:med_papier>med_erp": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "medienbruch:med_erp>med_excel": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "rollen": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "freigabe:auf_freigeben": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "menge:vorgaenge": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "menge:benutzer": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-1": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-2": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-3": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-5": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-6": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-GB-1": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-GB-2": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-GB-3": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BT-1": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BT-2": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_aendern": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "aufgabe:auf_stornieren": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-1": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-2": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-4": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-6": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "baustein:ERP-5": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "menge:antwortzeit": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "menge:datenbestand": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-DS-4": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-SI-1": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-GB-4": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BT-3": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": "Verfügbarkeit hängt am eigenen Server."
+        },
+        "katalog:N-BT-4": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BT-5": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-BF-2": {
+          "ko": null,
+          "punkte": 3,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-AN-1": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-AN-2": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "katalog:N-AN-3": {
+          "ko": null,
+          "punkte": 3,
+          "fundstelle": "",
+          "notiz": ""
+        }
+      },
+      "kosten": {
+        "einmalig": [
+          {
+            "id": "west-lizenz",
+            "art": "lizenzkauf",
+            "bezeichnung": "Lizenzen für 7 Benutzer",
+            "betragEuro": 21000
+          },
+          {
+            "id": "west-einrichtung",
+            "art": "einrichtung",
+            "bezeichnung": "Einrichtung",
+            "betragEuro": 6500
+          },
+          {
+            "id": "west-daten",
+            "art": "datenuebernahme",
+            "bezeichnung": "Datenübernahme",
+            "betragEuro": 3000
+          },
+          {
+            "id": "west-schulung",
+            "art": "schulung",
+            "bezeichnung": "Schulung",
+            "betragEuro": 2400
+          },
+          {
+            "id": "west-server",
+            "art": "hardware",
+            "bezeichnung": "Server mit Sicherung",
+            "betragEuro": 4200
+          }
+        ],
+        "laufendJahr": [
+          {
+            "id": "west-wartung",
+            "art": "wartung",
+            "bezeichnung": "Wartung",
+            "betragEuro": 4200
+          }
+        ],
+        "preisJeBenutzerMonatEuro": 0,
+        "internEinfuehrungTage": 25,
+        "internSchulungStundenJeBenutzer": 8,
+        "internBetriebStundenMonat": 8
+      }
+    }
+  ],
+  "bewertungBegonnenAm": "2026-11-04T10:00:00.000Z",
+  "wirtschaftlichkeit": {
+    "jahre": 5,
+    "benutzer": 7,
+    "internerStundensatzEuro": 44,
+    "stundenProPersonentag": 8,
+    "preissteigerungProzent": 3,
+    "zinsProzent": 5,
+    "kostenbasis": "nominal",
+    "nutzenProJahrEuro": 40000,
+    "budgetEuro": 80000,
+    "budgetAlsKo": false
+  },
+  "entscheidung": {
+    "regel": "nutzwert",
+    "mindestNutzwert": 5,
+    "gewaehltId": null,
+    "begruendung": "",
+    "risiken": [
+      {
+        "id": "risiko-datenuebernahme",
+        "text": "Die Datenübernahme aus der alten Warenwirtschaft dauert länger als geplant.",
+        "massnahme": "Probeübernahme mit echten Daten vor Vertragsschluss."
+      },
+      {
+        "id": "risiko-doppelarbeit",
+        "text": "Der Innendienst arbeitet in der Einführung doppelt (alt und neu).",
+        "massnahme": "Stichtag festlegen und zwei Wochen vorher schulen."
+      }
+    ],
+    "status": "entwurf",
+    "datum": null
+  }
+}
