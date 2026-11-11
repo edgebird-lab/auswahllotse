@@ -12,6 +12,16 @@ test('Beispiel durch alle sieben Schritte bis zur Vorlage (E1)', async ({ page }
   await expect(vorlage).toContainText('Rechtliche Anforderungen ohne Gewähr, keine Rechtsberatung, Stand 11.11.2026.')
 })
 
+test('Befunde im Ergebnis nennen die Anforderung und springen zu ihr', async ({ page }) => {
+  await page.goto('/')
+  await ladeBeispiel(page)
+  const befund = page.locator('.befund', { hasText: 'Der Text hat 44 Wörter' })
+  await expect(befund).toContainText('R-01: Der Text hat 44 Wörter; bitte aufteilen.')
+  await befund.getByRole('button', { name: /^Zur Stelle/ }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('3 · Anforderungen')
+  await expect(page.locator(':focus')).toContainText('Rollen und Rechte')
+})
+
 test('Prozesslotse-Datei einlesen und Umfang zeigen (E2)', async ({ page }) => {
   await page.goto('/')
   await leseProzessEin(page, DATEI.lieferdienst)

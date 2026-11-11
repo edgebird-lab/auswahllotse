@@ -102,6 +102,34 @@ describe('Projektdatei speichern und laden', () => {
     expect(() => leseProjektText(JSON.stringify(ohneProzess))).toThrow('Prozessmodell: Ist-Prozess, Ablauf: Schrittliste fehlt.')
   })
 
+  it('lehnt doppelte Kennungen ab, weil Bewertungen und Wahl über sie laufen', async () => {
+    const doppelt = async (aendern: (d: ReturnType<typeof JSON.parse>) => void) => {
+      const daten = JSON.parse(alsJson(await vollesProjekt()))
+      aendern(daten)
+      return () => leseProjektText(JSON.stringify(daten))
+    }
+    expect(
+      await doppelt((d) => {
+        d.anforderungen.push({ ...d.anforderungen[0] })
+      }),
+    ).toThrow('Die Projektdatei ist beschädigt (Anforderung 3: Kennung „aufgabe:auf_erfassen“ kommt doppelt vor).')
+    expect(
+      await doppelt((d) => {
+        d.angebote.push({ ...d.angebote[0] })
+      }),
+    ).toThrow(/Angebot 2: Kennung „.+“ kommt doppelt vor/)
+    expect(
+      await doppelt((d) => {
+        d.angebote[0].kosten.einmalig.push({ ...d.angebote[0].kosten.einmalig[0] })
+      }),
+    ).toThrow('Angebot 1, einmalige Kosten, Position 2: Kennung „k1“ kommt doppelt vor')
+    expect(
+      await doppelt((d) => {
+        d.entscheidung.risiken.push({ ...d.entscheidung.risiken[0] })
+      }),
+    ).toThrow('Risiko 2: Kennung „r1“ kommt doppelt vor')
+  })
+
   it('übernimmt keine fremden Felder und lässt __proto__ wirkungslos', async () => {
     const text = alsJson(await vollesProjekt())
       .replace('"app": "auswahllotse",', '"app": "auswahllotse", "fremd": 1, "__proto__": { "boese": true },')

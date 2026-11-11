@@ -239,8 +239,23 @@ function leseGewichtung(f: Feld): Gewichtung {
   }
 }
 
+/**
+ * Kennungen einer Liste müssen eindeutig sein: Bewertungen, Wahl und
+ * Bearbeiten finden Einträge über ihre Kennung; doppelte würden sich
+ * gegenseitig überschreiben.
+ */
+function eindeutig<T extends { id: string }>(liste: T[], wo: (i: number) => string): T[] {
+  const gesehen = new Set<string>()
+  liste.forEach((x, i) => {
+    fordere(!gesehen.has(x.id), `${BESCHAEDIGT} (${wo(i)}: Kennung „${x.id}“ kommt doppelt vor).`)
+    gesehen.add(x.id)
+  })
+  return liste
+}
+
 function lesePositionen<A extends string>(f: Feld, name: string, arten: readonly A[], wo: string): Kostenposition<A>[] {
-  return f.liste(name, (p) => ({ id: p.text('id'), art: p.wahl('art', arten), bezeichnung: p.text('bezeichnung'), betragEuro: p.zahl('betragEuro') }), (i) => `${wo}, Position ${i + 1}`)
+  const positionen = f.liste(name, (p) => ({ id: p.text('id'), art: p.wahl('art', arten), bezeichnung: p.text('bezeichnung'), betragEuro: p.zahl('betragEuro') }), (i) => `${wo}, Position ${i + 1}`)
+  return eindeutig(positionen, (i) => `${wo}, Position ${i + 1}`)
 }
 
 function leseKosten(f: Feld, wo: string): Kosten {
@@ -315,10 +330,16 @@ export function leseProjekt(daten: unknown): AuswahlProjekt {
     rahmen: leseRahmen(f.objekt('rahmen')),
     prozess: prozess === null ? null : leseProzess(f.objekt('prozess')),
     umfang: umfang === null ? null : leseUmfang(f.objekt('umfang')),
-    anforderungen: f.liste('anforderungen', leseAnforderung, (i) => `Anforderung ${i + 1}`),
+    anforderungen: eindeutig(
+      f.liste('anforderungen', leseAnforderung, (i) => `Anforderung ${i + 1}`),
+      (i) => `Anforderung ${i + 1}`,
+    ),
     naechsteNummer: f.zahlen('naechsteNummer', GRUPPEN_REIHENFOLGE, (n) => Number.isInteger(n) && n >= 1),
     gewichtung: leseGewichtung(f.objekt('gewichtung')),
-    angebote: f.liste('angebote', leseAngebot, (i) => `Angebot ${i + 1}`),
+    angebote: eindeutig(
+      f.liste('angebote', leseAngebot, (i) => `Angebot ${i + 1}`),
+      (i) => `Angebot ${i + 1}`,
+    ),
     bewertungBegonnenAm: f.textOderNull('bewertungBegonnenAm'),
     wirtschaftlichkeit: leseWirtschaftlichkeit(f.objekt('wirtschaftlichkeit')),
     entscheidung: {
@@ -326,7 +347,10 @@ export function leseProjekt(daten: unknown): AuswahlProjekt {
       mindestNutzwert: e.zahl('mindestNutzwert'),
       gewaehltId: e.textOderNull('gewaehltId'),
       begruendung: e.text('begruendung'),
-      risiken: e.liste('risiken', (r) => ({ id: r.text('id'), text: r.text('text'), massnahme: r.text('massnahme') }), (i) => `Risiko ${i + 1}`),
+      risiken: eindeutig(
+        e.liste('risiken', (r) => ({ id: r.text('id'), text: r.text('text'), massnahme: r.text('massnahme') }), (i) => `Risiko ${i + 1}`),
+        (i) => `Risiko ${i + 1}`,
+      ),
       status: e.wahl('status', ['entwurf', 'final'] as const),
       datum: e.textOderNull('datum'),
     },

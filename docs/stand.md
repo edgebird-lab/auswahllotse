@@ -2,7 +2,7 @@
 
 Checkliste aller Phasen und Schritte aus [spezifikation.md](spezifikation.md), Abschnitt 11. Nach jedem Schritt aktualisieren, damit ein Nachfolger hier weitermachen kann. Annahmen stehen in [entscheidungen.md](entscheidungen.md).
 
-Letzte Aktualisierung: 11.11.2026, nach Phase 7 und 8.1, 8.2
+Letzte Aktualisierung: 11.11.2026, nach der kritischen Prüfung (siehe „Prüfung vom 11.11.2026“ unten)
 
 ## Phase 0 – Einrichten
 
@@ -68,7 +68,7 @@ Letzte Aktualisierung: 11.11.2026, nach Phase 7 und 8.1, 8.2
 
 ## Phase 8 – Qualität und Version 0.1.0
 
-- [x] **8.1** Browsertests E1 bis E11 in `e2e/` (19 Tests), lokal mit Edge grün. Laut Auftrag läuft die CI nur mit lint, test und build (U1); einen CI-Lauf gibt es erst, wenn das Repo angelegt ist (0.3). `npm audit`: 0 Schwachstellen (11.11.2026).
+- [x] **8.1** Browsertests E1 bis E11 in `e2e/` (seit der Prüfung 22 Tests), lokal mit Edge grün. Laut Auftrag läuft die CI nur mit lint, test und build (U1); einen CI-Lauf gibt es erst, wenn das Repo angelegt ist (0.3). `npm audit`: 0 Schwachstellen (11.11.2026).
 - [x] **8.2** Barrierefreiheit und Tastatur: E9 (axe in allen Schritten und Reitern, hell und dunkel, dazu Farbschema-Wahl) und E5 (ganzer Durchlauf nur mit Tastatur, Fokus auf die Überschrift beim Schrittwechsel) grün; jedes Eingabefeld beschriftet.
 - [ ] **8.3** Durchsicht mit Robin an einem echten Fall. **Offen, braucht Robin.** Vorschlag für die Durchsicht: ein eigenes Prozessmodell aus dem Prozesslotsen einlesen, Umfang und Vorschläge prüfen, zwei echte Angebote erfassen und die Entscheidungsvorlage als PDF lesen; besonders Kataloginhalte (offene Frage 4) und Satzmuster der Anforderungen. Befunde als Issues, sobald es das Repo gibt.
 - [ ] **8.4** Tag `v0.1.0` (Repo bleibt privat). **Bewusst noch nicht gesetzt** (U52): erst nach der Durchsicht 8.3. Dann: Version in `package.json` und `App.tsx` auf 0.1.0, `git tag -a v0.1.0 -m "Version 0.1.0"`, mit dem Repo pushen.
@@ -81,9 +81,31 @@ Letzte Aktualisierung: 11.11.2026, nach Phase 7 und 8.1, 8.2
 - [ ] **9.4** PDF über WebView2
 - [ ] **9.5** Test in der Windows Sandbox, Windows-Job in der CI
 
+## Prüfung vom 11.11.2026
+
+Kritische Prüfung gegen die Spezifikation für den gebauten Umfang (Phasen 0 bis 8.2). Vorgehen: Fallbeispiel unabhängig in Python nachgerechnet (Nutzwerte 8,52 / 7,70 / 5,49, Gesamtkosten 54.517 / 93.088 / 35.230 €, Kapitalwerte 123.892 / 86.200 €, Amortisation im 1. und 2. Jahr, Funktionen stabil bis 57,1 %: alles wie in App und README), T-K1 bis T-K5 und T-AHP3 von Hand nachgerechnet, Formeln Zeile für Zeile mit 6.2 bis 6.13 verglichen, ODER-Rechnung mit dem Prozesslotsen verglichen, App im Browser durchgeklickt (alle Schritte hell und dunkel, Handy-Breite, beschädigte Projektdateien, Format 4 speichern und neu öffnen, Angebote löschen, anderes Modell neu einlesen, Softwareart wechseln, ohne Modell), PDF-Proben Seite für Seite angesehen.
+
+Gefunden und behoben, jeweils mit Test (Annahmen U53 bis U61 in [entscheidungen.md](entscheidungen.md)):
+
+1. **Tausenderpunkt:** „90.000“ im Budget ergab 90 €, „1.234.567“ wurde gar nicht übernommen. `ui/texte.ts` `leseZahl` liest jetzt Dreiergruppen als Tausender (U53). Tests: `ui/texte.test.ts`, Browsertest „Beträge mit Tausenderpunkt …“.
+2. **Änderungszähler beim Tippen (G5):** Jeder Tastendruck zählte; „90.000“ und „40“ ergaben „5-mal geändert“ in der Vorlage. Eine Eingabe zählt jetzt höchstens einmal, zurück zum Ausgangswert gar nicht (`bewertung/zaehler.ts`, `zustand.ts`, U54). Tests: `zustand.test.ts`, Browsertest.
+3. **Änderungszähler bei Abgleichen (G5):** „Neu einlesen“ eines anderen Modells nach Bewertungsbeginn (8 Anforderungen entfallen) ließ die Vorlage „nicht geändert“ schreiben. Abgleiche, die aktive Anforderungen verschieben, zählen jetzt einmal; die Texte nennen „Gewichte, Anforderungen oder Regel“ (U61). Tests: `lastenheft/aenderungen.test.ts`.
+4. **Rundung:** 35 % · 3/12 = 8,75 % erschien als 8,7 % (Gleitkommafehler); „-0,0“ war möglich. `modell/zahlformat.ts` bereinigt vor dem Runden (U55). Tests: `modell/zahlformat.test.ts`.
+5. **P8:** Eine Gruppe nur mit „Nicht“ bekam „wirkt nur als K.-o.“ (U56). Test in `lastenheft/pruefung.test.ts`.
+6. **D3:** Schied jedes Angebot nur am Budget aus (Budget als K.-o.), hieß es „Kein Angebot erfüllt alle Muss-Kriterien“ (U57). Test in `bewertung/nutzwert.test.ts`.
+7. **D5 nach dem Festlegen:** Eine finale Entscheidung blieb ohne Hinweis final, wenn später Fehler dazukamen; jetzt Warnung D5 mit Sprung zur Bedienung (U58). Test in `entscheidung/begruendung.test.ts`.
+8. **Einzahl:** „Heute laufen 1 Vorgänge pro Tag“, „1 Datensätze“, „1 Übertragungen“, „1 Rollen“ in Lastenheft, Vorlage und Prozess-Karte (U59). Test in `export/vorlagen.test.ts`.
+9. **Stiller Datenverlust:** Ein unlesbarer Stand im Browser-Speicher wurde beim Start sofort vom neuen Projekt überschrieben. Jetzt Kopie, Meldung und „Kopie herunterladen“ (U60). Tests: `modell/speicher.test.ts`, Browsertest.
+10. **Doppelte Kennungen:** Projektdateien mit doppelten Kennungen bei Anforderungen, Angeboten, Kostenpositionen oder Risiken wurden geöffnet; Bewertungen und Bearbeiten trafen dann den falschen Eintrag. Jetzt Meldung „Kennung … kommt doppelt vor“ mit Stelle. Test in `modell/speicher.test.ts`.
+11. **Befunde ohne Bezug:** Die Gesamtliste im Ergebnis zeigte „Der Text hat 44 Wörter; bitte aufteilen.“ ohne zu sagen, welche Anforderung. Jetzt „R-01: …“ (`ui/texte.ts` `befundMitAnforderung`). Tests: `ui/texte.test.ts`, Browsertest „Befunde im Ergebnis …“.
+
+Geprüft und in Ordnung: K1 bis K9 (T-K1 bis T-K5 nachgerechnet), AHP (T-AHP3 nachgerechnet), Nutzwert, Rang und Sensitivität (Fallbeispiel nachgerechnet), CSV mit BOM, CRLF und Formelschutz, Fehlerfälle beim Öffnen (leer, abgeschnitten, Liste, fremde App, neuere Version, falsche Typen mit Stelle), Format 4 mit unbekanntem Baustein (Warnung bleibt nach Speichern und Öffnen), Druckbild beider Vorlagen (A4, 20 mm, keine Bedienelemente), axe hell und dunkel, Tastatur. README-Bilder und PDF-Proben neu erzeugt.
+
+Verbleibende Mängel stehen im Bericht der Prüfung und in der README unter „Grenzen“; die wichtigsten: keine Durchsicht an einem echten Fall (8.3), kein Repo und keine CI (0.3), Kopfzeile bricht die Statusmeldung bei 1280 px in vier Zeilen um, Wertebereiche (z. B. negative Betriebstage) prüft nur die Eingabe, nicht das Öffnen einer von Hand geänderten Datei.
+
 ## Hinweise für den nächsten Durchgang
 
-- **Repo:** Lokal liegen alle Commits auf `main`. Das private GitHub-Repo `edgebird-lab/auswahllotse` ist noch nicht angelegt, weil die Rechteprüfung der Sitzung `gh repo create` abgelehnt hat. Sobald Robin es anlegt oder freigibt: `gh repo create edgebird-lab/auswahllotse --private --source . --remote origin` und `git push -u origin main`; danach den ersten CI-Lauf prüfen (Schritt 0.3).
+- **Repo:** Lokal liegen alle Commits auf `main`. Das private GitHub-Repo `edgebird-lab/auswahllotse` ist noch nicht angelegt, weil die Rechteprüfung der Sitzung `gh repo create` abgelehnt hat (zuletzt erneut am 11.11.2026 in der Prüfung). Sobald Robin es anlegt oder freigibt: `gh repo create edgebird-lab/auswahllotse --private --source . --remote origin` und `git push -u origin main`; danach den ersten CI-Lauf prüfen (Schritt 0.3).
 - **Prüfen vor jedem Commit:** `npm run lint`, `npm test`, `npm run build`, `npm run e2e` (Edge, Port 4183 fest).
 - **Nächster Schritt:** Repo anlegen und pushen (0.3), Durchsicht mit Robin (8.3), danach Tag `v0.1.0` (8.4). Phase 9 (Tauri) erst nach W3 des Prozesslotsen.
 - **Oberfläche:** `src/App.tsx` (Gerüst), `src/ui/schritte/*` (sieben Schritte), `src/ui/druck/*` (Vorlagen), `src/ui/diagramme/*` (SVG, Rechnungen in `geometrie.ts`). Alle Zahlen und Befunde liefert `berechneGesamt(projekt)` aus `entscheidung/gesamt.ts`; Änderungen laufen als reine Funktionen über `aendere` (Kontext in `ui/kontext.ts`).

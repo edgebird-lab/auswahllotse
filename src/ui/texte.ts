@@ -2,11 +2,22 @@
  * Kleine Texte der Oberfläche, die mehrere Schritte und Vorlagen teilen.
  */
 import { jahreFuerRechnung } from '../kosten/kosten'
-import type { MedienbruchFall, Schwere } from '../modell/ergebnisse'
-import type { AuswahlProjekt } from '../modell/typen'
+import type { Befund, MedienbruchFall, Schwere } from '../modell/ergebnisse'
+import type { Anforderung, AuswahlProjekt } from '../modell/typen'
 import { zahl } from '../modell/zahlformat'
 
 export const SCHWERE_TEXT: Record<Schwere, string> = { fehler: 'Fehler', warnung: 'Warnung', hinweis: 'Hinweis' }
+
+/**
+ * Befund mit der Anforderung davor, für Listen ohne Zusammenhang (Schritt
+ * Ergebnis): „R-01: Der Text hat 44 Wörter; bitte aufteilen.“ Ohne Nummer
+ * steht der Titel da; Befunde ohne Anforderung bleiben unverändert.
+ */
+export function befundMitAnforderung(b: Befund, anforderungen: readonly Anforderung[]): string {
+  const a = b.bezug === null ? undefined : anforderungen.find((x) => x.id === b.bezug)
+  if (!a) return b.text
+  return `${a.nummer ?? `„${a.titel || 'ohne Titel'}“`}: ${b.text}`
+}
 
 /** Medienbruch-Fälle nach U4 (6.4). */
 export const FALL_TEXT: Record<MedienbruchFall, string> = {
