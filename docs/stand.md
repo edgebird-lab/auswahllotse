@@ -18,15 +18,15 @@ Letzte Aktualisierung: 11.11.2026
 
 ## Phase 2 – Prozessmodell einlesen
 
-- [ ] **2.1** Testdateien mit Herkunft, eigene `Pl`-Typen in `format.ts`
-- [ ] **2.2** JSON-Leser E1 bis E8, E13 (T-E1 bis T-E8)
-- [ ] **2.3** Häufigkeit nach dem Flussverfahren (T-H1 bis T-H6)
-- [ ] **2.4** Mengengerüst, Prozesskosten, Medienbruchkosten (T-M1 bis T-M5)
-- [ ] **2.5** BPMN mit eingebettetem Projekt E9 bis E12 (T-E9 bis T-E13)
+- [x] **2.1** Testdateien aus dem Prozesslotsen (Commit `0139e53`, Format 3) mit Herkunft in `testdaten/prozesslotse/README.md`, dazu Format 1 und 2 und Fehlerfälle in `kaputt/`; `Pl`-Typen für Format 3 in `format.ts`
+- [x] **2.2** `lesen.ts`, `einlesen.ts`: E1 bis E8, E13; Format 1 bis 3, neuere Formate mit Warnung, unbekannte Bausteine als allgemeiner Schritt (T-E1 bis T-E8 grün, T-E4 und T-E6 nach Annahme U5/U6 angepasst)
+- [x] **2.3** `haeufigkeit.ts` mit H1 bis H7 und neuer Regel H8 für ODER (T-H1 bis T-H6 grün)
+- [x] **2.4** `mengengeruest.ts` M1 bis M8; Medienbrüche nach U4/U5 in `lastenheft/schnittstellen.ts` (T-M1 bis T-M5 grün)
+- [x] **2.5** `bpmn.ts` E9 bis E12 mit `DOMParser` (Tests mit jsdom); Testdatei vom echten Export des Prozesslotsen (T-E9 bis T-E13 grün)
 
 ## Phase 3 – Lastenheft ableiten
 
-- [ ] **3.1** Umfang U1 bis U3 (T-U1 bis T-U3)
+- [x] **3.1** `lastenheft/umfang.ts` U1 bis U3 (T-U1 bis T-U3 grün)
 - [ ] **3.2** Funktionen und Entscheidungs-Vorschläge A0 bis A3 (T-A1, T-A2)
 - [ ] **3.3** Schnittstellen aus Medienbrüchen U4, U5, A4 (T-A3 bis T-A5)
 - [ ] **3.4** Rollen, Freigaben, Prüfungen, Mengengerüst A5 bis A8 (T-A6, T-A7)

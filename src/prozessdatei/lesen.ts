@@ -88,6 +88,8 @@ export async function sha256Hex(text: string): Promise<string> {
 // ── Projektion ─────────────────────────────────────────────────────────────
 
 interface Kontext {
+  /** „Ist-Prozess“ oder „Soll-Prozess“, für kurze Meldungen */
+  prozess: string
   version: number
   befunde: Befund[]
   /** Bausteine im aktuellen Prozess (E6) */
@@ -119,14 +121,15 @@ function verweis(ctx: Kontext, wert: unknown, bekannt: Set<PlId>, wo: string, wa
 
 function projiziereSequenz(x: unknown, wo: string, ctx: Kontext, tiefe: number, bereiche: PlId[]): PlSequenz {
   fordere(istObj(x) && istText(x.id) && Array.isArray(x.schritte), `${wo}: Schrittliste fehlt.`)
-  fordere(tiefe <= MAX_TIEFE, `${wo}: Das Prozessmodell ist tiefer als ${MAX_TIEFE} Ebenen verschachtelt.`)
   return { id: x.id, schritte: x.schritte.map((b, i) => projiziereBlock(b, `${wo}, Schritt ${i + 1}`, ctx, tiefe, bereiche)) }
 }
 
 function projiziereBlock(x: unknown, wo: string, ctx: Kontext, tiefe: number, bereiche: PlId[]): PlBlock {
   fordere(istObj(x) && istText(x.id) && istText(x.typ), `${wo}: kein gültiger Baustein.`)
+  // E6: zählen und abbrechen, bevor die Rekursion zu tief wird
+  fordere(tiefe <= MAX_TIEFE, `${ctx.prozess}: Das Prozessmodell ist tiefer als ${MAX_TIEFE} Ebenen verschachtelt.`)
   ctx.bausteine += 1
-  fordere(ctx.bausteine <= MAX_BAUSTEINE, `${wo}: Das Prozessmodell hat mehr als ${ganzzahl(MAX_BAUSTEINE)} Bausteine.`)
+  fordere(ctx.bausteine <= MAX_BAUSTEINE, `${ctx.prozess}: Das Prozessmodell hat mehr als ${ganzzahl(MAX_BAUSTEINE)} Bausteine.`)
   kennung(ctx, x.id, wo)
   const id = x.id
   switch (x.typ) {
@@ -262,7 +265,7 @@ function projiziereProzess(x: unknown, wo: string, version: number, befunde: Bef
   const teilnehmerRoh = x.teilnehmer ?? []
   fordere(Array.isArray(teilnehmerRoh) && teilnehmerRoh.every((t) => istObj(t) && istText(t.id) && istText(t.name)), `${wo}: externe Teilnehmer ungültig.`)
 
-  const ctx: Kontext = { version, befunde, bausteine: 0, rollen: new Set(), medien: new Set(), teilnehmer: new Set(), kennungen: new Set() }
+  const ctx: Kontext = { prozess: wo, version, befunde, bausteine: 0, rollen: new Set(), medien: new Set(), teilnehmer: new Set(), kennungen: new Set() }
   const rollen: PlRolle[] = x.rollen.map((r, i) => {
     fordere(
       istObj(r) && istText(r.id) && istText(r.name) && istZahl(r.stundensatz) && istZahl(r.personen) && istZahl(r.verfuegbarProzent),
