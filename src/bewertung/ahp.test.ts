@@ -73,8 +73,11 @@ describe('Paarvergleich nach AHP (AHP1 bis AHP6)', () => {
     expect(fehlendeVergleiche(ahpMatrix(['funktion', 'betrieb', 'anbieter'], []))).toBe(3)
   })
 
-  // Misst die Laufzeit (unter 2 s); läuft der Rechner gerade unter Last, darf der Test es noch zweimal versuchen.
-  it('bestätigt die RI-Tabelle per Simulation (T-AHP6)', { retry: 2 }, () => {
+  // Laufzeit unter 2 s: gemessen wird die Rechenzeit des Testprozesses (process.cpuUsage), nicht die
+  // Uhrzeit, damit andere Programme auf dem Rechner das Ergebnis nicht verfälschen. Ohne cpuUsage: Uhrzeit.
+  it('bestätigt die RI-Tabelle per Simulation (T-AHP6)', { retry: 1 }, () => {
+    const prozess = (globalThis as { process?: { cpuUsage?: (vorher?: { user: number; system: number }) => { user: number; system: number } } }).process
+    const cpuStart = prozess?.cpuUsage?.()
     const start = performance.now()
     const zufall = mulberry32(20261111)
     const werte = [1 / 9, 1 / 8, 1 / 7, 1 / 6, 1 / 5, 1 / 4, 1 / 3, 1 / 2, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -94,7 +97,9 @@ describe('Paarvergleich nach AHP (AHP1 bis AHP6)', () => {
       }
       abweichung[n] = Math.abs(summe / 5000 - RI[n])
     }
-    const dauer = performance.now() - start
+    const cpu = cpuStart && prozess?.cpuUsage ? prozess.cpuUsage(cpuStart) : null
+    // cpuUsage liefert Mikrosekunden
+    const dauer = cpu ? (cpu.user + cpu.system) / 1000 : performance.now() - start
     expect(abweichung[3]).toBeLessThanOrEqual(0.08)
     for (let n = 4; n <= 10; n++) expect(abweichung[n], `n = ${n}`).toBeLessThanOrEqual(0.05)
     expect(dauer).toBeLessThan(2000)

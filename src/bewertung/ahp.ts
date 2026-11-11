@@ -47,23 +47,40 @@ function mal(a: Matrix, w: readonly number[]): number[] {
   return a.map((zeile) => zeile.reduce((s, x, j) => s + x * w[j], 0))
 }
 
-/** AHP2 und AHP3: Eigenvektor per Potenzmethode und λmax. */
+/**
+ * AHP2 und AHP3: Eigenvektor per Potenzmethode und λmax. Schleifen statt
+ * map/reduce, weil die Simulation (T-AHP6) 40.000 Matrizen rechnet; die
+ * Reihenfolge der Summen ist dieselbe, die Ergebnisse sind bitgleich.
+ */
 export function eigenvektor(a: Matrix): { gewichte: number[]; lambdaMax: number; schritte: number } {
   const n = a.length
   let w = Array<number>(n).fill(1 / n)
+  let neu = Array<number>(n).fill(0)
   let schritte = 0
   while (schritte < AHP_MAX_SCHRITTE) {
     schritte += 1
-    const aw = mal(a, w)
-    const summe = aw.reduce((s, x) => s + x, 0)
-    const neu = aw.map((x) => x / summe)
-    const aenderung = Math.max(...neu.map((x, i) => Math.abs(x - w[i])))
+    let summe = 0
+    for (let i = 0; i < n; i++) {
+      const zeile = a[i]
+      let s = 0
+      for (let j = 0; j < n; j++) s += zeile[j] * w[j]
+      neu[i] = s
+      summe += s
+    }
+    let aenderung = 0
+    for (let i = 0; i < n; i++) {
+      neu[i] /= summe
+      const d = Math.abs(neu[i] - w[i])
+      if (d > aenderung) aenderung = d
+    }
+    const alt = w
     w = neu
+    neu = alt
     if (aenderung <= AHP_TOLERANZ) break
   }
   const aw = mal(a, w)
   const lambdaMax = aw.reduce((s, x, i) => s + x / w[i], 0) / n
-  return { gewichte: w, lambdaMax, schritte }
+  return { gewichte: [...w], lambdaMax, schritte }
 }
 
 /** AHP1 bis AHP6 für eine vollständige Matrix. */

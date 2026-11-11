@@ -193,7 +193,7 @@ function PaarZeile({ links, rechts }: { links: Gruppe; rechts: Gruppe }) {
   const r = gruppenName(rechts)
   return (
     <fieldset className="paar">
-      <legend>
+      <legend className="sr">
         „{l}“ gegen „{r}“
       </legend>
       <div className="paar-zeile">

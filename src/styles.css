@@ -1664,3 +1664,7 @@ fieldset {
 .anforderung-bearbeiten > * + * {
   margin-top: 0.6rem;
 }
+.gewicht-tabelle th,
+.gewicht-tabelle td {
+  vertical-align: middle;
+}

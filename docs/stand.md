@@ -2,7 +2,7 @@
 
 Checkliste aller Phasen und Schritte aus [spezifikation.md](spezifikation.md), Abschnitt 11. Nach jedem Schritt aktualisieren, damit ein Nachfolger hier weitermachen kann. Annahmen stehen in [entscheidungen.md](entscheidungen.md).
 
-Letzte Aktualisierung: 11.11.2026, nach Phase 6 und 7.1 bis 7.3
+Letzte Aktualisierung: 11.11.2026, nach Phase 7 und 8.1, 8.2
 
 ## Phase 0 – Einrichten
 
@@ -61,17 +61,17 @@ Letzte Aktualisierung: 11.11.2026, nach Phase 6 und 7.1 bis 7.3
 
 ## Phase 7 – Vorlagen und Export
 
-- [x] **7.1** Druckansicht Lastenheft mit Abschnitten 1 bis 12 und Anhang, Druck-CSS A4 mit 20 mm Rand, Titel für „als PDF“ (`ui/druck/Lastenheft.tsx`, Texte in `export/vorlagen.ts`) (E8 grün). Offen: PDF-Probe ablegen (mit 7.4)
+- [x] **7.1** Druckansicht Lastenheft mit Abschnitten 1 bis 12 und Anhang, Druck-CSS A4 mit 20 mm Rand, Titel für „als PDF“ (`ui/druck/Lastenheft.tsx`, Texte in `export/vorlagen.ts`) (E8 grün); PDF-Proben beider Vorlagen in `docs/proben/` (Lastenheft 9 Seiten, Entscheidungsvorlage 3 Seiten)
 - [x] **7.2** Entscheidungsvorlage mit Empfehlung im Kasten, Begründung oder Entwurf, Ausgangslage, Vorgehen, Ergebnis, Kosten, Sensitivität, Risiken, Freigabe; Bedienung mit Wahl, „Entwurf erzeugen“, Risiken und Status mit Sperre D5 (E1 vollständig grün)
 - [x] **7.3** CSV-Anbieterfragebogen `export/csv.ts` (T-C1 bis T-C3 und E7 grün)
-- [ ] **7.4** README mit Bildern, `docs/datenmodell.md`
+- [x] **7.4** README mit Bildern, Fallbeispiel, Formeln, Daten und Sicherheit, Bedienung und Grenzen; Bilder und PDF-Proben per `scripts/readme-bilder.mjs`; `docs/datenmodell.md` als Kurzfassung des Dateiformats
 
 ## Phase 8 – Qualität und Version 0.1.0
 
-- [ ] **8.1** Alle Browsertests E1 bis E11 (laut Auftrag nur lokal, siehe entscheidungen.md). **Stand:** E1 bis E11 stehen in `e2e/` und sind lokal grün (19 Tests); eine CI gibt es mangels Repo noch nicht.
-- [ ] **8.2** Barrierefreiheit und Tastatur (E5, E9). **Stand:** E5 (Tastatur) und E9 (axe in allen Schritten, hell und dunkel) grün.
-- [ ] **8.3** Durchsicht mit Robin an einem echten Fall
-- [ ] **8.4** Tag `v0.1.0` (Repo bleibt privat)
+- [x] **8.1** Browsertests E1 bis E11 in `e2e/` (19 Tests), lokal mit Edge grün. Laut Auftrag läuft die CI nur mit lint, test und build (U1); einen CI-Lauf gibt es erst, wenn das Repo angelegt ist (0.3). `npm audit`: 0 Schwachstellen (11.11.2026).
+- [x] **8.2** Barrierefreiheit und Tastatur: E9 (axe in allen Schritten und Reitern, hell und dunkel, dazu Farbschema-Wahl) und E5 (ganzer Durchlauf nur mit Tastatur, Fokus auf die Überschrift beim Schrittwechsel) grün; jedes Eingabefeld beschriftet.
+- [ ] **8.3** Durchsicht mit Robin an einem echten Fall. **Offen, braucht Robin.** Vorschlag für die Durchsicht: ein eigenes Prozessmodell aus dem Prozesslotsen einlesen, Umfang und Vorschläge prüfen, zwei echte Angebote erfassen und die Entscheidungsvorlage als PDF lesen; besonders Kataloginhalte (offene Frage 4) und Satzmuster der Anforderungen. Befunde als Issues, sobald es das Repo gibt.
+- [ ] **8.4** Tag `v0.1.0` (Repo bleibt privat). **Bewusst noch nicht gesetzt** (U52): erst nach der Durchsicht 8.3. Dann: Version in `package.json` und `App.tsx` auf 0.1.0, `git tag -a v0.1.0 -m "Version 0.1.0"`, mit dem Repo pushen.
 
 ## Phase 9 – Windows-Programm mit Tauri (später, nach W3 des Prozesslotsen)
 
@@ -85,7 +85,7 @@ Letzte Aktualisierung: 11.11.2026, nach Phase 6 und 7.1 bis 7.3
 
 - **Repo:** Lokal liegen alle Commits auf `main`. Das private GitHub-Repo `edgebird-lab/auswahllotse` ist noch nicht angelegt, weil die Rechteprüfung der Sitzung `gh repo create` abgelehnt hat. Sobald Robin es anlegt oder freigibt: `gh repo create edgebird-lab/auswahllotse --private --source . --remote origin` und `git push -u origin main`; danach den ersten CI-Lauf prüfen (Schritt 0.3).
 - **Prüfen vor jedem Commit:** `npm run lint`, `npm test`, `npm run build`, `npm run e2e` (Edge, Port 4183 fest).
-- **Nächster Schritt:** 7.4 (README mit Bildern per `scripts/readme-bilder.mjs`, PDF-Proben, `docs/datenmodell.md`), danach 8.1 bis 8.4.
+- **Nächster Schritt:** Repo anlegen und pushen (0.3), Durchsicht mit Robin (8.3), danach Tag `v0.1.0` (8.4). Phase 9 (Tauri) erst nach W3 des Prozesslotsen.
 - **Oberfläche:** `src/App.tsx` (Gerüst), `src/ui/schritte/*` (sieben Schritte), `src/ui/druck/*` (Vorlagen), `src/ui/diagramme/*` (SVG, Rechnungen in `geometrie.ts`). Alle Zahlen und Befunde liefert `berechneGesamt(projekt)` aus `entscheidung/gesamt.ts`; Änderungen laufen als reine Funktionen über `aendere` (Kontext in `ui/kontext.ts`).
 - **Ansehen:** `npm run build`, dann `npx vite preview --port 4183 --strictPort` und `node scripts/ansehen.mjs <ordner>` (Bildschirmfotos aller Schritte, hell und dunkel). Den Vorschau-Server danach beenden, sonst scheitert `npm run e2e` am belegten Port.
 - **Bausteine der Fachlogik:** Einlesen `prozessdatei/einlesen.ts` → `lastenheft/abgleich.ts` (`liesProzessEin`, `ohneProzessmodell`, `gleicheAb`) → Prüfungen `lastenheft/pruefung.ts` → Bewertung `bewertung/auswertung.ts` (`werteAus`). Alle Funktionen sind rein und geben neue Objekte zurück; die Oberfläche (Phase 6) braucht nur noch Zustand, Plattform und Darstellung.

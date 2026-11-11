@@ -20,6 +20,8 @@ async function alleSchritte(page: Page) {
 
 for (const schema of ['light', 'dark'] as const) {
   test(`alle Schritte ohne schwere Barrieren (${schema === 'light' ? 'hell' : 'dunkel'}, E9)`, async ({ page }) => {
+    // axe in allen Schritten und Reitern dauert unter Last länger als die üblichen 30 s
+    test.slow()
     await page.emulateMedia({ colorScheme: schema })
     await page.goto('/')
     await pruefeBarrieren(page)
@@ -33,6 +35,7 @@ for (const schema of ['light', 'dark'] as const) {
 }
 
 test('auch ein neues Projekt und das eingelesene Modell ohne schwere Barrieren', async ({ page }) => {
+  test.slow()
   await page.goto('/')
   await leseLieferdienstEin(page)
   await pruefeBarrieren(page)
