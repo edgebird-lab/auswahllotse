@@ -68,7 +68,7 @@ describe('Begründungsentwurf (6.13)', () => {
     p.gewichtung = { ...p.gewichtung, aenderungenNachBewertung: 2 }
     const s = saetze(p)
     expect(s).toContain('Beim einzigen Muss-Kriterium steht die Prüfung noch aus.')
-    expect(s).toContain('Hinweis: Gewichte oder Regel wurden nach Beginn der Bewertung 2-mal geändert.')
+    expect(s).toContain('Hinweis: Gewichte, Anforderungen oder Regel wurden nach Beginn der Bewertung 2-mal geändert.')
     expect(s[s.length - 1]).toBe('Das Ergebnis ist vorläufig: 1 Bewertung fehlt, 1 K.-o.-Prüfung ist offen.')
   })
 

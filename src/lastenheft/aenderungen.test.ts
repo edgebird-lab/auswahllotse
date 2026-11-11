@@ -81,3 +81,26 @@ describe('Umfang ändern (5.3, U2)', () => {
     expect(setzeGrundlage(p, 'ist', JETZT)).toBe(p)
   })
 })
+
+describe('Änderungszähler G5 bei Abgleichen nach Bewertungsbeginn', () => {
+  const bewertet = () => ({ ...lieferdienstAuswahl(), bewertungBegonnenAm: JETZT })
+  const zaehler = (p: AuswahlProjekt) => p.gewichtung.aenderungenNachBewertung
+
+  it('zählt einen Abgleich, der K.-o.-Kriterien oder Nutzwert verschiebt, einmal', () => {
+    // Warenwirtschaft nicht mehr ablösen: sieben Funktionen und eine Schnittstelle entfallen auf einmal
+    const p = setzeMediumStatus(bewertet(), 'med_erp', 'anbinden', JETZT)
+    expect(status(p, 'aufgabe:auf_erfassen')).toBe('verworfen')
+    expect(zaehler(p)).toBe(1)
+    // Daten über Personen „nein“: der Datenschutz-Katalog entfällt
+    expect(zaehler(setzeRahmen(p, { personenbezogen: 'nein' }, JETZT))).toBe(2)
+    // eine Aufgabe in den Umfang nehmen: neue Funktion
+    expect(zaehler(setzeAufgabeImUmfang(p, 'auf_annehmen', true, JETZT))).toBe(2)
+  })
+
+  it('zählt reine Textänderungen und Abgleiche vor Bewertungsbeginn nicht', () => {
+    // Antwortzeit und Betriebstage ändern nur Zahlen in Texten
+    expect(zaehler(setzeRichtwert(bewertet(), 'antwortzeitSek', 3, JETZT))).toBe(0)
+    expect(zaehler(setzeRahmen(bewertet(), { betriebstageProJahr: 220 }, JETZT))).toBe(0)
+    expect(zaehler(setzeMediumStatus(lieferdienstAuswahl(), 'med_erp', 'anbinden', JETZT))).toBe(0)
+  })
+})

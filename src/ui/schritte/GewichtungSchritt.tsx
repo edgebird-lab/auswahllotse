@@ -171,7 +171,7 @@ export function GewichtungSchritt() {
         </p>
         {nachBeginn && gw.aenderungenNachBewertung > 0 && (
           <p className="banner banner-warnung" role="note">
-            Nach Beginn der Bewertung wurden Gewichte, Punkte oder Regel {gw.aenderungenNachBewertung}-mal geändert. Die Entscheidungsvorlage nennt diese Zahl.
+            Nach Beginn der Bewertung wurden Gewichte, Anforderungen oder Regel {gw.aenderungenNachBewertung}-mal geändert. Die Entscheidungsvorlage nennt diese Zahl.
           </p>
         )}
         {nachBeginn && gw.aenderungenNachBewertung === 0 && <p className="feld-hilfe">Die Bewertung hat begonnen. Jede weitere Änderung hier wird gezählt und in der Vorlage genannt.</p>}

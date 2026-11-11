@@ -117,7 +117,7 @@ describe('Festlegen und Änderungen nach Bewertungsbeginn (G5, T-G4)', () => {
     p = setzeDirektAlle(p, { funktion: 50, betrieb: 30, anbieter: 20 })
     expect(p.gewichtung.aenderungenNachBewertung).toBe(1)
     // Satz 8 des Begründungsentwurfs (6.13)
-    expect(begruendungsSaetze(p, werteAus(p))).toContain('Hinweis: Gewichte oder Regel wurden nach Beginn der Bewertung 1-mal geändert.')
+    expect(begruendungsSaetze(p, werteAus(p))).toContain('Hinweis: Gewichte, Anforderungen oder Regel wurden nach Beginn der Bewertung 1-mal geändert.')
   })
 
   it('zählt Methode, Paarurteile, Regel, Mindestnutzwert und Budget, aber keine Wiederholungen desselben Werts', () => {

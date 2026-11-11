@@ -67,7 +67,7 @@ describe('Texte der Vorlagen (5.8)', () => {
       'Punkteskala je Soll- und Kann-Anforderung von 0 bis 10: 0 nicht, 3 ansatzweise, 5 teilweise oder mit Anpassung, 8 weitgehend im Standard, 10 vollständig im Standard.',
       'Entscheidungsregel: höchster Nutzwert. Budget 80.000 € als Richtwert.',
       'Gewichte und Regel festgelegt am 20.10.2026.',
-      'Nach Beginn der Bewertung am 04.11.2026 wurden Gewichte und Regel nicht geändert.',
+      'Nach Beginn der Bewertung am 04.11.2026 wurden Gewichte, Anforderungen und Regel nicht geändert.',
     ])
   })
 
@@ -88,7 +88,7 @@ describe('Texte der Vorlagen (5.8)', () => {
     // T-AHP1: w = (4/7, 2/7, 1/7), CR 0
     expect(punkte[1]).toBe('Gewichte per Paarvergleich (AHP, Eigenvektorverfahren): Funktionen 57,1 %, Betrieb und Support 28,6 %, Anbieter und Einführung 14,3 %. Konsistenz CR 0,00 (stimmig, Grenze 0,10).')
     expect(punkte[3]).toBe('Entscheidungsregel: bestes Preis-Leistungs-Verhältnis (Mindestnutzwert 6,5).')
-    expect(punkte[5]).toBe('Nach Beginn der Bewertung am 11.11.2026 wurden Gewichte, Punkte oder Regel 1-mal geändert.')
+    expect(punkte[5]).toBe('Nach Beginn der Bewertung am 11.11.2026 wurden Gewichte, Anforderungen oder Regel 1-mal geändert.')
   })
 
   it('bildet den Titel für Druck und PDF', () => {

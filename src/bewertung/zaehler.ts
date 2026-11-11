@@ -4,11 +4,27 @@
  * Anforderungen, Regel, Mindestnutzwert, Budget). Die Entscheidungsvorlage
  * nennt die Zahl, damit nachträgliches Drehen an den Gewichten sichtbar wird.
  */
-import type { AuswahlProjekt } from '../modell/typen'
+import type { Anforderung, AuswahlProjekt } from '../modell/typen'
 
 export function zaehleAenderung(p: AuswahlProjekt): AuswahlProjekt {
   if (p.bewertungBegonnenAm === null) return p
   return { ...p, gewichtung: { ...p.gewichtung, aenderungenNachBewertung: p.gewichtung.aenderungenNachBewertung + 1 } }
+}
+
+/** Was eine Anforderung zum Ergebnis beiträgt: aktiv mit Priorität (K.-o. oder Nutzwert) und Punkten. */
+const wirkung = (a: Anforderung) => (a.status === 'aktiv' ? `${a.prioritaet}:${a.punkte}` : '')
+
+/**
+ * G5 für Abgleiche (Neu einlesen, Rahmen, Umfang, ohne Prozessmodell): zählt
+ * einmal, wenn dabei eine Anforderung aktiv wird oder wegfällt oder ihre
+ * Priorität oder Punkte wechseln. Reine Textänderungen zählen nicht.
+ */
+export function zaehleAbgleich(vorher: readonly Anforderung[], p: AuswahlProjekt): AuswahlProjekt {
+  if (p.bewertungBegonnenAm === null) return p
+  const alt = new Map(vorher.map((a) => [a.id, wirkung(a)]))
+  const neu = new Map(p.anforderungen.map((a) => [a.id, wirkung(a)]))
+  const geaendert = [...new Set([...alt.keys(), ...neu.keys()])].some((id) => (alt.get(id) ?? '') !== (neu.get(id) ?? ''))
+  return geaendert ? zaehleAenderung(p) : p
 }
 
 /** Projekt ohne Zähler und Änderungszeit, um den Inhalt zweier Stände zu vergleichen. */

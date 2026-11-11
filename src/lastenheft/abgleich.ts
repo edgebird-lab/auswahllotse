@@ -10,6 +10,7 @@
  * übergebenen Projekt; die Oberfläche zeigt erst die Vorschau und übernimmt
  * das Ergebnis nur auf Wunsch.
  */
+import { zaehleAbgleich } from '../bewertung/zaehler'
 import { datum } from '../modell/zahlformat'
 import type { Anforderung, AuswahlProjekt, HerkunftArt, ProzessQuelle, Softwareart, Umfang } from '../modell/typen'
 import type { PlProjekt } from '../prozessdatei/format'
@@ -96,7 +97,8 @@ export function gleicheAb(projekt: AuswahlProjekt, jetzt: string): Abgleich {
     const hinweis = notizEntfallen(alt.herkunft.art, jetzt)
     ergebnis.push({ ...alt, status: 'verworfen', notiz: alt.notiz ? `${alt.notiz}\n${hinweis}` : hinweis })
   }
-  return { projekt: { ...projekt, anforderungen: ergebnis, naechsteNummer: naechste }, vorschau }
+  // G5: Verschiebt der Abgleich nach Bewertungsbeginn K.-o.-Kriterien oder Nutzwert, zählt er als Änderung
+  return { projekt: zaehleAbgleich(projekt.anforderungen, { ...projekt, anforderungen: ergebnis, naechsteNummer: naechste }), vorschau }
 }
 
 /**

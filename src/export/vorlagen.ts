@@ -98,8 +98,8 @@ export function vorgehenPunkte(p: AuswahlProjekt, g: Gesamt): string[] {
   if (p.bewertungBegonnenAm) {
     punkte.push(
       gw.aenderungenNachBewertung > 0
-        ? `Nach Beginn der Bewertung am ${datum(p.bewertungBegonnenAm)} wurden Gewichte, Punkte oder Regel ${gw.aenderungenNachBewertung}-mal geändert.`
-        : `Nach Beginn der Bewertung am ${datum(p.bewertungBegonnenAm)} wurden Gewichte und Regel nicht geändert.`,
+        ? `Nach Beginn der Bewertung am ${datum(p.bewertungBegonnenAm)} wurden Gewichte, Anforderungen oder Regel ${gw.aenderungenNachBewertung}-mal geändert.`
+        : `Nach Beginn der Bewertung am ${datum(p.bewertungBegonnenAm)} wurden Gewichte, Anforderungen und Regel nicht geändert.`,
     )
   }
   return punkte

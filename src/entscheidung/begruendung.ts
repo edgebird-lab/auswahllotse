@@ -124,7 +124,7 @@ export function begruendungsSaetze(p: AuswahlProjekt, w: Auswertung): string[] {
 
   // 8
   const z = p.gewichtung.aenderungenNachBewertung
-  if (z > 0) saetze.push(`Hinweis: Gewichte oder Regel wurden nach Beginn der Bewertung ${z}-mal geändert.`)
+  if (z > 0) saetze.push(`Hinweis: Gewichte, Anforderungen oder Regel wurden nach Beginn der Bewertung ${z}-mal geändert.`)
 
   // 9
   if (w.vorlaeufig) {
