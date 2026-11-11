@@ -49,6 +49,16 @@ export function rolleVon(p: PlProzess, id: PlId | null): PlRolle | undefined {
   return id === null ? undefined : p.rollen.find((r) => r.id === id)
 }
 
+/** Aufgabe aus Ist oder Soll, Grundlage zuerst (für Namen bei Medienbrüchen nach U5). */
+export function findeAufgabe(projekt: PlProjekt, id: PlId, grundlage: 'ist' | 'soll'): PlAufgabe | undefined {
+  const reihenfolge = grundlage === 'soll' && projekt.soll ? [projekt.soll, projekt.ist] : [projekt.ist, projekt.soll]
+  for (const p of reihenfolge) {
+    const a = p ? aufgabenVon(p).find((x) => x.id === id) : undefined
+    if (a) return a
+  }
+  return undefined
+}
+
 export function mediumVon(p: PlProzess, id: PlId | null): PlMedium | undefined {
   return id === null ? undefined : p.medien.find((m) => m.id === id)
 }

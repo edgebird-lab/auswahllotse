@@ -27,12 +27,12 @@ Letzte Aktualisierung: 11.11.2026
 ## Phase 3 – Lastenheft ableiten
 
 - [x] **3.1** `lastenheft/umfang.ts` U1 bis U3 (T-U1 bis T-U3 grün)
-- [ ] **3.2** Funktionen und Entscheidungs-Vorschläge A0 bis A3 (T-A1, T-A2)
-- [ ] **3.3** Schnittstellen aus Medienbrüchen U4, U5, A4 (T-A3 bis T-A5)
-- [ ] **3.4** Rollen, Freigaben, Prüfungen, Mengengerüst A5 bis A8 (T-A6, T-A7)
-- [ ] **3.5** Katalog und Bausteine, `docs/kataloge.md` (T-A8 bis T-A10)
-- [ ] **3.6** Prüfungen P1 bis P11, Nummernvergabe (T-P1 bis T-P6)
-- [ ] **3.7** Neu einlesen mit Abgleich und Vorschau, ohne Prozessmodell (T-A11, T-A12)
+- [x] **3.2** `ableitung.ts` A0 bis A3, Satzbausteine in `texte.ts`, Zahlen in `modell/zahlformat.ts` (T-A1, T-A2 grün)
+- [x] **3.3** Schnittstellen aus Medienbrüchen U4, U5, A4 in `ableitung.ts` und `schnittstellen.ts` (T-A3 bis T-A5 grün)
+- [x] **3.4** Rollen, Freigaben, Prüfungen, Mengengerüst A5 bis A8 (T-A6, T-A7 grün)
+- [x] **3.5** `katalog.ts` mit 21 Einträgen und 24 Bausteinen, dreiwertige Bedingungen; `docs/kataloge.md` aus den Daten erzeugt, ein Test hält beide gleich (T-A8 bis T-A10 grün)
+- [x] **3.6** `pruefung.ts` P1 bis P10, `nummern.ts` P11, Bearbeiten in `operationen.ts` (Übernehmen, Verwerfen, Wiederherstellen, Priorität mit Modalverb, Texte, Punkte, eigene Anforderungen) (T-P1 bis T-P6 grün)
+- [x] **3.7** `abgleich.ts`: erstes Einlesen, Neu einlesen und Abgleich nach Rahmenänderung mit Vorschau „n neu, g geändert, e entfallen“; ohne Prozessmodell (T-A11, T-A12 grün)
 
 ## Phase 4 – Gewichtung und Nutzwert
 
