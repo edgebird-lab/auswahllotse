@@ -1,6 +1,6 @@
 # Auswahl-Lotse – Hinweise für die Arbeit am Projekt
 
-- Portfolio-Projekt von Robin (Wirtschaftsinformatik, olbricht-digital). Repo `edgebird-lab/auswahllotse`; Robin hat am 11.11.2026 die Veröffentlichung freigegeben (Release mit Windows-Installer, vorerst keine Lizenz: alle Rechte vorbehalten, siehe README „Rechte“). Keine GitHub Pages, keine Geheimnisse ins Repo.
+- Portfolio-Projekt von Robin (Wirtschaftsinformatik, olbricht-digital). Repo `edgebird-lab/auswahllotse` ist **seit 11.11.2026 öffentlich** (auf Robins Freigabe); alles, was committet wird, ist sofort für alle sichtbar. Vorerst keine Lizenz: alle Rechte vorbehalten, siehe README „Rechte“. Keine GitHub Pages, keine Geheimnisse, Zugangsdaten oder privaten Notizen ins Repo.
 - Releases: Tag `v*` → `release.yml` legt einen Entwurf mit Installer und Kopie `Auswahl-Lotse-Setup.exe` an; erst nach Prüfung veröffentlichen (`gh release edit <tag> --draft=false --latest`). Den Namen `Auswahl-Lotse-Setup.exe` nie ändern: Die Website verlinkt `https://github.com/edgebird-lab/auswahllotse/releases/latest/download/Auswahl-Lotse-Setup.exe`. Neue Version: Schritte in `docs/stand.md` („Neue Version“).
 - Spezifikation: `docs/spezifikation.md` (lang, in Teilen lesen). Fortschritt mit Häkchen: `docs/stand.md`, nach jedem Schritt aktualisieren. Annahmen bis zu Robins Entscheidung: `docs/entscheidungen.md`.
 - Sprache: Oberfläche, Bezeichner (deutsch in ASCII: `ae`, `oe`, `ue`, `ss`), Doku und Commit-Nachrichten auf Deutsch. Keine KI-Funktionen, kein Server, Daten bleiben lokal.
