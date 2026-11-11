@@ -1,0 +1,5 @@
+# Von Cargo erzeugt (lokal liegt das Ziel meist in CARGO_TARGET_DIR)
+/target/
+
+# Von Tauri erzeugt (Schemas für die Rechte)
+/gen/schemas

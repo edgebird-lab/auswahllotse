@@ -1,8 +1,8 @@
 # Auswahl-Lotse
 
-Vom Prozessmodell zu Lastenheft und begründeter Softwareentscheidung. Der Auswahl-Lotse liest ein Projekt des Prozesslotsen, leitet daraus ein Lastenheft mit MoSCoW-Prioritäten und Abnahmekriterien ab, gewichtet Kriterien direkt oder per Paarvergleich (AHP), prüft K.-o.-Kriterien, bewertet Angebote per Nutzwertanalyse, vergleicht die Kosten über mehrere Jahre und schreibt eine druckbare Entscheidungsvorlage. Läuft im Browser, ohne KI und ohne Server; später auch als Windows-Programm.
+Vom Prozessmodell zu Lastenheft und begründeter Softwareentscheidung. Der Auswahl-Lotse liest ein Projekt des Prozesslotsen, leitet daraus ein Lastenheft mit MoSCoW-Prioritäten und Abnahmekriterien ab, gewichtet Kriterien direkt oder per Paarvergleich (AHP), prüft K.-o.-Kriterien, bewertet Angebote per Nutzwertanalyse, vergleicht die Kosten über mehrere Jahre und schreibt eine druckbare Entscheidungsvorlage. Läuft im Browser oder als Windows-Programm, ohne KI und ohne Server.
 
-> **Stand 11.11.2026:** in Arbeit, noch keine Version 0.1.0. Fachlogik und Oberfläche mit allen sieben Schritten, Druckvorlagen und CSV-Fragebogen sind fertig, getestet und kritisch gegen die Spezifikation geprüft. Es fehlen die Durchsicht an einem echten Fall, das GitHub-Repo mit CI und der Tag `v0.1.0`. Einzelheiten unter [Stand](#stand) und in [docs/stand.md](docs/stand.md).
+> **Stand 11.11.2026:** in Arbeit, noch keine Version 0.1.0. Fachlogik und Oberfläche mit allen sieben Schritten, Druckvorlagen und CSV-Fragebogen sind fertig, getestet und kritisch gegen die Spezifikation geprüft. Das Windows-Programm (Phase 9) ist gebaut und getestet. Es fehlen die Durchsicht an einem echten Fall und der Tag `v0.1.0`. Einzelheiten unter [Stand](#stand) und in [docs/stand.md](docs/stand.md).
 
 ![Ergebnis des Fallbeispiels: Empfehlung, K.-o.-Prüfung und Nutzwert als gestapelte Balken](docs/bilder/ergebnis.png)
 
@@ -65,7 +65,8 @@ Alle Schwellen stehen mit Quelle in [`src/regeln/schwellen.ts`](src/regeln/schwe
 - **Alles lokal:** kein Server, keine KI, keine Telemetrie. Das Projekt liegt im Browser-Speicher dieses Geräts und als `.auswahllotse`-Datei, die Sie selbst speichern. „Browser-Speicher leeren“ im Fuß ist für gemeinsam genutzte Rechner gedacht.
 - **Nichts geht still verloren:** Lässt sich der im Browser gesicherte Stand beim Start nicht lesen, bleibt er als Kopie erhalten; eine Meldung nennt den Grund und bietet „Kopie herunterladen“ an.
 - **Beim Öffnen geprüft:** Projektdateien werden Feld für Feld geprüft (Typen, Auswahlwerte, eindeutige Kennungen); eine beschädigte Datei ergibt eine Meldung mit der Stelle, das geöffnete Projekt bleibt unverändert.
-- **Inhaltsrichtlinie:** Der Build erlaubt nur eigene Dateien und keine Verbindungen nach außen (`connect-src 'none'`).
+- **Inhaltsrichtlinie:** Der Build erlaubt nur eigene Dateien und keine Verbindungen nach außen (`connect-src 'none'`). Im Windows-Programm setzt Tauri eine ebenso enge Richtlinie, die nur die Verbindung zum eigenen Programmteil zulässt.
+- **Windows-Programm:** Die Oberfläche hat keine allgemeinen Dateirechte. Geschrieben wird nur auf Pfade, die Sie selbst gewählt haben (Speichern unter, geöffnetes Projekt), und zwar über eine Hilfsdatei, damit ein Absturz keine halbe Datei hinterlässt. Prozesslotse- und BPMN-Dateien werden nur gelesen.
 - **Eingaben:** Größen- und Tiefengrenzen beim Einlesen, BPMN mit DOCTYPE wird vor dem Parsen abgelehnt, eingelesene Daten werden Feld für Feld kopiert.
 - **CSV:** Formelschutz für Felder, die Excel als Formel lesen würde.
 - Dateiformat: [docs/datenmodell.md](docs/datenmodell.md).
@@ -74,11 +75,13 @@ Alle Schwellen stehen mit Quelle in [`src/regeln/schwellen.ts`](src/regeln/schwe
 
 | Taste | Wirkung |
 | --- | --- |
-| Strg+S | Projekt als Datei speichern |
+| Strg+S | Projekt speichern (im Programm an den bekannten Ort, sonst mit Rückfrage nach dem Ort) |
+| Strg+Umschalt+S | Speichern unter |
 | Strg+O | Projektdatei öffnen |
+| Strg+N | Neues Projekt (nur im Programm) |
 | Strg+Z, Strg+Y | Rückgängig, Wiederholen (außerhalb von Eingabefeldern) |
 
-Prozesslotse-Dateien werden im Schritt „Prozess“ eingelesen, nicht über „Öffnen“.
+Prozesslotse-Dateien werden im Schritt „Prozess“ eingelesen, nicht über „Öffnen“. Im Programm geht das auch über „Datei > Prozessmodell einlesen …“, per „Öffnen mit“ oder durch Ziehen ins Fenster.
 
 Zahlen versteht die App deutsch geschrieben: „1.234,50“, „1234,5“ und „90.000“ (Punkte in Dreiergruppen sind Tausendertrennzeichen). Ein einzelner Punkt ohne Dreiergruppe gilt als Dezimalpunkt („2.5“ ist 2,5). Nach Beginn der Bewertung zählt jede Änderung an Gewichten, Anforderungen oder Regel einmal, auch wenn man Ziffer für Ziffer tippt; die Entscheidungsvorlage nennt die Zahl.
 
@@ -95,6 +98,30 @@ npm run preview    # gebaute App auf http://localhost:4183 (fester Port)
 
 Im Browser „Beispiel laden“ öffnet das Fallbeispiel; ein eigenes Prozessmodell liest man im Schritt „Prozess“ ein (`.prozesslotse`, `.json` oder `.bpmn` mit eingebettetem Projekt).
 
+Als Windows-Programm: einmal `npm run desktop:build`, dann den Installer `Auswahl-Lotse_<Version>_x64-setup.exe` aus `…/release/bundle/nsis/` ausführen (pro Benutzer, ohne Admin-Rechte). Gestartet wird über die Verknüpfung „Auswahl-Lotse“ auf dem Desktop, über das Startmenü oder per Doppelklick auf eine `.auswahllotse`-Datei. Einzelheiten unter [Windows-Programm](#windows-programm).
+
+## Windows-Programm
+
+Der Auswahl-Lotse läuft auch als Windows-Programm (Tauri 2 mit WebView2, App-ID `de.olbricht-digital.auswahllotse`). Gleiche Oberfläche, dazu:
+
+- **Installation pro Benutzer ohne Admin-Rechte:** Der Installer (NSIS, deutsch, etwa 1,3 MB; WebView2 bringt Windows 11 mit) legt das Programm unter `%LOCALAPPDATA%\Auswahl-Lotse` ab, mit Eintrag im Startmenü und Verknüpfung „Auswahl-Lotse“ auf dem Desktop. Entfernen über Einstellungen > Apps. Noch nicht signiert: Bei einem heruntergeladenen Installer fragt SmartScreen beim ersten Start nach.
+- **Dateien:** `.auswahllotse` öffnet sich per Doppelklick. Ein zweiter Doppelklick landet im laufenden Programm (eine Instanz). `.prozesslotse` und `.bpmn` werden nicht zugeordnet; man liest sie über den Dialog ein. Dateien lassen sich auch ins Fenster ziehen: Projekte werden geöffnet, Prozessmodelle eingelesen.
+- **Menü „Datei“:** Neu, Öffnen, Prozessmodell einlesen, Speichern, Speichern unter, Anbieterfragebogen als CSV, Beispiel laden, Beenden. Beim Schließen mit ungespeicherten Änderungen fragt das Programm nach; „Nicht speichern“ verwirft sie auch für den nächsten Start.
+- **PDF ohne Druckdialog:** In beiden Vorlagen schreibt „Als PDF speichern …“ die angezeigte Vorlage direkt über WebView2 als PDF (A4, 20 mm Rand). „Drucken …“ öffnet den Druckdialog.
+- Programmdaten (zuletzt bearbeitetes Projekt, Einstellungen) liegen unter `%LOCALAPPDATA%\de.olbricht-digital.auswahllotse`.
+
+Bauen und prüfen (Rust stable, z. B. per rustup; dazu Node 24):
+
+```bash
+cargo test --manifest-path src-tauri/Cargo.toml   # Rust-Tests (Argumente, atomares Speichern, Endungen, Erkennung)
+npx tauri build --debug --no-bundle               # Debug-Programm für den Desktop-Test
+npm run desktop:test                              # Desktop-Test ohne Installation (WebView2-Debugport 9335)
+npm run desktop:build                             # Release mit Installer unter …/release/bundle/nsis/
+npm run desktop                                   # Entwicklung mit Neuladen (Vite auf Port 5183)
+```
+
+Der Desktop-Test startet das echte Programm und steuert es über die Debug-Schnittstelle von WebView2. Dateidialoge beantwortet nur der Debug-Build über Umgebungsvariablen; im Release fehlt das. Weil ein installierter Auswahl-Lotse dieselben Programmdaten nutzt, benennt der Test sie vorher um und stellt sie danach wieder her; läuft der Auswahl-Lotse, bricht der Test ab. Die CI baut das Programm auf Windows, installiert es still, prüft Zuordnung und Verknüpfungen und deinstalliert es wieder (`src-tauri/windows/installer-test.ps1`).
+
 ## Tests
 
 ```bash
@@ -103,8 +130,9 @@ npm test           # Unit-Tests der Fachlogik (Vitest)
 npm run e2e        # Browsertests mit Playwright und axe (lokal Edge, Port 4183 fest)
 ```
 
-- **255 Unit-Tests in 28 Dateien:** alle Testwerte der Spezifikation (Abschnitt 9.1, von Hand nachgerechnet), dazu Randfälle wie Tausenderpunkt, Rundung an Halbwerten, doppelte Kennungen und unlesbarer Browser-Speicher. Das Fallbeispiel prüft auch die Zahlen dieser README.
+- **258 Unit-Tests in 28 Dateien:** alle Testwerte der Spezifikation (Abschnitt 9.1, von Hand nachgerechnet), dazu Randfälle wie Tausenderpunkt, Rundung an Halbwerten, doppelte Kennungen und unlesbarer Browser-Speicher. Das Fallbeispiel prüft auch die Zahlen dieser README.
 - **22 Browsertests:** E1 bis E11 der Spezifikation, axe in allen Schritten und Reitern hell und dunkel, ganzer Durchlauf nur mit Tastatur, Speichern und Öffnen, beschädigter Browser-Speicher, Zahleneingabe mit Änderungszähler und Sprung von Befunden zur Ursache.
+- **Windows-Programm:** 6 Rust-Tests und der Desktop-Test mit 48 Prüfungen am echten Programm (siehe [Windows-Programm](#windows-programm)).
 - Vor jedem Commit laufen lint, Unit-Tests, Build und Browsertests. Der Port 4183 muss frei sein; ein laufender Vorschau-Server lässt `npm run e2e` abbrechen.
 
 Bilder und PDF-Proben neu erzeugen: `npm run build`, dann `npx vite preview --port 4183 --strictPort` und `node scripts/readme-bilder.mjs`. Rundgang mit Bildschirmfotos: `node scripts/ansehen.mjs <ordner>`. Das Fallbeispiel neu schreiben: `npx vitest run -u src/beispiel`.
@@ -115,10 +143,10 @@ Aufbau: Fachlogik ohne React in `src/prozessdatei`, `src/modell`, `src/lastenhef
 
 | Phase | Stand |
 | --- | --- |
-| 0 Einrichten | fertig bis auf das GitHub-Repo: `gh repo create` wurde in der Arbeitssitzung von der Rechteprüfung abgelehnt; daher noch kein Push und kein CI-Lauf |
+| 0 Einrichten | fertig; privates Repo und CI seit 11.11.2026 |
 | 1 bis 7 Datenmodell, Einlesen, Lastenheft, Gewichtung, Kosten, Oberfläche, Vorlagen | fertig und getestet |
 | 8 Qualität | Browsertests, Barrierefreiheit und Tastatur fertig; die kritische Prüfung vom 11.11.2026 hat elf Fehler und Schwächen gefunden und behoben (Liste in [docs/stand.md](docs/stand.md)). Offen: Durchsicht mit Robin an einem echten Fall (8.3), danach Tag `v0.1.0` (8.4) |
-| 9 Windows-Programm mit Tauri | später, nach Schritt W3 des Prozesslotsen |
+| 9 Windows-Programm mit Tauri | fertig (auf Robins Wunsch vorgezogen): Plattformschicht, Installer pro Benutzer, Zuordnung `.auswahllotse`, Einlese-Dialog, eine Instanz, atomares Speichern, PDF beider Vorlagen, Desktop-Test, Windows-Job in der CI |
 
 Offene Fragen der Spezifikation (Kataloginhalte, Festlegungen, Lizenz) gelten als Annahmen, bis Robin entscheidet: [docs/entscheidungen.md](docs/entscheidungen.md).
 
@@ -132,3 +160,4 @@ Offene Fragen der Spezifikation (Kataloginhalte, Festlegungen, Lizenz) gelten al
 - Änderungszähler: Eine Eingabe zählt wie ein Rückgängig-Schritt; wer beim Tippen länger als 1,5 Sekunden pausiert, erzeugt zwei Änderungen.
 - Ein auf „final“ gesetzter Status bleibt stehen, wenn später Fehler hinzukommen; die App warnt dann, setzt ihn aber nicht selbst zurück.
 - Im Browser: PDF nur über den Druckdialog, keine Rückfrage beim Schließen des Tabs (das Projekt liegt ohnehin im Browser-Speicher), kein Ablegen von Dateien per Ziehen.
+- Windows-Programm: nicht signiert, keine automatischen Updates; nach einem Neustart kennt es den Pfad der zuletzt bearbeiteten Datei nicht mehr, Strg+S fragt dann einmal nach dem Ort.

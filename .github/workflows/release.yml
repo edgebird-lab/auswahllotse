@@ -1,0 +1,39 @@
+name: Version vorbereiten
+
+# Bei einem Tag wie v0.1.0 entsteht ein Release-Entwurf mit Installer.
+# Veröffentlicht wird nichts: Der Entwurf bleibt unsichtbar, und das Repo bleibt privat,
+# bis Robin beides ausdrücklich freigibt.
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri -> target
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+      - run: cargo test --manifest-path src-tauri/Cargo.toml
+      - uses: tauri-apps/tauri-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: Auswahl-Lotse ${{ github.ref_name }}
+          releaseBody: Installer für Windows (pro Benutzer, ohne Admin-Rechte). Noch nicht signiert; SmartScreen fragt beim ersten Start nach.
+          releaseDraft: true
+          prerelease: false

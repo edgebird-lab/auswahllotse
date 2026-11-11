@@ -8,7 +8,7 @@ import { berechneGesamt } from './entscheidung/gesamt'
 import { neuesArbeitsprojekt } from './lastenheft/aenderungen'
 import { ladeBrowserStand, ladeDokumentInfo, ladeEinstellungen, speichereDokumentInfo, speichereEinstellungen, speichereImBrowser, unlesbarerStand } from './modell/speicher'
 import type { AuswahlProjekt, Einstellungen } from './modell/typen'
-import { plattform } from './plattform'
+import { plattform, type MenueBefehl } from './plattform'
 import type { Ziel } from './ui/befundziel'
 import { startSchritt, useDateiBefehle } from './ui/datei'
 import { Schalter } from './ui/Eingaben'
@@ -135,7 +135,60 @@ function Hauptfenster() {
     else ziel.scrollIntoView({ block: 'center' })
   }, [z.schritt, sprung])
 
-  const oeffnen = useCallback(() => projektFeld.current?.click(), [])
+  // Öffnen: im Programm der Dialog des Systems, im Browser das Dateifeld
+  const oeffnen = useCallback(() => {
+    if (plattform.desktop) void befehle.oeffnen()
+    else projektFeld.current?.click()
+  }, [befehle])
+
+  // Programm: Ereignisse des Rust-Teils kommen jederzeit; sie nutzen immer die aktuellen Befehle,
+  // ohne sich bei jeder Änderung neu anzumelden
+  const befehleRef = useRef(befehle)
+  useEffect(() => {
+    befehleRef.current = befehle
+  }, [befehle])
+  const menueRef = useRef<(b: MenueBefehl) => void>(() => {})
+  useEffect(() => {
+    menueRef.current = (b) => {
+      switch (b) {
+        case 'neu':
+          return void befehle.neu()
+        case 'oeffnen':
+          return oeffnen()
+        case 'importieren':
+          return void befehle.importiere()
+        case 'speichern':
+          return void befehle.speichern()
+        case 'speichernUnter':
+          return void befehle.speichernUnter()
+        case 'fragebogen':
+          return void befehle.fragebogen()
+        case 'beispiel':
+          return void befehle.ladeBeispiel()
+        case 'ueber':
+          return void frage({
+            titel: 'Auswahl-Lotse',
+            text: `Version ${VERSION}. Vom Prozessmodell zu Lastenheft und begründeter Softwareentscheidung. Läuft ohne Server und ohne KI; Projekte bleiben auf diesem Rechner. Rechtliche Hinweise ohne Gewähr, keine Rechtsberatung.`,
+            knoepfe: [{ wert: 'ok', text: 'Schließen', art: 'haupt' }],
+            abbrechen: 'ok',
+          })
+      }
+    }
+  }, [befehle, oeffnen, frage])
+
+  // Programm: Startdatei (Doppelklick im Explorer), weitere Dateien, Menü, Rückfrage beim Schließen
+  const gestartet = useRef(false)
+  useEffect(() => {
+    if (!plattform.desktop || gestartet.current) return
+    gestartet.current = true
+    void plattform.startDatei().then(
+      (d) => d && befehleRef.current.oeffneOderLiesEin(d),
+      (e: unknown) => zeigeFehler(`Die Datei beim Start ließ sich nicht lesen: ${e instanceof Error ? e.message : String(e)}`),
+    )
+  }, [zeigeFehler])
+  useEffect(() => plattform.beiDatei((d) => void befehleRef.current.oeffneOderLiesEin(d), zeigeFehler), [zeigeFehler])
+  useEffect(() => plattform.beiMenue((b) => menueRef.current(b)), [])
+  useEffect(() => plattform.beimSchliessen(() => befehleRef.current.darfSchliessen()), [])
 
   useEffect(() => {
     const taste = (e: KeyboardEvent) => {
@@ -143,7 +196,13 @@ function Hauptfenster() {
       const k = e.key.toLowerCase()
       if (k === 's') {
         e.preventDefault()
-        void befehle.speichern()
+        void (e.shiftKey ? befehle.speichernUnter() : befehle.speichern())
+        return
+      }
+      // Strg+N öffnet im Browser ein neues Fenster; nur im Programm gehört es der App
+      if (k === 'n' && !e.shiftKey && plattform.desktop) {
+        e.preventDefault()
+        void befehle.neu()
         return
       }
       if (k === 'o' && !e.shiftKey) {
@@ -271,9 +330,12 @@ function Hauptfenster() {
         </main>
         <footer className="fuss">
           <p>Auswahl-Lotse {VERSION} · Alle Daten bleiben auf diesem Gerät, ohne Server und ohne KI. Rechtliche Hinweise ohne Gewähr, keine Rechtsberatung.</p>
-          <button type="button" className="knopf knopf-klein knopf-leise" onClick={() => void befehle.leereSpeicher()}>
-            Browser-Speicher leeren
-          </button>
+          {/* Im Programm liegen die Daten im Benutzerprofil von Windows; das Leeren für gemeinsam genutzte Browser entfällt */}
+          {!plattform.desktop && (
+            <button type="button" className="knopf knopf-klein knopf-leise" onClick={() => void befehle.leereSpeicher()}>
+              Browser-Speicher leeren
+            </button>
+          )}
         </footer>
       </div>
     </AppKontext.Provider>

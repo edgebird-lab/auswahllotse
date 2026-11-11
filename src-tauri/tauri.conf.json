@@ -1,0 +1,57 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "Auswahl-Lotse",
+  "mainBinaryName": "auswahllotse",
+  "version": "../package.json",
+  "identifier": "de.olbricht-digital.auswahllotse",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:5183",
+    "beforeDevCommand": "npx vite --port 5183 --strictPort",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Auswahl-Lotse",
+        "width": 1360,
+        "height": 860,
+        "minWidth": 960,
+        "minHeight": 600,
+        "center": true,
+        "dragDropEnabled": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; font-src 'self'; connect-src ipc: http://ipc.localhost; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'",
+      "freezePrototype": true
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis"],
+    "publisher": "Robin Olbricht",
+    "category": "Business",
+    "shortDescription": "Vom Prozessmodell zu Lastenheft und begründeter Softwareentscheidung",
+    "copyright": "© 2026 Robin Olbricht",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"],
+    "fileAssociations": [
+      {
+        "ext": ["auswahllotse"],
+        "name": "AuswahlLotse.Projekt",
+        "description": "Auswahl-Lotse-Projekt",
+        "mimeType": "application/vnd.auswahllotse+json",
+        "role": "Editor"
+      }
+    ],
+    "windows": {
+      "webviewInstallMode": { "type": "downloadBootstrapper", "silent": true },
+      "nsis": {
+        "installMode": "currentUser",
+        "languages": ["German"],
+        "compression": "lzma"
+      }
+    }
+  }
+}

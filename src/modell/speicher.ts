@@ -370,6 +370,24 @@ export function leseProjektText(text: string): AuswahlProjekt {
   return leseProjekt(daten)
 }
 
+/**
+ * Soll eine Datei als Projekt geöffnet oder als Prozessmodell eingelesen
+ * werden? Für Dateien, die per Doppelklick, „Öffnen mit“ oder Ziehen ins
+ * Programmfenster kommen. Entscheidend ist die Endung; `.json` und Unbekanntes
+ * gelten als Projekt, wenn sie das Merkmal `"app": "auswahllotse"` tragen.
+ */
+export function istProjektdatei(name: string, inhalt: string): boolean {
+  const endung = /\.([^.]+)$/.exec(name)?.[1]?.toLowerCase()
+  if (endung === DATEIENDUNG) return true
+  if (endung === 'prozesslotse' || endung === 'bpmn') return false
+  try {
+    const daten: unknown = JSON.parse(inhalt.replace(/^﻿/, ''))
+    return istObj(daten) && daten.app === 'auswahllotse'
+  } catch {
+    return false
+  }
+}
+
 /** JSON mit 2 Leerzeichen Einzug; als Datei UTF-8 ohne BOM. */
 export function alsJson(p: AuswahlProjekt): string {
   return JSON.stringify(p, null, 2)
@@ -432,6 +450,21 @@ export function unlesbarerStand(): string | null {
     return globalThis.localStorage.getItem(UNLESBAR_SCHLUESSEL)
   } catch {
     return null
+  }
+}
+
+/**
+ * Programm: „Nicht speichern“ beim Schließen. Der gesicherte Stand und der
+ * Dateiname fallen weg, damit der nächste Start die verworfenen Änderungen
+ * nicht wiederherstellt; Einstellungen bleiben.
+ */
+export function vergissProjektImBrowser(): boolean {
+  try {
+    globalThis.localStorage.removeItem(PROJEKT_SCHLUESSEL)
+    globalThis.localStorage.removeItem(DOKUMENT_SCHLUESSEL)
+    return true
+  } catch {
+    return false
   }
 }
 

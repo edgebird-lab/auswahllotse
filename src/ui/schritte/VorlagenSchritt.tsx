@@ -6,6 +6,8 @@ import { Lastenheft } from '../druck/Lastenheft'
 import { Entscheidungsvorlage } from '../druck/Entscheidungsvorlage'
 import { Feld, Reiter, ReiterFlaeche } from '../Eingaben'
 import { jetzt, useApp } from '../kontext'
+import type { Vorlage } from '../datei'
+import { plattform } from '../../plattform'
 
 export function VorlagenSchritt() {
   const { z, ansicht, setzeAnsicht, befehle } = useApp()
@@ -44,9 +46,7 @@ export function VorlagenSchritt() {
       {ansicht.vorlage === 'lastenheft' ? (
         <ReiterFlaeche idPraefix={praefix} id="lastenheft">
           <div className="bedienung knopfreihe vorlage-knoepfe">
-            <button type="button" className="knopf knopf-haupt" onClick={() => void befehle.drucken('Lastenheft')}>
-              Drucken / als PDF
-            </button>
+            <DruckKnoepfe was="Lastenheft" />
           </div>
           <Lastenheft />
         </ReiterFlaeche>
@@ -60,8 +60,30 @@ export function VorlagenSchritt() {
   )
 }
 
+/** Im Browser entsteht das PDF über den Druckdialog; im Programm gibt es dafür einen eigenen Knopf ohne Dialog. */
+function DruckKnoepfe({ was }: { was: Vorlage }) {
+  const { befehle } = useApp()
+  if (!plattform.desktop) {
+    return (
+      <button type="button" className="knopf knopf-haupt" onClick={() => void befehle.drucken(was)}>
+        Drucken / als PDF
+      </button>
+    )
+  }
+  return (
+    <>
+      <button type="button" className="knopf knopf-haupt" onClick={() => void befehle.alsPdf(was)}>
+        Als PDF speichern …
+      </button>
+      <button type="button" className="knopf" onClick={() => void befehle.drucken(was)}>
+        Drucken …
+      </button>
+    </>
+  )
+}
+
 function EntscheidungBedienung() {
-  const { z, g, aendere, befehle } = useApp()
+  const { z, g, aendere } = useApp()
   const p = z.projekt
   const e = p.entscheidung
   const w = g.auswertung
@@ -143,9 +165,7 @@ function EntscheidungBedienung() {
         </p>
       )}
       <div className="knopfreihe vorlage-knoepfe">
-        <button type="button" className="knopf knopf-haupt" onClick={() => void befehle.drucken('Entscheidungsvorlage')}>
-          Drucken / als PDF
-        </button>
+        <DruckKnoepfe was="Entscheidungsvorlage" />
       </div>
     </section>
   )

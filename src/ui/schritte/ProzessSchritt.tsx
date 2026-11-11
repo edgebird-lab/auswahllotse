@@ -5,6 +5,7 @@ import { mitEinheit } from '../../lastenheft/texte'
 import { alleMedien, standardStatus, statusVon } from '../../lastenheft/umfang'
 import type { MediumStatus } from '../../modell/typen'
 import { datum, proTag, zahl } from '../../modell/zahlformat'
+import { plattform } from '../../plattform'
 import { befundeDerQuelle } from '../../prozessdatei/einlesen'
 import { PL_FORMAT_AKTUELL, PL_MEDIUM_NAMEN, type PlBlock } from '../../prozessdatei/format'
 import { aufgabenVon, durchlaufe, grundlageVon, mediumVon, rolleVon } from '../../prozessdatei/struktur'
@@ -79,7 +80,8 @@ export function ProzessSchritt() {
           onChange={(e) => void gewaehlt(e)}
         />
         <div className="knopfreihe">
-          <button type="button" className="knopf knopf-haupt" onClick={() => feld.current?.click()}>
+          {/* Im Programm der Dialog des Systems (nur lesen, die Datei bleibt unverändert), im Browser das Dateifeld */}
+          <button type="button" className="knopf knopf-haupt" onClick={() => (plattform.desktop ? void befehle.importiere() : feld.current?.click())}>
             {quelle ? 'Neu einlesen …' : 'Prozesslotse-Datei wählen …'}
           </button>
           <button type="button" className="knopf" onClick={() => void befehle.ohneProzessmodell()}>

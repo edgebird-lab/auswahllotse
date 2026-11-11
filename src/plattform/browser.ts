@@ -27,6 +27,7 @@ export const browserPlattform: Plattform = {
   desktop: false,
   oeffnen: async () => null,
   importieren: async () => null,
+  startDatei: async () => null,
   speichern: async () => {
     throw new Error('Im Browser gibt es kein Speichern an einen Pfad.')
   },
@@ -44,8 +45,12 @@ export const browserPlattform: Plattform = {
       document.title = vorher
     }
   },
+  // PDF entsteht im Browser über den Druckdialog
+  alsPdf: async () => null,
   setzeTitel: (titel) => {
     document.title = titel
   },
+  beiDatei: () => () => {},
   beimSchliessen: () => () => {},
+  beiMenue: () => () => {},
 }

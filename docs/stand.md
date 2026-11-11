@@ -2,13 +2,13 @@
 
 Checkliste aller Phasen und Schritte aus [spezifikation.md](spezifikation.md), Abschnitt 11. Nach jedem Schritt aktualisieren, damit ein Nachfolger hier weitermachen kann. Annahmen stehen in [entscheidungen.md](entscheidungen.md).
 
-Letzte Aktualisierung: 11.11.2026, nach der kritischen Prüfung (siehe „Prüfung vom 11.11.2026“ unten)
+Letzte Aktualisierung: 11.11.2026, nach Phase 9 (Windows-Programm, auf Robins Wunsch vorgezogen und auf seinem Rechner installiert)
 
 ## Phase 0 – Einrichten
 
 - [x] **0.1** Vite 8, React 19, TypeScript 7, Vitest 5; Einstellungen wie beim Prozesslotsen. `npm run build` und Platzhaltertest laufen.
 - [x] **0.2** oxlint mit `react/no-danger` (an einer Probedatei geprüft), Playwright mit axe (lokal Edge, Port 4183 mit strictPort), Smoke-Test hell und dunkel. CSP-Meta-Tag per Vite-Plugin im Build.
-- [ ] **0.3** Workflow „Prüfung“ (`.github/workflows/ci.yml`, nur lint, test, build) und `CLAUDE.md` sind fertig. **Offen:** Das private Repo `edgebird-lab/auswahllotse` konnte nicht angelegt werden (`gh repo create` wurde von der Rechteprüfung der Sitzung abgelehnt); daher noch kein Push und kein CI-Lauf. Robin: Repo anlegen oder freigeben, dann `git push -u origin main`.
+- [x] **0.3** Workflow „Prüfung“ (`.github/workflows/ci.yml`, nur lint, test, build) und `CLAUDE.md`. Das private Repo `edgebird-lab/auswahllotse` gibt es seit 11.11.2026 (auf Robins Bitte angelegt); erster CI-Lauf am selben Tag grün.
 
 ## Phase 1 – Datenmodell und Speichern
 
@@ -68,18 +68,22 @@ Letzte Aktualisierung: 11.11.2026, nach der kritischen Prüfung (siehe „Prüfu
 
 ## Phase 8 – Qualität und Version 0.1.0
 
-- [x] **8.1** Browsertests E1 bis E11 in `e2e/` (seit der Prüfung 22 Tests), lokal mit Edge grün. Laut Auftrag läuft die CI nur mit lint, test und build (U1); einen CI-Lauf gibt es erst, wenn das Repo angelegt ist (0.3). `npm audit`: 0 Schwachstellen (11.11.2026).
+- [x] **8.1** Browsertests E1 bis E11 in `e2e/` (seit der Prüfung 22 Tests), lokal mit Edge grün. Laut Auftrag läuft die CI nur mit lint, test und build (U1); seit 11.11.2026 grün. `npm audit`: 0 Schwachstellen (11.11.2026).
 - [x] **8.2** Barrierefreiheit und Tastatur: E9 (axe in allen Schritten und Reitern, hell und dunkel, dazu Farbschema-Wahl) und E5 (ganzer Durchlauf nur mit Tastatur, Fokus auf die Überschrift beim Schrittwechsel) grün; jedes Eingabefeld beschriftet.
-- [ ] **8.3** Durchsicht mit Robin an einem echten Fall. **Offen, braucht Robin.** Vorschlag für die Durchsicht: ein eigenes Prozessmodell aus dem Prozesslotsen einlesen, Umfang und Vorschläge prüfen, zwei echte Angebote erfassen und die Entscheidungsvorlage als PDF lesen; besonders Kataloginhalte (offene Frage 4) und Satzmuster der Anforderungen. Befunde als Issues, sobald es das Repo gibt.
+- [ ] **8.3** Durchsicht mit Robin an einem echten Fall. **Offen, braucht Robin.** Vorschlag für die Durchsicht: ein eigenes Prozessmodell aus dem Prozesslotsen einlesen, Umfang und Vorschläge prüfen, zwei echte Angebote erfassen und die Entscheidungsvorlage als PDF lesen; besonders Kataloginhalte (offene Frage 4) und Satzmuster der Anforderungen. Befunde als Issues im Repo.
 - [ ] **8.4** Tag `v0.1.0` (Repo bleibt privat). **Bewusst noch nicht gesetzt** (U52): erst nach der Durchsicht 8.3. Dann: Version in `package.json` und `App.tsx` auf 0.1.0, `git tag -a v0.1.0 -m "Version 0.1.0"`, mit dem Repo pushen.
 
-## Phase 9 – Windows-Programm mit Tauri (später, nach W3 des Prozesslotsen)
+## Phase 9 – Windows-Programm mit Tauri
 
-- [ ] **9.1** Desktop-Teil der Plattformschicht
-- [ ] **9.2** Tauri-Gerüst
-- [ ] **9.3** Dateizuordnung, Import-Dialog, Single-Instance, atomares Speichern
-- [ ] **9.4** PDF über WebView2
-- [ ] **9.5** Test in der Windows Sandbox, Windows-Job in der CI
+Auf Robins ausdrücklichen Wunsch am 11.11.2026 vorgezogen („richtige Software mit exe“, vom Desktop zu starten); Vorbild ist das Windows-Programm des Prozesslotsen (W0 bis W5).
+
+- [x] **9.1** Plattformschicht `src/plattform`: Schnittstelle `typen.ts` um Startdatei, weitere Dateien, Menü, PDF erweitert; `desktop.ts` ruft die Rust-Befehle und lädt `@tauri-apps/api` nur per dynamischem Import; `index.ts` wählt anhand von `__TAURI_INTERNALS__`. Oberfläche: Speichern an den bekannten Pfad, Speichern unter (Strg+Umschalt+S), Öffnen- und Einlese-Dialog, Rückfrage beim Schließen („Nicht speichern“ vergisst den gesicherten Stand), Dateien aus dem Explorer werden nach Endung und Merkmal `app` geöffnet oder eingelesen (`istProjektdatei`). Browser-Fassung unverändert (Texte, Knöpfe und Abläufe gleich; 22 Browsertests grün).
+- [x] **9.2** Tauri-Gerüst in `src-tauri`: App-ID `de.olbricht-digital.auswahllotse`, Produktname „Auswahl-Lotse“, eigenes Symbol (`icons/symbol.svg`, drei Angebote als Balken, das beste mit Haken; erzeugt mit `npx tauri icon`), Fenster 1360 × 860, Menü „Datei“ und „Hilfe“. CSP ohne `'unsafe-inline'` (`style-src 'self'`, `connect-src` nur IPC), `freezePrototype: true` (läuft, anders als beim Prozesslotsen). Rechte: nur `core:event:default`, Fenstertitel, Schließen und die sechs eigenen Befehle; kein Dialog- oder Datei-Plugin für die Oberfläche. Das CSP-Meta-Tag des Web-Builds entfällt im Tauri-Build (`TAURI_ENV_PLATFORM`), sonst sperrte `connect-src 'none'` die IPC. NSIS pro Benutzer, deutsch, WebView2 per Bootstrapper. Installer `Auswahl-Lotse_0.0.0_x64-setup.exe`: 1,26 MiB; installiert 3,5 MB (`auswahllotse.exe`) plus Deinstaller.
+- [x] **9.3** Zuordnung nur `.auswahllotse` (Rolle Editor, MIME `application/vnd.auswahllotse+json`); Einlese-Dialog für `.prozesslotse`, `.json`, `.bpmn`; Single-Instance (zweiter Start übergibt die Datei); Ziehen ins Fenster; atomares Speichern über `.speichern.tmp` und Umbenennen. Freigegeben zum Schreiben werden nur Pfade aus „Speichern unter“ und geöffnete Dateien mit `"app": "auswahllotse"`; eingelesene Prozesslotse-Dateien nie. Fehlt beim Speichern unter die Endung, wird sie angehängt, nicht ersetzt.
+- [x] **9.4** PDF über WebView2 (`PrintToPdf`, A4, 20 mm Rand, ohne Kopf- und Fußzeile) für Lastenheft und Entscheidungsvorlage; der PDF-Titel ist der Dateiname-Vorschlag. Knopf „Als PDF speichern …“ nur im Programm, „Drucken …“ öffnet den Druckdialog.
+- [x] **9.5** Tests: 6 Rust-Tests (`cargo test`), Desktop-Test `npm run desktop:test` mit 48 Prüfungen (Start, Speichern, Einlesen, Rechte, CSV, PDF beider Vorlagen, zweiter Start mit Projekt und Prozessdatei, Öffnen-Dialog, Rückfrage beim Schließen, Neustart). Windows Sandbox gibt es unter Windows 11 Home nicht; dafür installiert die CI (`windows.yml`) auf einem frischen Runner still, prüft Zuordnung und Verknüpfungen und deinstalliert (`src-tauri/windows/installer-test.ps1`). Ohne Admin-Rechte bestätigt die Installation auf Robins Rechner (siehe unten). `release.yml` legt bei einem Tag nur einen Release-Entwurf an.
+
+**Installation auf Robins Rechner (11.11.2026, auf seinen Wunsch):** Release-Build mit `npx tauri build`, Installer still (`/S`) ohne Admin-Rechte ausgeführt, Rückgabewert 0. Programm in `%LOCALAPPDATA%\Auswahl-Lotse\auswahllotse.exe`; Startmenü-Eintrag und Desktop-Verknüpfung „Auswahl-Lotse“ hat der Installer selbst angelegt; `.auswahllotse` zeigt auf `AuswahlLotse.Projekt` (`"…\auswahllotse.exe" "%1"`), `.prozesslotse` und `.bpmn` sind unberührt; Eintrag „Auswahl-Lotse 0.0.0“ unter Apps. Startprobe über die WebView2-Debugschnittstelle: direkter Start zeigt „1 · Rahmen“ mit Titel „Neues Vorhaben – Auswahl-Lotse“; Öffnen einer Kopie von `beispiel-lieferdienst.auswahllotse` über die Dateizuordnung (wie Doppelklick) zeigt „6 · Ergebnis“ mit dem Dateinamen im Titel; beide Male sauber geschlossen. Die dabei angelegten Programmdaten wurden danach entfernt, damit der erste eigene Start leer beginnt. Neue Fassung installieren: Installer erneut ausführen (ersetzt die alte); entfernen über Einstellungen > Apps.
 
 ## Prüfung vom 11.11.2026
 
@@ -105,9 +109,9 @@ Verbleibende Mängel stehen im Bericht der Prüfung und in der README unter „G
 
 ## Hinweise für den nächsten Durchgang
 
-- **Repo:** Lokal liegen alle Commits auf `main`. Das private GitHub-Repo `edgebird-lab/auswahllotse` ist noch nicht angelegt, weil die Rechteprüfung der Sitzung `gh repo create` abgelehnt hat (zuletzt erneut am 11.11.2026 in der Prüfung). Sobald Robin es anlegt oder freigibt: `gh repo create edgebird-lab/auswahllotse --private --source . --remote origin` und `git push -u origin main`; danach den ersten CI-Lauf prüfen (Schritt 0.3).
-- **Prüfen vor jedem Commit:** `npm run lint`, `npm test`, `npm run build`, `npm run e2e` (Edge, Port 4183 fest).
-- **Nächster Schritt:** Repo anlegen und pushen (0.3), Durchsicht mit Robin (8.3), danach Tag `v0.1.0` (8.4). Phase 9 (Tauri) erst nach W3 des Prozesslotsen.
+- **Repo:** privat, `edgebird-lab/auswahllotse`, Zweig `main`. Workflows: „Prüfung“ (jeder Push), „Windows-Programm“ (nur bei Änderungen an `src-tauri`, `src/plattform`, `package*.json` oder von Hand), „Version vorbereiten“ (nur bei Tags, legt einen Release-Entwurf an).
+- **Prüfen vor jedem Commit:** `npm run lint`, `npm test`, `npm run build`, `npm run e2e` (Edge, Port 4183 fest). Bei Änderungen am Programmteil zusätzlich `cargo test`, Debug-Build und `npm run desktop:test` (siehe `CLAUDE.md`).
+- **Nächster Schritt:** Durchsicht mit Robin (8.3), am besten gleich im installierten Programm, danach Tag `v0.1.0` (8.4). Mit dem Tag erhält auch das Programm die Version 0.1.0 (Version kommt aus `package.json`); ein neuer Installer ersetzt die installierte Fassung.
 - **Oberfläche:** `src/App.tsx` (Gerüst), `src/ui/schritte/*` (sieben Schritte), `src/ui/druck/*` (Vorlagen), `src/ui/diagramme/*` (SVG, Rechnungen in `geometrie.ts`). Alle Zahlen und Befunde liefert `berechneGesamt(projekt)` aus `entscheidung/gesamt.ts`; Änderungen laufen als reine Funktionen über `aendere` (Kontext in `ui/kontext.ts`).
 - **Ansehen:** `npm run build`, dann `npx vite preview --port 4183 --strictPort` und `node scripts/ansehen.mjs <ordner>` (Bildschirmfotos aller Schritte, hell und dunkel). Den Vorschau-Server danach beenden, sonst scheitert `npm run e2e` am belegten Port.
 - **Bausteine der Fachlogik:** Einlesen `prozessdatei/einlesen.ts` → `lastenheft/abgleich.ts` (`liesProzessEin`, `ohneProzessmodell`, `gleicheAb`) → Prüfungen `lastenheft/pruefung.ts` → Bewertung `bewertung/auswertung.ts` (`werteAus`). Alle Funktionen sind rein und geben neue Objekte zurück; die Oberfläche (Phase 6) braucht nur noch Zustand, Plattform und Darstellung.

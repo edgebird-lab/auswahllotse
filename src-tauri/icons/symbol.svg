@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- Symbol des Auswahl-Lotsen: drei Angebote als Balken, das beste mit Haken.
+       Farben wie in der App (Akzent #0f6e5a, dunkel #6dd3b8). Quelle für `npx tauri icon`. -->
+  <defs>
+    <linearGradient id="grund" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#15876e"/>
+      <stop offset="1" stop-color="#0b5546"/>
+    </linearGradient>
+  </defs>
+  <rect x="32" y="32" width="960" height="960" rx="216" fill="url(#grund)"/>
+  <rect x="176" y="262" width="472" height="124" rx="62" fill="#ffffff"/>
+  <rect x="176" y="450" width="372" height="124" rx="62" fill="#ffffff" fill-opacity="0.72"/>
+  <rect x="176" y="638" width="252" height="124" rx="62" fill="#ffffff" fill-opacity="0.45"/>
+  <circle cx="782" cy="324" r="118" fill="#6dd3b8"/>
+  <path d="M726 326l40 40 76-86" fill="none" stroke="#0b5546" stroke-width="44" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

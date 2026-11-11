@@ -7,6 +7,7 @@ import {
   ladeAusBrowser,
   ladeBrowserStand,
   ladeDokumentInfo,
+  istProjektdatei,
   ladeEinstellungen,
   Ladefehler,
   leereBrowserSpeicher,
@@ -16,6 +17,7 @@ import {
   speichereEinstellungen,
   speichereImBrowser,
   unlesbarerStand,
+  vergissProjektImBrowser,
 } from './speicher'
 import type { Anforderung, AuswahlProjekt } from './typen'
 
@@ -246,5 +248,40 @@ describe('Dokumentinfo im Browser', () => {
     expect(ladeDokumentInfo()).toEqual({ name: null, ungespeichert: false })
     vi.stubGlobal('localStorage', undefined)
     expect(speichereDokumentInfo({ name: null, ungespeichert: false })).toBe(false)
+  })
+
+  it('vergisst beim Verwerfen Projekt und Dateiname, aber nicht die Einstellungen', () => {
+    vi.stubGlobal('localStorage', speicher())
+    speichereImBrowser(neuesProjekt())
+    speichereDokumentInfo({ name: 'a.auswahllotse', ungespeichert: true })
+    speichereEinstellungen({ lernmodus: false, farbschema: 'dunkel' })
+    expect(vergissProjektImBrowser()).toBe(true)
+    expect(ladeAusBrowser()).toBeNull()
+    expect(ladeDokumentInfo()).toEqual({ name: null, ungespeichert: false })
+    expect(ladeEinstellungen()).toEqual({ lernmodus: false, farbschema: 'dunkel' })
+    vi.stubGlobal('localStorage', undefined)
+    expect(vergissProjektImBrowser()).toBe(false)
+  })
+})
+
+describe('Projekt oder Prozessmodell (Dateien aus dem Explorer)', () => {
+  const projekt = alsJson(neuesProjekt())
+
+  it('entscheidet zuerst nach der Endung', () => {
+    expect(istProjektdatei('a.auswahllotse', projekt)).toBe(true)
+    expect(istProjektdatei('A.AUSWAHLLOTSE', '{kaputt')).toBe(true)
+    expect(istProjektdatei('lieferdienst.prozesslotse', TEXTE.lieferdienst)).toBe(false)
+    expect(istProjektdatei('lieferdienst.bpmn', TEXTE.lieferdienstBpmn)).toBe(false)
+    // auch wenn jemand ein Projekt falsch benennt: eine .prozesslotse-Datei wird nie als Projekt geöffnet
+    expect(istProjektdatei('falsch.prozesslotse', projekt)).toBe(false)
+  })
+
+  it('erkennt JSON und Unbekanntes am Merkmal app', () => {
+    expect(istProjektdatei('projekt.json', projekt)).toBe(true)
+    expect(istProjektdatei('projekt.json', '\uFEFF' + projekt)).toBe(true)
+    expect(istProjektdatei('ohne-endung', projekt)).toBe(true)
+    expect(istProjektdatei('lieferdienst.json', TEXTE.lieferdienstFormat1)).toBe(false)
+    expect(istProjektdatei('liste.json', '[1,2]')).toBe(false)
+    expect(istProjektdatei('kaputt.json', '{kaputt')).toBe(false)
   })
 })
