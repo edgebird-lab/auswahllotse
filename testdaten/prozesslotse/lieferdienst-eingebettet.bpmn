@@ -1,0 +1,582 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitionen" targetNamespace="https://olbricht-digital.de/prozesslotse" exporter="Prozesslotse" exporterVersion="0.1.0">
+  <bpmn:collaboration id="Kollaboration">
+    <bpmn:participant id="Teilnehmer" name="Bestellung bis Rechnung (Lieferdienst)" processRef="Prozess" />
+    <bpmn:participant id="Pool_tln_kunde" name="Kunde" />
+    <bpmn:messageFlow id="Nachricht_1" sourceRef="Pool_tln_kunde" targetRef="Start" />
+    <bpmn:messageFlow id="Nachricht_2" sourceRef="auf_benachrichtigen" targetRef="Pool_tln_kunde" />
+    <bpmn:messageFlow id="Nachricht_3" sourceRef="Pool_tln_kunde" targetRef="wrt_termin" />
+    <bpmn:messageFlow id="Nachricht_4" sourceRef="auf_versenden" targetRef="Pool_tln_kunde" />
+  </bpmn:collaboration>
+  <bpmn:process id="Prozess" name="Bestellung bis Rechnung (Lieferdienst)" isExecutable="false">
+    <bpmn:documentation>Ein regionaler Lieferdienst nimmt Bestellungen telefonisch an, liefert am Folgetag aus und stellt danach die Rechnung. · Vorgänge pro Arbeitstag: 120 · Arbeitstag: 8 Std.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <pl:projekt xmlns:pl="https://olbricht-digital.de/prozesslotse/projekt" ansicht="ist" formatVersion="3">{"formatVersion":3,"ist":{"formatVersion":3,"id":"pro_lieferdienst","name":"Bestellung bis Rechnung (Lieferdienst)","beschreibung":"Ein regionaler Lieferdienst nimmt Bestellungen telefonisch an, liefert am Folgetag aus und stellt danach die Rechnung.","ausloeser":{"art":"nachricht","text":"Kunde bestellt telefonisch","von":"tln_kunde"},"ergebnis":"Ware zugestellt und berechnet","vorgaengeProTag":120,"arbeitsstundenProTag":8,"rollen":[{"id":"rol_innendienst","name":"Innendienst","stundensatz":38,"personen":4,"verfuegbarProzent":100},{"id":"rol_lager","name":"Lager","stundensatz":34,"personen":5,"verfuegbarProzent":100},{"id":"rol_disposition","name":"Disposition","stundensatz":45,"personen":1,"verfuegbarProzent":100},{"id":"rol_fahrer","name":"Fahrer","stundensatz":32,"personen":6,"verfuegbarProzent":100},{"id":"rol_buchhaltung","name":"Buchhaltung","stundensatz":48,"personen":1,"verfuegbarProzent":60},{"id":"rol_leitung","name":"Niederlassungsleitung","stundensatz":65,"personen":1,"verfuegbarProzent":25}],"medien":[{"id":"med_papier","name":"Papier","art":"papier"},{"id":"med_telefon","name":"Telefon","art":"telefon"},{"id":"med_excel","name":"Excel-Tourenliste","art":"tabelle"},{"id":"med_erp","name":"Warenwirtschaft","art":"erp"}],"teilnehmer":[{"id":"tln_kunde","name":"Kunde"}],"ablauf":{"id":"haupt","schritte":[{"typ":"aufgabe","id":"auf_annehmen","name":"Bestellung telefonisch annehmen","rolleId":"rol_innendienst","mediumId":"med_papier","bearbeitungMin":6,"liegezeitMin":0,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":null,"uebertragung":null},{"typ":"aufgabe","id":"auf_erfassen","name":"Bestellung in Warenwirtschaft erfassen","rolleId":"rol_innendienst","mediumId":"med_erp","bearbeitungMin":4,"liegezeitMin":90,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":{"quelleMediumId":"med_papier","minuten":3}},{"typ":"entscheidung","id":"ent_vorrat","art":"daten","frage":"Ware vorrätig?","zweige":[{"id":"zw_vorrat_ja","bezeichnung":"Ja","anteil":0.92,"schritte":[],"ende":null,"zurueckZu":null,"ereignis":null},{"id":"zw_vorrat_nein","bezeichnung":"Nein","anteil":0.08,"schritte":[{"typ":"aufgabe","id":"auf_ersatz","name":"Kunden anrufen und Ersatz anbieten","rolleId":"rol_innendienst","mediumId":"med_telefon","bearbeitungMin":5,"liegezeitMin":60,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":null},{"typ":"entscheidung","id":"ent_ersatz","art":"daten","frage":"Ersatz angenommen?","zweige":[{"id":"zw_ersatz_ja","bezeichnung":"Ja","anteil":0.7,"schritte":[{"typ":"aufgabe","id":"auf_aendern","name":"Bestellung ändern","rolleId":"rol_innendienst","mediumId":"med_erp","bearbeitungMin":3,"liegezeitMin":0,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":null}],"ende":null,"zurueckZu":null,"ereignis":null},{"id":"zw_ersatz_nein","bezeichnung":"Nein","anteil":0.3,"schritte":[{"typ":"aufgabe","id":"auf_stornieren","name":"Bestellung stornieren","rolleId":"rol_innendienst","mediumId":"med_erp","bearbeitungMin":2,"liegezeitMin":0,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":null}],"ende":"Bestellung storniert","zurueckZu":null,"ereignis":null}]}],"ende":null,"zurueckZu":null,"ereignis":null}]},{"typ":"wiederholung","id":"wdh_kommission","modus":"anteil","frage":"Fehler gefunden?","anteilWiederholung":0.2,"koerper":{"id":"seq_kommission","schritte":[{"typ":"aufgabe","id":"auf_kommissionieren","name":"Ware kommissionieren","rolleId":"rol_lager","mediumId":"med_papier","bearbeitungMin":8,"liegezeitMin":120,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":null,"uebertragung":null},{"typ":"aufgabe","id":"auf_kontrollieren","name":"Kommissionierung kontrollieren","rolleId":"rol_lager","mediumId":"med_papier","bearbeitungMin":2,"liegezeitMin":15,"art":"pruefung","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":null}]}},{"typ":"aufgabe","id":"auf_tour","name":"Tour planen","rolleId":"rol_disposition","mediumId":"med_excel","bearbeitungMin":1.5,"liegezeitMin":240,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":false,"uebertragung":{"quelleMediumId":"med_erp","minuten":1}},{"typ":"aufgabe","id":"auf_verladen","name":"Ware verladen","rolleId":"rol_lager","mediumId":"med_papier","bearbeitungMin":3,"liegezeitMin":480,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":null},{"typ":"aufgabe","id":"auf_ausliefern","name":"Ware ausliefern","rolleId":"rol_fahrer","mediumId":"med_papier","bearbeitungMin":12,"liegezeitMin":180,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":null},{"typ":"entscheidung","id":"ent_angetroffen","art":"daten","frage":"Kunde angetroffen?","zweige":[{"id":"zw_angetroffen_ja","bezeichnung":"Ja","anteil":0.9,"schritte":[{"typ":"aufgabe","id":"auf_quittieren","name":"Empfang quittieren lassen","rolleId":"rol_fahrer","mediumId":"med_papier","bearbeitungMin":2,"liegezeitMin":0,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":null}],"ende":null,"zurueckZu":null,"ereignis":null},{"id":"zw_angetroffen_nein","bezeichnung":"Nein","anteil":0.1,"schritte":[{"typ":"aufgabe","id":"auf_benachrichtigen","name":"Benachrichtigung hinterlassen","rolleId":"rol_fahrer","mediumId":"med_papier","bearbeitungMin":1,"liegezeitMin":0,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":null,"nachrichtAn":"tln_kunde"},{"typ":"warten","id":"wrt_termin","name":"Neuen Liefertermin abwarten","art":"nachricht","dauerMin":480,"von":"tln_kunde"},{"typ":"aufgabe","id":"auf_erneut","name":"Ware erneut zustellen","rolleId":"rol_fahrer","mediumId":"med_papier","bearbeitungMin":12,"liegezeitMin":120,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":null}],"ende":null,"zurueckZu":null,"ereignis":null}]},{"typ":"aufgabe","id":"auf_abgeben","name":"Lieferscheine abgeben","rolleId":"rol_fahrer","mediumId":"med_papier","bearbeitungMin":1,"liegezeitMin":300,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":null},{"typ":"aufgabe","id":"auf_bestaetigen","name":"Zustellung im System bestätigen","rolleId":"rol_disposition","mediumId":"med_erp","bearbeitungMin":1.5,"liegezeitMin":240,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":{"quelleMediumId":"med_papier","minuten":1}},{"typ":"aufgabe","id":"auf_rechnung","name":"Rechnung erstellen","rolleId":"rol_buchhaltung","mediumId":"med_erp","bearbeitungMin":1.5,"liegezeitMin":480,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":null},{"typ":"aufgabe","id":"auf_freigeben","name":"Rechnung freigeben","rolleId":"rol_leitung","mediumId":"med_erp","bearbeitungMin":1,"liegezeitMin":960,"art":"freigabe","freigabeQuote":0.98,"brauchtVorgaenger":true,"uebertragung":null},{"typ":"aufgabe","id":"auf_versenden","name":"Rechnung versenden","rolleId":"rol_buchhaltung","mediumId":"med_erp","bearbeitungMin":0.5,"liegezeitMin":60,"art":"normal","freigabeQuote":0.9,"brauchtVorgaenger":true,"uebertragung":null,"nachrichtAn":"tln_kunde"}]}},"soll":null,"massnahmen":[],"verworfen":[]}</pl:projekt>
+    </bpmn:extensionElements>
+    <bpmn:laneSet id="Bahnen">
+      <bpmn:lane id="Bahn_rol_innendienst" name="Innendienst">
+        <bpmn:flowNodeRef>Start</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>auf_annehmen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>auf_erfassen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ent_vorrat_auf</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>auf_ersatz</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ent_ersatz_auf</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>auf_aendern</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>auf_stornieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>zw_ersatz_nein_ende</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ent_vorrat_zu</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wdh_kommission_ein</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wdh_kommission_frage</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Bahn_rol_lager" name="Lager">
+        <bpmn:flowNodeRef>auf_kommissionieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>auf_kontrollieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>auf_verladen</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Bahn_rol_disposition" name="Disposition">
+        <bpmn:flowNodeRef>auf_tour</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>auf_bestaetigen</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Bahn_rol_fahrer" name="Fahrer">
+        <bpmn:flowNodeRef>auf_ausliefern</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ent_angetroffen_auf</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>auf_quittieren</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>auf_benachrichtigen</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>wrt_termin</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>auf_erneut</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>ent_angetroffen_zu</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>auf_abgeben</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Bahn_rol_buchhaltung" name="Buchhaltung">
+        <bpmn:flowNodeRef>auf_rechnung</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>auf_versenden</bpmn:flowNodeRef>
+        <bpmn:flowNodeRef>Ende</bpmn:flowNodeRef>
+      </bpmn:lane>
+      <bpmn:lane id="Bahn_rol_leitung" name="Niederlassungsleitung">
+        <bpmn:flowNodeRef>auf_freigeben</bpmn:flowNodeRef>
+      </bpmn:lane>
+    </bpmn:laneSet>
+    <bpmn:startEvent id="Start" name="Kunde bestellt telefonisch">
+      <bpmn:outgoing>Fluss_30</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="Start_def" />
+    </bpmn:startEvent>
+    <bpmn:manualTask id="auf_annehmen" name="Bestellung telefonisch annehmen">
+      <bpmn:documentation>Rolle: Innendienst · System: Papier · Bearbeitung: 6 Min. · Liegezeit davor: 0 Min.</bpmn:documentation>
+      <bpmn:incoming>Fluss_30</bpmn:incoming>
+      <bpmn:outgoing>Fluss_1</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:userTask id="auf_erfassen" name="Bestellung in Warenwirtschaft erfassen">
+      <bpmn:documentation>Rolle: Innendienst · System: Warenwirtschaft · Bearbeitung: 4 Min. · Liegezeit davor: 1,5 Std. · Medienbruch: Daten aus Papier von Hand übertragen (3 Min.)</bpmn:documentation>
+      <bpmn:incoming>Fluss_1</bpmn:incoming>
+      <bpmn:outgoing>Fluss_9</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:exclusiveGateway id="ent_vorrat_auf" name="Ware vorrätig?" gatewayDirection="Diverging">
+      <bpmn:incoming>Fluss_9</bpmn:incoming>
+      <bpmn:outgoing>Fluss_6</bpmn:outgoing>
+      <bpmn:outgoing>Fluss_7</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:manualTask id="auf_ersatz" name="Kunden anrufen und Ersatz anbieten">
+      <bpmn:documentation>Rolle: Innendienst · System: Telefon · Bearbeitung: 5 Min. · Liegezeit davor: 1 Std.</bpmn:documentation>
+      <bpmn:incoming>Fluss_6</bpmn:incoming>
+      <bpmn:outgoing>Fluss_5</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:exclusiveGateway id="ent_ersatz_auf" name="Ersatz angenommen?" gatewayDirection="Diverging">
+      <bpmn:incoming>Fluss_5</bpmn:incoming>
+      <bpmn:outgoing>Fluss_3</bpmn:outgoing>
+      <bpmn:outgoing>Fluss_4</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="auf_aendern" name="Bestellung ändern">
+      <bpmn:documentation>Rolle: Innendienst · System: Warenwirtschaft · Bearbeitung: 3 Min. · Liegezeit davor: 0 Min.</bpmn:documentation>
+      <bpmn:incoming>Fluss_3</bpmn:incoming>
+      <bpmn:outgoing>Fluss_8</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="auf_stornieren" name="Bestellung stornieren">
+      <bpmn:documentation>Rolle: Innendienst · System: Warenwirtschaft · Bearbeitung: 2 Min. · Liegezeit davor: 0 Min.</bpmn:documentation>
+      <bpmn:incoming>Fluss_4</bpmn:incoming>
+      <bpmn:outgoing>Fluss_2</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="zw_ersatz_nein_ende" name="Bestellung storniert">
+      <bpmn:incoming>Fluss_2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="ent_vorrat_zu" gatewayDirection="Converging">
+      <bpmn:incoming>Fluss_7</bpmn:incoming>
+      <bpmn:incoming>Fluss_8</bpmn:incoming>
+      <bpmn:outgoing>Fluss_14</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:exclusiveGateway id="wdh_kommission_ein" gatewayDirection="Converging">
+      <bpmn:incoming>Fluss_13</bpmn:incoming>
+      <bpmn:incoming>Fluss_14</bpmn:incoming>
+      <bpmn:outgoing>Fluss_11</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:manualTask id="auf_kommissionieren" name="Ware kommissionieren">
+      <bpmn:documentation>Rolle: Lager · System: Papier · Bearbeitung: 8 Min. · Liegezeit davor: 2 Std.</bpmn:documentation>
+      <bpmn:incoming>Fluss_11</bpmn:incoming>
+      <bpmn:outgoing>Fluss_10</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:manualTask id="auf_kontrollieren" name="Kommissionierung kontrollieren">
+      <bpmn:documentation>Rolle: Lager · System: Papier · Bearbeitung: 2 Min. · Liegezeit davor: 15 Min. · Prüfung</bpmn:documentation>
+      <bpmn:incoming>Fluss_10</bpmn:incoming>
+      <bpmn:outgoing>Fluss_12</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:exclusiveGateway id="wdh_kommission_frage" name="Fehler gefunden?" gatewayDirection="Diverging">
+      <bpmn:incoming>Fluss_12</bpmn:incoming>
+      <bpmn:outgoing>Fluss_13</bpmn:outgoing>
+      <bpmn:outgoing>Fluss_15</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:userTask id="auf_tour" name="Tour planen">
+      <bpmn:documentation>Rolle: Disposition · System: Excel-Tourenliste · Bearbeitung: 1,5 Min. · Liegezeit davor: 4 Std. · Medienbruch: Daten aus Warenwirtschaft von Hand übertragen (1 Min.) · Braucht das Ergebnis des vorherigen Schritts nicht</bpmn:documentation>
+      <bpmn:incoming>Fluss_15</bpmn:incoming>
+      <bpmn:outgoing>Fluss_16</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:manualTask id="auf_verladen" name="Ware verladen">
+      <bpmn:documentation>Rolle: Lager · System: Papier · Bearbeitung: 3 Min. · Liegezeit davor: 1 Arbeitstag</bpmn:documentation>
+      <bpmn:incoming>Fluss_16</bpmn:incoming>
+      <bpmn:outgoing>Fluss_17</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:manualTask id="auf_ausliefern" name="Ware ausliefern">
+      <bpmn:documentation>Rolle: Fahrer · System: Papier · Bearbeitung: 12 Min. · Liegezeit davor: 3 Std.</bpmn:documentation>
+      <bpmn:incoming>Fluss_17</bpmn:incoming>
+      <bpmn:outgoing>Fluss_24</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:exclusiveGateway id="ent_angetroffen_auf" name="Kunde angetroffen?" gatewayDirection="Diverging">
+      <bpmn:incoming>Fluss_24</bpmn:incoming>
+      <bpmn:outgoing>Fluss_20</bpmn:outgoing>
+      <bpmn:outgoing>Fluss_21</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:manualTask id="auf_quittieren" name="Empfang quittieren lassen">
+      <bpmn:documentation>Rolle: Fahrer · System: Papier · Bearbeitung: 2 Min. · Liegezeit davor: 0 Min.</bpmn:documentation>
+      <bpmn:incoming>Fluss_20</bpmn:incoming>
+      <bpmn:outgoing>Fluss_22</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:manualTask id="auf_benachrichtigen" name="Benachrichtigung hinterlassen">
+      <bpmn:documentation>Rolle: Fahrer · System: Papier · Bearbeitung: 1 Min. · Liegezeit davor: 0 Min.</bpmn:documentation>
+      <bpmn:incoming>Fluss_21</bpmn:incoming>
+      <bpmn:outgoing>Fluss_18</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:intermediateCatchEvent id="wrt_termin" name="Neuen Liefertermin abwarten">
+      <bpmn:documentation>Wartezeit im Schnitt: 1 Arbeitstag</bpmn:documentation>
+      <bpmn:incoming>Fluss_18</bpmn:incoming>
+      <bpmn:outgoing>Fluss_19</bpmn:outgoing>
+      <bpmn:messageEventDefinition id="wrt_termin_def" />
+    </bpmn:intermediateCatchEvent>
+    <bpmn:manualTask id="auf_erneut" name="Ware erneut zustellen">
+      <bpmn:documentation>Rolle: Fahrer · System: Papier · Bearbeitung: 12 Min. · Liegezeit davor: 2 Std.</bpmn:documentation>
+      <bpmn:incoming>Fluss_19</bpmn:incoming>
+      <bpmn:outgoing>Fluss_23</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:exclusiveGateway id="ent_angetroffen_zu" gatewayDirection="Converging">
+      <bpmn:incoming>Fluss_22</bpmn:incoming>
+      <bpmn:incoming>Fluss_23</bpmn:incoming>
+      <bpmn:outgoing>Fluss_25</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:manualTask id="auf_abgeben" name="Lieferscheine abgeben">
+      <bpmn:documentation>Rolle: Fahrer · System: Papier · Bearbeitung: 1 Min. · Liegezeit davor: 5 Std.</bpmn:documentation>
+      <bpmn:incoming>Fluss_25</bpmn:incoming>
+      <bpmn:outgoing>Fluss_26</bpmn:outgoing>
+    </bpmn:manualTask>
+    <bpmn:userTask id="auf_bestaetigen" name="Zustellung im System bestätigen">
+      <bpmn:documentation>Rolle: Disposition · System: Warenwirtschaft · Bearbeitung: 1,5 Min. · Liegezeit davor: 4 Std. · Medienbruch: Daten aus Papier von Hand übertragen (1 Min.)</bpmn:documentation>
+      <bpmn:incoming>Fluss_26</bpmn:incoming>
+      <bpmn:outgoing>Fluss_27</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="auf_rechnung" name="Rechnung erstellen">
+      <bpmn:documentation>Rolle: Buchhaltung · System: Warenwirtschaft · Bearbeitung: 1,5 Min. · Liegezeit davor: 1 Arbeitstag</bpmn:documentation>
+      <bpmn:incoming>Fluss_27</bpmn:incoming>
+      <bpmn:outgoing>Fluss_28</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="auf_freigeben" name="Rechnung freigeben">
+      <bpmn:documentation>Rolle: Niederlassungsleitung · System: Warenwirtschaft · Bearbeitung: 1 Min. · Liegezeit davor: 2 Arbeitstage · Freigabe, erteilt in 98 % der Fälle</bpmn:documentation>
+      <bpmn:incoming>Fluss_28</bpmn:incoming>
+      <bpmn:outgoing>Fluss_29</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:userTask id="auf_versenden" name="Rechnung versenden">
+      <bpmn:documentation>Rolle: Buchhaltung · System: Warenwirtschaft · Bearbeitung: 0,5 Min. · Liegezeit davor: 1 Std.</bpmn:documentation>
+      <bpmn:incoming>Fluss_29</bpmn:incoming>
+      <bpmn:outgoing>Fluss_31</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Ende" name="Ware zugestellt und berechnet">
+      <bpmn:incoming>Fluss_31</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Fluss_1" sourceRef="auf_annehmen" targetRef="auf_erfassen" />
+    <bpmn:sequenceFlow id="Fluss_6" name="Nein" sourceRef="ent_vorrat_auf" targetRef="auf_ersatz">
+      <bpmn:documentation>Anteil: 8 %</bpmn:documentation>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Fluss_3" name="Ja" sourceRef="ent_ersatz_auf" targetRef="auf_aendern">
+      <bpmn:documentation>Anteil: 70 %</bpmn:documentation>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Fluss_4" name="Nein" sourceRef="ent_ersatz_auf" targetRef="auf_stornieren">
+      <bpmn:documentation>Anteil: 30 %</bpmn:documentation>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Fluss_2" sourceRef="auf_stornieren" targetRef="zw_ersatz_nein_ende" />
+    <bpmn:sequenceFlow id="Fluss_5" sourceRef="auf_ersatz" targetRef="ent_ersatz_auf" />
+    <bpmn:sequenceFlow id="Fluss_7" name="Ja" sourceRef="ent_vorrat_auf" targetRef="ent_vorrat_zu">
+      <bpmn:documentation>Anteil: 92 %</bpmn:documentation>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Fluss_8" sourceRef="auf_aendern" targetRef="ent_vorrat_zu" />
+    <bpmn:sequenceFlow id="Fluss_9" sourceRef="auf_erfassen" targetRef="ent_vorrat_auf" />
+    <bpmn:sequenceFlow id="Fluss_10" sourceRef="auf_kommissionieren" targetRef="auf_kontrollieren" />
+    <bpmn:sequenceFlow id="Fluss_11" sourceRef="wdh_kommission_ein" targetRef="auf_kommissionieren" />
+    <bpmn:sequenceFlow id="Fluss_12" sourceRef="auf_kontrollieren" targetRef="wdh_kommission_frage" />
+    <bpmn:sequenceFlow id="Fluss_13" name="Ja" sourceRef="wdh_kommission_frage" targetRef="wdh_kommission_ein">
+      <bpmn:documentation>Wiederholung in 20 % der Durchläufe</bpmn:documentation>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Fluss_14" sourceRef="ent_vorrat_zu" targetRef="wdh_kommission_ein" />
+    <bpmn:sequenceFlow id="Fluss_15" name="Nein" sourceRef="wdh_kommission_frage" targetRef="auf_tour" />
+    <bpmn:sequenceFlow id="Fluss_16" sourceRef="auf_tour" targetRef="auf_verladen" />
+    <bpmn:sequenceFlow id="Fluss_17" sourceRef="auf_verladen" targetRef="auf_ausliefern" />
+    <bpmn:sequenceFlow id="Fluss_20" name="Ja" sourceRef="ent_angetroffen_auf" targetRef="auf_quittieren">
+      <bpmn:documentation>Anteil: 90 %</bpmn:documentation>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Fluss_21" name="Nein" sourceRef="ent_angetroffen_auf" targetRef="auf_benachrichtigen">
+      <bpmn:documentation>Anteil: 10 %</bpmn:documentation>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Fluss_18" sourceRef="auf_benachrichtigen" targetRef="wrt_termin" />
+    <bpmn:sequenceFlow id="Fluss_19" sourceRef="wrt_termin" targetRef="auf_erneut" />
+    <bpmn:sequenceFlow id="Fluss_22" sourceRef="auf_quittieren" targetRef="ent_angetroffen_zu" />
+    <bpmn:sequenceFlow id="Fluss_23" sourceRef="auf_erneut" targetRef="ent_angetroffen_zu" />
+    <bpmn:sequenceFlow id="Fluss_24" sourceRef="auf_ausliefern" targetRef="ent_angetroffen_auf" />
+    <bpmn:sequenceFlow id="Fluss_25" sourceRef="ent_angetroffen_zu" targetRef="auf_abgeben" />
+    <bpmn:sequenceFlow id="Fluss_26" sourceRef="auf_abgeben" targetRef="auf_bestaetigen" />
+    <bpmn:sequenceFlow id="Fluss_27" sourceRef="auf_bestaetigen" targetRef="auf_rechnung" />
+    <bpmn:sequenceFlow id="Fluss_28" sourceRef="auf_rechnung" targetRef="auf_freigeben" />
+    <bpmn:sequenceFlow id="Fluss_29" sourceRef="auf_freigeben" targetRef="auf_versenden" />
+    <bpmn:sequenceFlow id="Fluss_30" sourceRef="Start" targetRef="auf_annehmen" />
+    <bpmn:sequenceFlow id="Fluss_31" sourceRef="auf_versenden" targetRef="Ende" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="Diagramm">
+    <bpmndi:BPMNPlane id="Ebene" bpmnElement="Kollaboration">
+      <bpmndi:BPMNShape id="Teilnehmer_di" bpmnElement="Teilnehmer" isHorizontal="true">
+        <dc:Bounds x="0" y="0" width="4690" height="1110" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Pool_tln_kunde_di" bpmnElement="Pool_tln_kunde" isHorizontal="true">
+        <dc:Bounds x="0" y="-100" width="4690" height="60" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Bahn_rol_innendienst_di" bpmnElement="Bahn_rol_innendienst" isHorizontal="true">
+        <dc:Bounds x="30" y="0" width="4660" height="350" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Bahn_rol_lager_di" bpmnElement="Bahn_rol_lager" isHorizontal="true">
+        <dc:Bounds x="30" y="350" width="4660" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Bahn_rol_disposition_di" bpmnElement="Bahn_rol_disposition" isHorizontal="true">
+        <dc:Bounds x="30" y="480" width="4660" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Bahn_rol_fahrer_di" bpmnElement="Bahn_rol_fahrer" isHorizontal="true">
+        <dc:Bounds x="30" y="610" width="4660" height="240" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Bahn_rol_buchhaltung_di" bpmnElement="Bahn_rol_buchhaltung" isHorizontal="true">
+        <dc:Bounds x="30" y="850" width="4660" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Bahn_rol_leitung_di" bpmnElement="Bahn_rol_leitung" isHorizontal="true">
+        <dc:Bounds x="30" y="980" width="4660" height="130" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Start_di" bpmnElement="Start">
+        <dc:Bounds x="147" y="47" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="120" y="89" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_annehmen_di" bpmnElement="auf_annehmen">
+        <dc:Bounds x="275" y="25" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_erfassen_di" bpmnElement="auf_erfassen">
+        <dc:Bounds x="445" y="25" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ent_vorrat_auf_di" bpmnElement="ent_vorrat_auf" isMarkerVisible="true">
+        <dc:Bounds x="650" y="40" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="630" y="6" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_ersatz_di" bpmnElement="auf_ersatz">
+        <dc:Bounds x="785" y="135" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ent_ersatz_auf_di" bpmnElement="ent_ersatz_auf" isMarkerVisible="true">
+        <dc:Bounds x="990" y="150" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="970" y="116" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_aendern_di" bpmnElement="auf_aendern">
+        <dc:Bounds x="1125" y="135" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_stornieren_di" bpmnElement="auf_stornieren">
+        <dc:Bounds x="1125" y="245" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="zw_ersatz_nein_ende_di" bpmnElement="zw_ersatz_nein_ende">
+        <dc:Bounds x="1337" y="267" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1310" y="309" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ent_vorrat_zu_di" bpmnElement="ent_vorrat_zu" isMarkerVisible="true">
+        <dc:Bounds x="1500" y="40" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wdh_kommission_ein_di" bpmnElement="wdh_kommission_ein" isMarkerVisible="true">
+        <dc:Bounds x="1670" y="40" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_kommissionieren_di" bpmnElement="auf_kommissionieren">
+        <dc:Bounds x="1805" y="375" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_kontrollieren_di" bpmnElement="auf_kontrollieren">
+        <dc:Bounds x="1975" y="375" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wdh_kommission_frage_di" bpmnElement="wdh_kommission_frage" isMarkerVisible="true">
+        <dc:Bounds x="2180" y="40" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2160" y="6" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_tour_di" bpmnElement="auf_tour">
+        <dc:Bounds x="2315" y="505" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_verladen_di" bpmnElement="auf_verladen">
+        <dc:Bounds x="2485" y="375" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_ausliefern_di" bpmnElement="auf_ausliefern">
+        <dc:Bounds x="2655" y="635" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ent_angetroffen_auf_di" bpmnElement="ent_angetroffen_auf" isMarkerVisible="true">
+        <dc:Bounds x="2860" y="650" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2840" y="616" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_quittieren_di" bpmnElement="auf_quittieren">
+        <dc:Bounds x="2995" y="635" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_benachrichtigen_di" bpmnElement="auf_benachrichtigen">
+        <dc:Bounds x="2995" y="745" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="wrt_termin_di" bpmnElement="wrt_termin">
+        <dc:Bounds x="3207" y="767" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="3180" y="809" width="90" height="28" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_erneut_di" bpmnElement="auf_erneut">
+        <dc:Bounds x="3335" y="745" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ent_angetroffen_zu_di" bpmnElement="ent_angetroffen_zu" isMarkerVisible="true">
+        <dc:Bounds x="3540" y="650" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_abgeben_di" bpmnElement="auf_abgeben">
+        <dc:Bounds x="3675" y="635" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_bestaetigen_di" bpmnElement="auf_bestaetigen">
+        <dc:Bounds x="3845" y="505" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_rechnung_di" bpmnElement="auf_rechnung">
+        <dc:Bounds x="4015" y="875" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_freigeben_di" bpmnElement="auf_freigeben">
+        <dc:Bounds x="4185" y="1005" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="auf_versenden_di" bpmnElement="auf_versenden">
+        <dc:Bounds x="4355" y="875" width="120" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Ende_di" bpmnElement="Ende">
+        <dc:Bounds x="4567" y="897" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="4540" y="939" width="90" height="42" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Fluss_1_di" bpmnElement="Fluss_1">
+        <di:waypoint x="395" y="65" />
+        <di:waypoint x="445" y="65" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_6_di" bpmnElement="Fluss_6">
+        <di:waypoint x="675" y="90" />
+        <di:waypoint x="675" y="175" />
+        <di:waypoint x="785" y="175" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="679" y="158" width="30.8" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_3_di" bpmnElement="Fluss_3">
+        <di:waypoint x="1040" y="175" />
+        <di:waypoint x="1125" y="175" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1044" y="158" width="18.4" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_4_di" bpmnElement="Fluss_4">
+        <di:waypoint x="1015" y="200" />
+        <di:waypoint x="1015" y="285" />
+        <di:waypoint x="1125" y="285" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1019" y="268" width="30.8" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_2_di" bpmnElement="Fluss_2">
+        <di:waypoint x="1245" y="285" />
+        <di:waypoint x="1337" y="285" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_5_di" bpmnElement="Fluss_5">
+        <di:waypoint x="905" y="175" />
+        <di:waypoint x="990" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_7_di" bpmnElement="Fluss_7">
+        <di:waypoint x="700" y="65" />
+        <di:waypoint x="1500" y="65" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="704" y="48" width="18.4" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_8_di" bpmnElement="Fluss_8">
+        <di:waypoint x="1245" y="175" />
+        <di:waypoint x="1525" y="175" />
+        <di:waypoint x="1525" y="90" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_9_di" bpmnElement="Fluss_9">
+        <di:waypoint x="565" y="65" />
+        <di:waypoint x="650" y="65" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_10_di" bpmnElement="Fluss_10">
+        <di:waypoint x="1925" y="415" />
+        <di:waypoint x="1975" y="415" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_11_di" bpmnElement="Fluss_11">
+        <di:waypoint x="1720" y="65" />
+        <di:waypoint x="1762.5" y="65" />
+        <di:waypoint x="1762.5" y="415" />
+        <di:waypoint x="1805" y="415" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_12_di" bpmnElement="Fluss_12">
+        <di:waypoint x="2095" y="415" />
+        <di:waypoint x="2127.5" y="415" />
+        <di:waypoint x="2127.5" y="65" />
+        <di:waypoint x="2180" y="65" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_13_di" bpmnElement="Fluss_13">
+        <di:waypoint x="2205" y="90" />
+        <di:waypoint x="2205" y="175" />
+        <di:waypoint x="1695" y="175" />
+        <di:waypoint x="1695" y="90" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2211" y="94" width="18.4" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_14_di" bpmnElement="Fluss_14">
+        <di:waypoint x="1550" y="65" />
+        <di:waypoint x="1670" y="65" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_15_di" bpmnElement="Fluss_15">
+        <di:waypoint x="2230" y="65" />
+        <di:waypoint x="2282.5" y="65" />
+        <di:waypoint x="2282.5" y="545" />
+        <di:waypoint x="2315" y="545" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2247.7" y="528" width="30.8" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_16_di" bpmnElement="Fluss_16">
+        <di:waypoint x="2435" y="545" />
+        <di:waypoint x="2460" y="545" />
+        <di:waypoint x="2460" y="415" />
+        <di:waypoint x="2485" y="415" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_17_di" bpmnElement="Fluss_17">
+        <di:waypoint x="2605" y="415" />
+        <di:waypoint x="2630" y="415" />
+        <di:waypoint x="2630" y="675" />
+        <di:waypoint x="2655" y="675" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_20_di" bpmnElement="Fluss_20">
+        <di:waypoint x="2910" y="675" />
+        <di:waypoint x="2995" y="675" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2914" y="658" width="18.4" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_21_di" bpmnElement="Fluss_21">
+        <di:waypoint x="2885" y="700" />
+        <di:waypoint x="2885" y="785" />
+        <di:waypoint x="2995" y="785" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2889" y="768" width="30.8" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_18_di" bpmnElement="Fluss_18">
+        <di:waypoint x="3115" y="785" />
+        <di:waypoint x="3207" y="785" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_19_di" bpmnElement="Fluss_19">
+        <di:waypoint x="3243" y="785" />
+        <di:waypoint x="3335" y="785" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_22_di" bpmnElement="Fluss_22">
+        <di:waypoint x="3115" y="675" />
+        <di:waypoint x="3540" y="675" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_23_di" bpmnElement="Fluss_23">
+        <di:waypoint x="3455" y="785" />
+        <di:waypoint x="3565" y="785" />
+        <di:waypoint x="3565" y="700" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_24_di" bpmnElement="Fluss_24">
+        <di:waypoint x="2775" y="675" />
+        <di:waypoint x="2860" y="675" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_25_di" bpmnElement="Fluss_25">
+        <di:waypoint x="3590" y="675" />
+        <di:waypoint x="3675" y="675" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_26_di" bpmnElement="Fluss_26">
+        <di:waypoint x="3795" y="675" />
+        <di:waypoint x="3820" y="675" />
+        <di:waypoint x="3820" y="545" />
+        <di:waypoint x="3845" y="545" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_27_di" bpmnElement="Fluss_27">
+        <di:waypoint x="3965" y="545" />
+        <di:waypoint x="3990" y="545" />
+        <di:waypoint x="3990" y="915" />
+        <di:waypoint x="4015" y="915" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_28_di" bpmnElement="Fluss_28">
+        <di:waypoint x="4135" y="915" />
+        <di:waypoint x="4160" y="915" />
+        <di:waypoint x="4160" y="1045" />
+        <di:waypoint x="4185" y="1045" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_29_di" bpmnElement="Fluss_29">
+        <di:waypoint x="4305" y="1045" />
+        <di:waypoint x="4330" y="1045" />
+        <di:waypoint x="4330" y="915" />
+        <di:waypoint x="4355" y="915" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_30_di" bpmnElement="Fluss_30">
+        <di:waypoint x="183" y="65" />
+        <di:waypoint x="275" y="65" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Fluss_31_di" bpmnElement="Fluss_31">
+        <di:waypoint x="4475" y="915" />
+        <di:waypoint x="4567" y="915" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Nachricht_1_di" bpmnElement="Nachricht_1">
+        <di:waypoint x="90" y="-40" />
+        <di:waypoint x="90" y="39" />
+        <di:waypoint x="165" y="39" />
+        <di:waypoint x="165" y="47" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Nachricht_2_di" bpmnElement="Nachricht_2">
+        <di:waypoint x="3055" y="745" />
+        <di:waypoint x="3055" y="737" />
+        <di:waypoint x="3142.5" y="737" />
+        <di:waypoint x="3142.5" y="-40" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Nachricht_3_di" bpmnElement="Nachricht_3">
+        <di:waypoint x="3152.5" y="-40" />
+        <di:waypoint x="3152.5" y="759" />
+        <di:waypoint x="3225" y="759" />
+        <di:waypoint x="3225" y="767" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Nachricht_4_di" bpmnElement="Nachricht_4">
+        <di:waypoint x="4415" y="875" />
+        <di:waypoint x="4415" y="867" />
+        <di:waypoint x="4507.5" y="867" />
+        <di:waypoint x="4507.5" y="-40" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

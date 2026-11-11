@@ -8,13 +8,13 @@ Letzte Aktualisierung: 11.11.2026
 
 - [x] **0.1** Vite 8, React 19, TypeScript 7, Vitest 5; Einstellungen wie beim Prozesslotsen. `npm run build` und Platzhaltertest laufen.
 - [x] **0.2** oxlint mit `react/no-danger` (an einer Probedatei geprüft), Playwright mit axe (lokal Edge, Port 4183 mit strictPort), Smoke-Test hell und dunkel. CSP-Meta-Tag per Vite-Plugin im Build.
-- [ ] **0.3** Privates Repo, Workflow „Prüfung“, `CLAUDE.md`.
+- [ ] **0.3** Workflow „Prüfung“ (`.github/workflows/ci.yml`, nur lint, test, build) und `CLAUDE.md` sind fertig. **Offen:** Das private Repo `edgebird-lab/auswahllotse` konnte nicht angelegt werden (`gh repo create` wurde von der Rechteprüfung der Sitzung abgelehnt); daher noch kein Push und kein CI-Lauf. Robin: Repo anlegen oder freigeben, dann `git push -u origin main`.
 
 ## Phase 1 – Datenmodell und Speichern
 
-- [ ] **1.1** `typen.ts`, `ergebnisse.ts`, `neuesProjekt()` (T-D1)
-- [ ] **1.2** Speichern und Laden mit Strukturprüfung (T-D2 bis T-D5)
-- [ ] **1.3** Browser-Speicher und Einstellungen (T-D6, T-D7)
+- [x] **1.1** `typen.ts`, `ergebnisse.ts`, `projekt.ts` mit `neuesProjekt()`, Konstanten in `regeln/schwellen.ts` (T-D1 grün)
+- [x] **1.2** `speicher.ts`: Speichern und Laden mit Strukturprüfung und Projektion Feld für Feld, Meldungen nach 6.16, Dateiname (`export/dateiname.ts`) (T-D2 bis T-D5 grün, dazu `__proto__`-Test)
+- [x] **1.3** Browser-Speicher, „Browser-Speicher leeren“, Einstellungen (T-D6, T-D7 grün)
 
 ## Phase 2 – Prozessmodell einlesen
 

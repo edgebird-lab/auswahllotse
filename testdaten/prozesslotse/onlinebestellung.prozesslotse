@@ -1,0 +1,288 @@
+{
+  "formatVersion": 3,
+  "ist": {
+    "formatVersion": 3,
+    "id": "pro_onlinebestellung",
+    "name": "Onlinebestellung bis Versand",
+    "beschreibung": "Ein Onlineshop übernimmt Bestellungen ins ERP. Bei fehlerhaften Daten wird der Kunde gefragt; er berichtigt oder storniert.",
+    "ausloeser": {
+      "art": "nachricht",
+      "text": "Bestellung im Shop eingegangen",
+      "von": "tln_kunde"
+    },
+    "ergebnis": "Ware versendet",
+    "vorgaengeProTag": 200,
+    "arbeitsstundenProTag": 8,
+    "rollen": [
+      {
+        "id": "rol_service",
+        "name": "Kundenservice",
+        "stundensatz": 40,
+        "personen": 3,
+        "verfuegbarProzent": 100
+      },
+      {
+        "id": "rol_lager",
+        "name": "Lager",
+        "stundensatz": 34,
+        "personen": 6,
+        "verfuegbarProzent": 100
+      },
+      {
+        "id": "rol_buchhaltung",
+        "name": "Buchhaltung",
+        "stundensatz": 48,
+        "personen": 2,
+        "verfuegbarProzent": 100
+      }
+    ],
+    "medien": [
+      {
+        "id": "med_shop",
+        "name": "Shopsystem",
+        "art": "fachanwendung"
+      },
+      {
+        "id": "med_erp",
+        "name": "ERP",
+        "art": "erp"
+      },
+      {
+        "id": "med_email",
+        "name": "E-Mail",
+        "art": "email"
+      },
+      {
+        "id": "med_papier",
+        "name": "Papier",
+        "art": "papier"
+      }
+    ],
+    "teilnehmer": [
+      {
+        "id": "tln_kunde",
+        "name": "Kunde"
+      }
+    ],
+    "ablauf": {
+      "id": "haupt",
+      "schritte": [
+        {
+          "typ": "wiederholung",
+          "id": "rsp_daten",
+          "modus": "ruecksprung",
+          "frage": "",
+          "anteilWiederholung": 0,
+          "koerper": {
+            "id": "seq_daten",
+            "schritte": [
+              {
+                "typ": "aufgabe",
+                "id": "auf_erfassen",
+                "name": "Bestelldaten erfassen",
+                "rolleId": "rol_service",
+                "mediumId": "med_erp",
+                "bearbeitungMin": 3,
+                "liegezeitMin": 30,
+                "art": "normal",
+                "freigabeQuote": 0.9,
+                "brauchtVorgaenger": null,
+                "uebertragung": {
+                  "quelleMediumId": "med_shop",
+                  "minuten": 2
+                }
+              },
+              {
+                "typ": "entscheidung",
+                "id": "ent_daten",
+                "art": "daten",
+                "frage": "Daten vollständig und korrekt?",
+                "zweige": [
+                  {
+                    "id": "zw_daten_ja",
+                    "bezeichnung": "Ja",
+                    "anteil": 0.88,
+                    "schritte": [],
+                    "ende": null,
+                    "zurueckZu": null,
+                    "ereignis": null
+                  },
+                  {
+                    "id": "zw_daten_nein",
+                    "bezeichnung": "Nein",
+                    "anteil": 0.12,
+                    "schritte": [
+                      {
+                        "typ": "aufgabe",
+                        "id": "auf_nachfragen",
+                        "name": "Kunden um Korrektur bitten",
+                        "rolleId": "rol_service",
+                        "mediumId": "med_email",
+                        "bearbeitungMin": 4,
+                        "liegezeitMin": 0,
+                        "art": "normal",
+                        "freigabeQuote": 0.9,
+                        "brauchtVorgaenger": true,
+                        "uebertragung": null,
+                        "nachrichtAn": "tln_kunde"
+                      },
+                      {
+                        "typ": "entscheidung",
+                        "id": "ent_antwort",
+                        "art": "ereignis",
+                        "frage": "Antwort des Kunden?",
+                        "zweige": [
+                          {
+                            "id": "zw_korrektur",
+                            "bezeichnung": "Korrektur erhalten",
+                            "anteil": 0.7,
+                            "schritte": [],
+                            "ende": null,
+                            "zurueckZu": "rsp_daten",
+                            "ereignis": {
+                              "art": "nachricht",
+                              "dauerMin": 480,
+                              "von": "tln_kunde"
+                            }
+                          },
+                          {
+                            "id": "zw_storno",
+                            "bezeichnung": "Stornierung erhalten",
+                            "anteil": 0.2,
+                            "schritte": [
+                              {
+                                "typ": "aufgabe",
+                                "id": "auf_storno",
+                                "name": "Bestellung stornieren",
+                                "rolleId": "rol_service",
+                                "mediumId": "med_erp",
+                                "bearbeitungMin": 2,
+                                "liegezeitMin": 0,
+                                "art": "normal",
+                                "freigabeQuote": 0.9,
+                                "brauchtVorgaenger": true,
+                                "uebertragung": null
+                              }
+                            ],
+                            "ende": "Bestellung storniert",
+                            "zurueckZu": null,
+                            "ereignis": {
+                              "art": "nachricht",
+                              "dauerMin": 480,
+                              "von": "tln_kunde"
+                            }
+                          },
+                          {
+                            "id": "zw_frist",
+                            "bezeichnung": "7 Tage ohne Antwort",
+                            "anteil": 0.1,
+                            "schritte": [
+                              {
+                                "typ": "aufgabe",
+                                "id": "auf_verfall",
+                                "name": "Bestellung verfallen lassen",
+                                "rolleId": "rol_service",
+                                "mediumId": "med_erp",
+                                "bearbeitungMin": 2,
+                                "liegezeitMin": 0,
+                                "art": "normal",
+                                "freigabeQuote": 0.9,
+                                "brauchtVorgaenger": true,
+                                "uebertragung": null
+                              }
+                            ],
+                            "ende": "Bestellung verfallen",
+                            "zurueckZu": null,
+                            "ereignis": {
+                              "art": "zeit",
+                              "dauerMin": 3360
+                            }
+                          }
+                        ]
+                      }
+                    ],
+                    "ende": null,
+                    "zurueckZu": null,
+                    "ereignis": null
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "typ": "parallel",
+          "id": "par_versand",
+          "zweige": [
+            {
+              "id": "seq_rechnung",
+              "schritte": [
+                {
+                  "typ": "aufgabe",
+                  "id": "auf_rechnung",
+                  "name": "Rechnung erstellen",
+                  "rolleId": "rol_buchhaltung",
+                  "mediumId": "med_erp",
+                  "bearbeitungMin": 2,
+                  "liegezeitMin": 60,
+                  "art": "normal",
+                  "freigabeQuote": 0.9,
+                  "brauchtVorgaenger": null,
+                  "uebertragung": null
+                }
+              ]
+            },
+            {
+              "id": "seq_lager",
+              "schritte": [
+                {
+                  "typ": "aufgabe",
+                  "id": "auf_kommissionieren",
+                  "name": "Ware kommissionieren",
+                  "rolleId": "rol_lager",
+                  "mediumId": "med_papier",
+                  "bearbeitungMin": 6,
+                  "liegezeitMin": 120,
+                  "art": "normal",
+                  "freigabeQuote": 0.9,
+                  "brauchtVorgaenger": null,
+                  "uebertragung": null
+                },
+                {
+                  "typ": "aufgabe",
+                  "id": "auf_verpacken",
+                  "name": "Ware verpacken",
+                  "rolleId": "rol_lager",
+                  "mediumId": "med_papier",
+                  "bearbeitungMin": 4,
+                  "liegezeitMin": 15,
+                  "art": "normal",
+                  "freigabeQuote": 0.9,
+                  "brauchtVorgaenger": true,
+                  "uebertragung": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "typ": "aufgabe",
+          "id": "auf_versenden",
+          "name": "Ware versenden",
+          "rolleId": "rol_lager",
+          "mediumId": "med_erp",
+          "bearbeitungMin": 3,
+          "liegezeitMin": 240,
+          "art": "normal",
+          "freigabeQuote": 0.9,
+          "brauchtVorgaenger": true,
+          "uebertragung": null,
+          "nachrichtAn": "tln_kunde"
+        }
+      ]
+    }
+  },
+  "soll": null,
+  "massnahmen": [],
+  "verworfen": []
+}

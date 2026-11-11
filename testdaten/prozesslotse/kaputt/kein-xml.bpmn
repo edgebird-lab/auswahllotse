@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" id="Definitionen" targetNamespace="https://olbricht-digital.de/prozesslotse" exporter="Prozesslotse" exporterVersion="0.1.0">
+  <bpmn:collaboration id="Kollaboration">
+    <bpmn:participant id="Teilnehmer" name="Bestellung bis Rechnung (Lieferdienst)" processRef="Prozess" />
+    <bpmn:participant id="Pool_tln_kunde" name="Kunde" />
+    <bpmn:messageFlow id="Nachricht_1" sourceRef="Pool_tln_kunde" targetRef="Start" />
+    <bpmn:messageFlow id="Nachricht_2" sourceRef="auf_benachrichtigen" targetRef="Pool_tln_kunde" />
+    <bpmn:messageFlow id="Nachricht_3" sourceRef="Pool_tln_kunde" targetRef="wrt_termin" />
+    <bpmn:messageFlow id="Nachricht_4" sourceRef="auf_versenden" targetRef="Pool_tln_kunde" />
+  </bpmn:collaboration>
+  <bpmn:process id="Prozess" name="Bestellung bis Rechnung (Lieferdienst)" isExecutable="false">
+    <bpmn:documentation>Ein regionaler Lieferdienst nimmt Bestellungen telefonisch an, liefert am Folgetag aus und stellt danach die Rechnung. · Vorgänge pro Arbeitstag: 120 · Arbeitstag: 8 Std.</bpmn:documentation>
+    <bpmn:extensionElements>
+      <pl:projekt xmlns:pl="https://olbricht-digital.de/prozesslotse/projekt" ansicht="ist" formatVersion="3">{"formatVersion":3,"ist":{"formatVersion":3,"id":"pro_lieferdienst","name":"Bestellung bis Rechnung (Lieferdienst)","beschreibung":"Ein regionaler Lieferdienst nimmt Bestellungen telefonisch an, liefert am Folgetag aus und stellt danach die Rechnung.","ausloeser":{"art":"nachricht","text":"Kunde bestellt telefonisch","von":"tln_kunde"},"ergebnis":"Ware zugestellt und berechnet","vorgaengeProTag":120,"arbeitsstundenProTag":8,"rollen":[{"id":"rol_innendienst","name":"Innendienst","stunden
