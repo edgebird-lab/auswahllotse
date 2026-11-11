@@ -2,7 +2,7 @@
 
 Checkliste aller Phasen und Schritte aus [spezifikation.md](spezifikation.md), Abschnitt 11. Nach jedem Schritt aktualisieren, damit ein Nachfolger hier weitermachen kann. Annahmen stehen in [entscheidungen.md](entscheidungen.md).
 
-Letzte Aktualisierung: 11.11.2026, nach Phase 5
+Letzte Aktualisierung: 11.11.2026, nach Phase 6 und 7.1 bis 7.3
 
 ## Phase 0 – Einrichten
 
@@ -51,25 +51,25 @@ Letzte Aktualisierung: 11.11.2026, nach Phase 5
 
 ## Phase 6 – Oberfläche
 
-- [ ] **6.1** Plattformschicht, Zustand mit Rückgängig, Kopf- und Schrittleiste, hell und dunkel, Lernmodus
-- [ ] **6.2** Schritte Rahmen und Prozess, Teil A (E3)
-- [ ] **6.3** Schritt Prozess, Teil B, Umfang (E2)
-- [ ] **6.4** Schritt Anforderungen (E10)
-- [ ] **6.5** Schritt Gewichtung (E4)
-- [ ] **6.6** Schritt Angebote (E11)
-- [ ] **6.7** Schritt Ergebnis mit SVG-Diagrammen (E1 bis Schritt 6)
+- [x] **6.1** `plattform/` (Schnittstelle 7.3, Browser-Teil), `zustand.ts` mit Rückgängig, Wiederholen und Zusammenfassen beim Tippen, Kopf- und Schrittleiste mit Sperren (`ui/sperren.ts`), Farbschema System/hell/dunkel, Lernmodus (`ui/lerninhalte.ts`), Rückfragen als Dialog, Fokus auf die Überschrift beim Schrittwechsel (Smoke-Test und axe grün)
+- [x] **6.2** Schritt Rahmen (alle Fragen aus 5.2, Richtwerte aufklappbar) und Prozess Teil A (Datei, Format, Befunde, Grundlage, „Neu einlesen“ mit Vorschau, „Ohne Prozessmodell weiter“); Änderungen am Rahmen gleichen sofort ab (`lastenheft/aenderungen.ts`) (E3 grün)
+- [x] **6.3** Prozess Teil B: Systeme mit Status und Marke „Vorschlag“, Aufgaben in Prozessreihenfolge mit Einrückung, Zählerzeile, Medienbrüche (E2 grün)
+- [x] **6.4** Schritt Anforderungen: Kopf mit Muss-Anteil (Marke bei 60 %), Filter, Karten je Gruppe mit MoSCoW, Bearbeiten, Übernehmen, Verwerfen, Wiederherstellen, eigene Anforderungen, „Alle Vorschläge übernehmen“ (E10 grün)
+- [x] **6.5** Schritt Gewichtung: direkt mit „gleich verteilen“ und „auf 100 % bringen“, Paarvergleich mit 17 Stufen, Ampel und widersprüchlichstem Urteil, Unterpunkte, Regel, Budget, Festlegen mit Zähler (E4 grün)
+- [x] **6.6** Schritt Angebote: Liste, Hinzufügen, Reiter Bewertung (K.-o. und Punkte mit Fortschritt) und Kosten (Annahmen mit Vorschlägen, Positionen, interne Aufwände, Summen) (`bewertung/angebote.ts`) (E11 grün)
+- [x] **6.7** Schritt Ergebnis: Empfehlung mit „vorläufig“, K.-o.-Übersicht, Nutzwert (gestapelte Balken), Kosten (Balken mit Budget), Sensitivität (kleine Liniendiagramme), Tabellen zu jedem Diagramm, Befunde mit „Zur Stelle“ (`ui/befundziel.ts`) (E1 bis Schritt 6 grün, axe hell und dunkel ohne Befunde)
 
 ## Phase 7 – Vorlagen und Export
 
-- [ ] **7.1** Druckansicht Lastenheft (E8)
-- [ ] **7.2** Entscheidungsvorlage (E1 vollständig)
-- [ ] **7.3** CSV-Anbieterfragebogen (T-C1 bis T-C3, E7)
+- [x] **7.1** Druckansicht Lastenheft mit Abschnitten 1 bis 12 und Anhang, Druck-CSS A4 mit 20 mm Rand, Titel für „als PDF“ (`ui/druck/Lastenheft.tsx`, Texte in `export/vorlagen.ts`) (E8 grün). Offen: PDF-Probe ablegen (mit 7.4)
+- [x] **7.2** Entscheidungsvorlage mit Empfehlung im Kasten, Begründung oder Entwurf, Ausgangslage, Vorgehen, Ergebnis, Kosten, Sensitivität, Risiken, Freigabe; Bedienung mit Wahl, „Entwurf erzeugen“, Risiken und Status mit Sperre D5 (E1 vollständig grün)
+- [x] **7.3** CSV-Anbieterfragebogen `export/csv.ts` (T-C1 bis T-C3 und E7 grün)
 - [ ] **7.4** README mit Bildern, `docs/datenmodell.md`
 
 ## Phase 8 – Qualität und Version 0.1.0
 
-- [ ] **8.1** Alle Browsertests E1 bis E11 (laut Auftrag nur lokal, siehe entscheidungen.md)
-- [ ] **8.2** Barrierefreiheit und Tastatur (E5, E9)
+- [ ] **8.1** Alle Browsertests E1 bis E11 (laut Auftrag nur lokal, siehe entscheidungen.md). **Stand:** E1 bis E11 stehen in `e2e/` und sind lokal grün (19 Tests); eine CI gibt es mangels Repo noch nicht.
+- [ ] **8.2** Barrierefreiheit und Tastatur (E5, E9). **Stand:** E5 (Tastatur) und E9 (axe in allen Schritten, hell und dunkel) grün.
 - [ ] **8.3** Durchsicht mit Robin an einem echten Fall
 - [ ] **8.4** Tag `v0.1.0` (Repo bleibt privat)
 
@@ -85,6 +85,8 @@ Letzte Aktualisierung: 11.11.2026, nach Phase 5
 
 - **Repo:** Lokal liegen alle Commits auf `main`. Das private GitHub-Repo `edgebird-lab/auswahllotse` ist noch nicht angelegt, weil die Rechteprüfung der Sitzung `gh repo create` abgelehnt hat. Sobald Robin es anlegt oder freigibt: `gh repo create edgebird-lab/auswahllotse --private --source . --remote origin` und `git push -u origin main`; danach den ersten CI-Lauf prüfen (Schritt 0.3).
 - **Prüfen vor jedem Commit:** `npm run lint`, `npm test`, `npm run build`, `npm run e2e` (Edge, Port 4183 fest).
-- **Nächster Schritt:** Phase 6, Oberfläche. Alle Zahlen und Befunde liefert `berechneGesamt(projekt)` aus `entscheidung/gesamt.ts`.
+- **Nächster Schritt:** 7.4 (README mit Bildern per `scripts/readme-bilder.mjs`, PDF-Proben, `docs/datenmodell.md`), danach 8.1 bis 8.4.
+- **Oberfläche:** `src/App.tsx` (Gerüst), `src/ui/schritte/*` (sieben Schritte), `src/ui/druck/*` (Vorlagen), `src/ui/diagramme/*` (SVG, Rechnungen in `geometrie.ts`). Alle Zahlen und Befunde liefert `berechneGesamt(projekt)` aus `entscheidung/gesamt.ts`; Änderungen laufen als reine Funktionen über `aendere` (Kontext in `ui/kontext.ts`).
+- **Ansehen:** `npm run build`, dann `npx vite preview --port 4183 --strictPort` und `node scripts/ansehen.mjs <ordner>` (Bildschirmfotos aller Schritte, hell und dunkel). Den Vorschau-Server danach beenden, sonst scheitert `npm run e2e` am belegten Port.
 - **Bausteine der Fachlogik:** Einlesen `prozessdatei/einlesen.ts` → `lastenheft/abgleich.ts` (`liesProzessEin`, `ohneProzessmodell`, `gleicheAb`) → Prüfungen `lastenheft/pruefung.ts` → Bewertung `bewertung/auswertung.ts` (`werteAus`). Alle Funktionen sind rein und geben neue Objekte zurück; die Oberfläche (Phase 6) braucht nur noch Zustand, Plattform und Darstellung.
 - **Testhilfen:** `src/testhilfen/` (Testdateien per `?raw`, Testprozesse, Projekte mit Rahmen L, Beispiel ABC).

@@ -1,0 +1,103 @@
+import { expect, test } from '@playwright/test'
+import { DATEI, ladeBeispiel, leseLieferdienstEin, leseProzessEin, schritt, SCHRITTE } from './hilfen.ts'
+
+test('Beispiel durch alle sieben Schritte bis zur Vorlage (E1)', async ({ page }) => {
+  await page.goto('/')
+  await ladeBeispiel(page)
+  for (const name of SCHRITTE) await schritt(page, name)
+  await page.getByRole('tab', { name: 'Entscheidungsvorlage' }).click()
+  const vorlage = page.locator('.druck-dokument')
+  await expect(vorlage).toContainText('Empfohlen wird Anbieter Nord (Warenwirtschaft Nord).')
+  await expect(vorlage.locator('.empfehlung-name')).toContainText('Anbieter Nord')
+})
+
+test('Prozesslotse-Datei einlesen und Umfang zeigen (E2)', async ({ page }) => {
+  await page.goto('/')
+  await leseProzessEin(page, DATEI.lieferdienst)
+  await expect(page.getByRole('status')).toContainText('eingelesen')
+  await expect(page.locator('#prozess-karte')).toContainText('18 Aufgaben, 6 Rollen')
+  await expect(page.locator('.zaehlerzeile')).toContainText('8 Aufgaben im Umfang · 4 Rollen · 7 Benutzer')
+  // Eine Aufgabe in den Umfang nehmen: Zähler und Anforderungen folgen
+  await page.getByRole('checkbox', { name: 'Bestellung telefonisch annehmen' }).check()
+  await expect(page.locator('.zaehlerzeile')).toContainText('9 Aufgaben im Umfang')
+  // auch BPMN mit eingebettetem Projekt; zuerst kommt die Vorschau des Abgleichs
+  await page.locator('#prozess-datei').setInputFiles(DATEI.lieferdienstBpmn)
+  const dialog = page.getByRole('dialog', { name: 'Prozessmodell neu einlesen?' })
+  await expect(dialog).toContainText('0 neu, 0 geändert, 0 entfallen')
+  await dialog.getByRole('button', { name: 'Übernehmen' }).click()
+  await expect(page.locator('#prozess-karte')).toContainText('BPMN mit eingebettetem Projekt')
+})
+
+test('kaputte Dateien melden und bedienbar bleiben (E3)', async ({ page }) => {
+  await page.goto('/')
+  await leseProzessEin(page, DATEI.keinJson)
+  await expect(page.getByRole('alert')).toContainText('Die Datei ist kein gültiges JSON.')
+  await page.locator('#prozess-datei').setInputFiles(DATEI.doctype)
+  await expect(page.getByRole('alert')).toContainText('aus Sicherheitsgründen nicht')
+  // Eine Prozesslotse-Datei ist kein Projekt
+  await page.getByLabel('Projektdatei öffnen').setInputFiles(DATEI.lieferdienst)
+  await expect(page.getByRole('alert')).toContainText('Das ist eine Prozesslotse-Datei. Bitte im Schritt „Prozess“ einlesen.')
+  await page.getByRole('button', { name: 'Meldung schließen' }).click()
+  await expect(page.getByRole('alert')).toHaveCount(0)
+  await page.getByRole('button', { name: 'Ohne Prozessmodell weiter' }).click()
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('3 · Anforderungen')
+})
+
+test('Anforderung bearbeiten und Vorschlag übernehmen (E10)', async ({ page }) => {
+  await page.goto('/')
+  await leseLieferdienstEin(page)
+  await schritt(page, 'Anforderungen')
+  const kopf = page.locator('#anforderungen-kopf')
+  // T-P5: 22 Muss von 35 aktiven
+  await expect(kopf).toContainText('62,9 % (22 von 35) – mehr als empfohlen')
+  const f01 = page.locator('article', { has: page.getByRole('heading', { name: 'Bestellung in Warenwirtschaft erfassen' }) })
+  await f01.getByRole('button', { name: /^Bearbeiten/ }).click()
+  await f01.getByLabel('Anforderung', { exact: true }).fill('Die Software muss Bestellungen in höchstens 2 Minuten erfassen lassen.')
+  await f01.getByRole('button', { name: /^Fertig/ }).click()
+  await expect(f01).toContainText('Die Software muss Bestellungen in höchstens 2 Minuten erfassen lassen.')
+  await f01.getByText('Soll', { exact: true }).click()
+  await expect(f01.locator('.marke-geaendert')).toHaveText('geändert')
+  await expect(kopf).toContainText('60,0 % (21 von 35)')
+  const vorschlag = page.locator('article', { has: page.getByRole('heading', { name: 'Stammdaten an einer Stelle' }) })
+  await expect(vorschlag.locator('.nummer-marke')).toHaveText('ohne Nr.')
+  await vorschlag.getByRole('button', { name: /^Übernehmen/ }).click()
+  await expect(vorschlag.locator('.nummer-marke')).toHaveText('F-09')
+  await expect(kopf).toContainText('58,3 % (21 von 36)')
+  // Rückgängig nimmt die Übernahme zurück
+  await page.getByRole('button', { name: '↶ Rückgängig' }).click()
+  await expect(kopf).toContainText('60,0 % (21 von 35)')
+})
+
+test('Angebot anlegen, alle Zeilen bewerten, Kosten eingeben (E11)', async ({ page }) => {
+  await page.goto('/')
+  await leseLieferdienstEin(page)
+  await schritt(page, 'Angebote')
+  await page.getByLabel('Anbieter', { exact: true }).fill('Anbieter Test')
+  await page.getByLabel('Produkt', { exact: true }).fill('Testprodukt')
+  await page.getByRole('button', { name: 'Hinzufügen' }).click()
+  await expect(page.locator('.fortschritt')).toHaveText('0 von 35 bewertet')
+  const erfuellt = page.getByRole('radio', { name: 'erfüllt', exact: true })
+  for (let i = 0; i < (await erfuellt.count()); i++) await erfuellt.nth(i).check({ force: true })
+  const punkte = page.getByRole('combobox', { name: /^Punkte für/ })
+  for (let i = 0; i < (await punkte.count()); i++) await punkte.nth(i).selectOption('8')
+  await expect(page.locator('.fortschritt')).toHaveText('35 von 35 bewertet')
+
+  await page.getByRole('tab', { name: 'Kosten' }).click()
+  // Annahmen aus dem Modell: 7 Benutzer, 44 € Stundensatz
+  await expect(page.getByLabel('Benutzer (Lizenzen)')).toHaveValue('7')
+  await page.getByRole('button', { name: '+ Position: Einmalige Kosten' }).click()
+  await page.getByLabel('Betrag der Position 1 (Einmalige Kosten) in Euro').fill('5000')
+  await page.getByLabel('Preis je Benutzer und Monat').fill('30')
+  // E = 5.000; L = 30 · 7 · 12 = 2.520; TCO = 5.000 + 5 · 2.520 = 17.600
+  const summen = page.locator('.summen')
+  await expect(summen).toContainText('Gesamtkosten über 5 Jahre')
+  await expect(summen).toContainText(/17\.600\s€/)
+  // Ohne Gewichte keine Empfehlung; „Gleich verteilen“ behebt das
+  await schritt(page, 'Ergebnis')
+  await expect(page.locator('#empfehlung')).toContainText('Keine Empfehlung: Summe ist 0 %')
+  await schritt(page, 'Gewichtung')
+  await page.getByRole('button', { name: 'Gleich verteilen' }).click()
+  await schritt(page, 'Ergebnis')
+  await expect(page.locator('#empfehlung')).toContainText('Anbieter Test')
+  await expect(page.locator('#empfehlung')).toContainText('8,00 von 10')
+})

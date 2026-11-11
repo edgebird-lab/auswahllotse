@@ -1,33 +1,294 @@
 /**
- * Vorläufige Startseite. Der geführte Assistent mit sieben Schritten entsteht
- * in Phase 6 (siehe docs/stand.md); bis dahin liegt die Fachlogik getestet in
- * src/prozessdatei, src/modell, src/lastenheft und src/bewertung.
+ * Geführter Assistent in sieben Schritten (Spezifikation 5): Kopfleiste,
+ * Schrittleiste, Schritt. Alle Zahlen kommen aus `berechneGesamt`; jede
+ * Änderung läuft über den Reducer mit Rückgängig und Wiederholen.
  */
-const SCHRITTE = ['Rahmen', 'Prozess', 'Anforderungen', 'Gewichtung', 'Angebote', 'Ergebnis', 'Vorlagen']
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState, type ChangeEvent } from 'react'
+import { berechneGesamt } from './entscheidung/gesamt'
+import { neuesArbeitsprojekt } from './lastenheft/aenderungen'
+import { ladeAusBrowser, ladeDokumentInfo, ladeEinstellungen, speichereDokumentInfo, speichereEinstellungen, speichereImBrowser } from './modell/speicher'
+import type { AuswahlProjekt, Einstellungen } from './modell/typen'
+import { plattform } from './plattform'
+import type { Ziel } from './ui/befundziel'
+import { startSchritt, useDateiBefehle } from './ui/datei'
+import { Schalter } from './ui/Eingaben'
+import { useFrage } from './ui/frage'
+import { FrageDialog } from './ui/FrageDialog'
+import { GeheZu } from './ui/GeheZu'
+import { AppKontext, type Ansicht, type AppApi, type Lesebefunde } from './ui/kontext'
+import { AngeboteSchritt } from './ui/schritte/AngeboteSchritt'
+import { AnforderungenSchritt } from './ui/schritte/AnforderungenSchritt'
+import { ErgebnisSchritt } from './ui/schritte/ErgebnisSchritt'
+import { GewichtungSchritt } from './ui/schritte/GewichtungSchritt'
+import { ProzessSchritt } from './ui/schritte/ProzessSchritt'
+import { RahmenSchritt } from './ui/schritte/RahmenSchritt'
+import { VorlagenSchritt } from './ui/schritte/VorlagenSchritt'
+import { sperreVon } from './ui/sperren'
+import { istGeaendert, reduziere, SCHRITTE, startZustand, type Schritt } from './zustand'
+
+export const VERSION = '0.0.0'
+
+function erstZustand() {
+  const gespeichert = ladeAusBrowser()
+  const info = ladeDokumentInfo()
+  const projekt = gespeichert ?? neuesArbeitsprojekt()
+  // Wiederhergestellt: Dateiname merken; ungespeicherte Änderungen bleiben als „geändert“ markiert
+  const z = startZustand(projekt, ladeEinstellungen(), gespeichert ? { name: info.name, gespeichert: info.ungespeichert ? null : projekt } : {})
+  return gespeichert ? { ...z, schritt: startSchritt(projekt) } : z
+}
+
+const FARBSCHEMA_TEXT: Record<Einstellungen['farbschema'], string> = { system: 'wie System', hell: 'hell', dunkel: 'dunkel' }
 
 export default function App() {
   return (
-    <>
-      <header className="kopf">
-        <span className="marke">Auswahl-Lotse</span>
-        <span className="kopf-hinweis">Version in Arbeit</span>
-      </header>
-      <main className="seite">
-        <h1>Auswahl-Lotse</h1>
-        <p className="einleitung">
-          Vom Prozessmodell zu Lastenheft und begründeter Softwareentscheidung. Läuft im Browser, ohne KI und ohne
-          Server; alle Daten bleiben auf diesem Gerät.
-        </p>
-        <section className="karte" aria-labelledby="ablauf-titel">
-          <h2 id="ablauf-titel">Geplanter Ablauf</h2>
-          <ol className="schrittliste">
-            {SCHRITTE.map((s) => (
-              <li key={s}>{s}</li>
-            ))}
+    <FrageDialog>
+      <Hauptfenster />
+    </FrageDialog>
+  )
+}
+
+function Hauptfenster() {
+  const [z, dispatch] = useReducer(reduziere, undefined, erstZustand)
+  const [meldung, setMeldung] = useState('')
+  const [fehler, setFehler] = useState<string | null>(null)
+  const [ansicht, setAnsicht] = useState<Ansicht>({ angebotId: null, angebotReiter: 'bewertung', vorlage: 'lastenheft' })
+  const [lesebefunde, setzeLesebefunde] = useState<Lesebefunde | null>(null)
+  const [sprung, setSprung] = useState(0)
+  const anker = useRef<string | null>(null)
+  const ersterSchritt = useRef(true)
+  const nichtSichernRef = useRef<AuswahlProjekt | null>(null)
+  const meldungsZeit = useRef<number | undefined>(undefined)
+  const projektFeld = useRef<HTMLInputElement>(null)
+  const frage = useFrage()
+  const g = useMemo(() => berechneGesamt(z.projekt), [z.projekt])
+  const geaendert = istGeaendert(z)
+
+  const melde = useCallback((text: string) => {
+    setMeldung(text)
+    window.clearTimeout(meldungsZeit.current)
+    meldungsZeit.current = window.setTimeout(() => setMeldung(''), 6000)
+  }, [])
+  const aendere = useCallback<AppApi['aendere']>((f, gruppe) => dispatch({ typ: 'aendern', aenderung: f, zeit: Date.now(), gruppe }), [])
+  const nichtSichern = useCallback((p: AuswahlProjekt) => {
+    nichtSichernRef.current = p
+  }, [])
+  const befehle = useDateiBefehle({ z, dispatch, aendere, melde, zeigeFehler: setFehler, frage, setzeLesebefunde, nichtSichern })
+  const setzeAnsicht = useCallback((teil: Partial<Ansicht>) => setAnsicht((a) => ({ ...a, ...teil })), [])
+  const springeZu = useCallback((ziel: Ziel) => {
+    anker.current = ziel.anker
+    setAnsicht((a) => ({
+      angebotId: ziel.angebotId ?? a.angebotId,
+      angebotReiter: ziel.reiter ?? a.angebotReiter,
+      vorlage: ziel.vorlage ?? a.vorlage,
+    }))
+    dispatch({ typ: 'schritt', schritt: ziel.schritt })
+    setSprung((n) => n + 1)
+  }, [])
+
+  // Sofort sichern: Ein Projekt ist klein, und ein verzögertes Sichern ginge beim Schließen des Tabs verloren
+  useEffect(() => {
+    if (nichtSichernRef.current === z.projekt) return
+    nichtSichernRef.current = null
+    speichereImBrowser(z.projekt)
+    speichereDokumentInfo({ name: z.dokument.name, ungespeichert: geaendert })
+  }, [z.projekt, z.dokument.name, geaendert])
+
+  useEffect(() => {
+    speichereEinstellungen(z.einstellungen)
+    const root = document.documentElement
+    if (z.einstellungen.farbschema === 'hell') root.dataset.theme = 'light'
+    else if (z.einstellungen.farbschema === 'dunkel') root.dataset.theme = 'dark'
+    else delete root.dataset.theme
+  }, [z.einstellungen])
+
+  // Fenstertitel; ein Punkt zeigt ungespeicherte Änderungen (5.1)
+  useEffect(() => {
+    const name = z.dokument.name ?? (z.projekt.rahmen.vorhaben || 'Neues Vorhaben')
+    plattform.setzeTitel(`${geaendert ? '• ' : ''}${name} – Auswahl-Lotse`)
+  }, [z.dokument.name, z.projekt.rahmen.vorhaben, geaendert])
+
+  // Beim Schrittwechsel springt der Fokus auf die Überschrift, bei einem Sprung auf die Ursache (5.9)
+  useEffect(() => {
+    if (ersterSchritt.current) {
+      ersterSchritt.current = false
+      return
+    }
+    const ziel = (anker.current && document.getElementById(anker.current)) || document.getElementById('schritt-titel')
+    anker.current = null
+    if (!ziel) return
+    if (!ziel.matches('a, button, input, select, textarea, [tabindex]')) ziel.setAttribute('tabindex', '-1')
+    ziel.focus({ preventScroll: true })
+    if (ziel.id === 'schritt-titel') window.scrollTo({ top: 0 })
+    else ziel.scrollIntoView({ block: 'center' })
+  }, [z.schritt, sprung])
+
+  const oeffnen = useCallback(() => projektFeld.current?.click(), [])
+
+  useEffect(() => {
+    const taste = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey) || e.altKey) return
+      const k = e.key.toLowerCase()
+      if (k === 's') {
+        e.preventDefault()
+        void befehle.speichern()
+        return
+      }
+      if (k === 'o' && !e.shiftKey) {
+        e.preventDefault()
+        oeffnen()
+        return
+      }
+      if ((e.target as HTMLElement | null)?.closest('input, textarea, select, [contenteditable="true"]')) return
+      if (k === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        dispatch({ typ: 'rueckgaengig' })
+      } else if (k === 'y' || (k === 'z' && e.shiftKey)) {
+        e.preventDefault()
+        dispatch({ typ: 'wiederholen' })
+      }
+    }
+    window.addEventListener('keydown', taste)
+    return () => window.removeEventListener('keydown', taste)
+  }, [befehle, oeffnen])
+
+  const projektGewaehlt = async (e: ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0]
+    e.target.value = ''
+    if (f) await befehle.oeffneDatei({ pfad: null, name: f.name, inhalt: await f.text() })
+  }
+
+  const api = useMemo<AppApi>(
+    () => ({ z, g, dispatch, aendere, melde, ansicht, setzeAnsicht, springeZu, befehle, lesebefunde }),
+    [z, g, aendere, melde, ansicht, setzeAnsicht, springeZu, befehle, lesebefunde],
+  )
+  const sperre = sperreVon(z.schritt, z.projekt, g.kriterien)
+
+  return (
+    <AppKontext.Provider value={api}>
+      <div className="app">
+        <a className="sprungmarke" href="#inhalt">
+          Zum Inhalt springen
+        </a>
+        <header className="kopf">
+          <div className="logo">
+            <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" width={26} height={26} />
+            <span>Auswahl-Lotse</span>
+            <span className="dokument-name" title={z.dokument.name ?? undefined}>
+              {z.dokument.name ?? (z.projekt.rahmen.vorhaben || 'Neues Vorhaben')}
+              {geaendert && (
+                <span className="ungespeichert" title="Ungespeicherte Änderungen">
+                  {' '}
+                  •<span className="sr"> (ungespeichert)</span>
+                </span>
+              )}
+            </span>
+          </div>
+          <p className="meldung" role="status" aria-live="polite">
+            {meldung}
+          </p>
+          <div className="kopf-aktionen">
+            <button type="button" className="knopf knopf-klein" onClick={() => void befehle.neu()}>
+              Neu
+            </button>
+            <button type="button" className="knopf knopf-klein" onClick={oeffnen} title="Strg+O">
+              Öffnen …
+            </button>
+            <button type="button" className="knopf knopf-klein" onClick={() => void befehle.speichern()} title="Strg+S">
+              Speichern
+            </button>
+            <button type="button" className="knopf knopf-klein" onClick={() => void befehle.ladeBeispiel()}>
+              Beispiel laden
+            </button>
+            <span className="kopf-trenner" aria-hidden="true" />
+            <button type="button" className="knopf knopf-klein" disabled={z.vergangenheit.length === 0} onClick={() => dispatch({ typ: 'rueckgaengig' })} title="Strg+Z">
+              ↶ Rückgängig
+            </button>
+            <button type="button" className="knopf knopf-klein" disabled={z.zukunft.length === 0} onClick={() => dispatch({ typ: 'wiederholen' })} title="Strg+Y" aria-label="Wiederholen">
+              ↷
+            </button>
+            <Schalter an={z.einstellungen.lernmodus} onAendern={(lernmodus) => dispatch({ typ: 'einstellungen', einstellungen: { lernmodus } })}>
+              Lernmodus
+            </Schalter>
+            <label className="farbschema">
+              <span className="sr">Farbschema</span>
+              <select value={z.einstellungen.farbschema} onChange={(e) => dispatch({ typ: 'einstellungen', einstellungen: { farbschema: e.target.value as Einstellungen['farbschema'] } })}>
+                {(Object.keys(FARBSCHEMA_TEXT) as Einstellungen['farbschema'][]).map((f) => (
+                  <option key={f} value={f}>
+                    Farben {FARBSCHEMA_TEXT[f]}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        </header>
+        <input ref={projektFeld} type="file" accept=".auswahllotse,.json,application/json" hidden aria-label="Projektdatei öffnen" onChange={(e) => void projektGewaehlt(e)} />
+        <nav className="schrittleiste" aria-label="Schritte">
+          <ol>
+            {SCHRITTE.map((s, i) => {
+              const gesperrt = sperreVon(s.id, z.projekt, g.kriterien)
+              return (
+                <li key={s.id}>
+                  <button type="button" aria-current={z.schritt === s.id ? 'step' : undefined} disabled={gesperrt !== null} title={gesperrt?.grund} onClick={() => dispatch({ typ: 'schritt', schritt: s.id })}>
+                    <span className="nummer" aria-hidden="true">
+                      {i + 1}
+                    </span>
+                    {s.name}
+                    {gesperrt && <span className="sr"> (gesperrt: {gesperrt.grund})</span>}
+                  </button>
+                </li>
+              )
+            })}
           </ol>
-          <p className="leise">Die Oberfläche folgt; zuerst entsteht die getestete Fachlogik.</p>
-        </section>
-      </main>
-    </>
+        </nav>
+        {fehler && (
+          <div className="banner banner-fehler fehler-banner" role="alert">
+            <p>{fehler}</p>
+            <button type="button" className="knopf knopf-klein" onClick={() => setFehler(null)}>
+              Meldung schließen
+            </button>
+          </div>
+        )}
+        <main id="inhalt" className={`flaeche flaeche-${z.schritt}`}>
+          {sperre ? <Gesperrt grund={sperre.grund} ausweg={sperre.ausweg} /> : <AktiverSchritt schritt={z.schritt} />}
+        </main>
+        <footer className="fuss">
+          <p>Auswahl-Lotse {VERSION} · Alle Daten bleiben auf diesem Gerät, ohne Server und ohne KI. Rechtliche Hinweise ohne Gewähr, keine Rechtsberatung.</p>
+          <button type="button" className="knopf knopf-klein knopf-leise" onClick={() => void befehle.leereSpeicher()}>
+            Browser-Speicher leeren
+          </button>
+        </footer>
+      </div>
+    </AppKontext.Provider>
+  )
+}
+
+function AktiverSchritt({ schritt }: { schritt: Schritt }) {
+  switch (schritt) {
+    case 'rahmen':
+      return <RahmenSchritt />
+    case 'prozess':
+      return <ProzessSchritt />
+    case 'anforderungen':
+      return <AnforderungenSchritt />
+    case 'gewichtung':
+      return <GewichtungSchritt />
+    case 'angebote':
+      return <AngeboteSchritt />
+    case 'ergebnis':
+      return <ErgebnisSchritt />
+    case 'vorlagen':
+      return <VorlagenSchritt />
+  }
+}
+
+function Gesperrt({ grund, ausweg }: { grund: string; ausweg: Schritt }) {
+  return (
+    <div className="schritt">
+      <h1 id="schritt-titel" tabIndex={-1}>
+        Dieser Schritt ist noch gesperrt
+      </h1>
+      <p>{grund}</p>
+      <GeheZu schritt={ausweg} text="Zum Schritt, der die Sperre aufhebt" />
+    </div>
   )
 }

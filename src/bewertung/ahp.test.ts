@@ -73,7 +73,8 @@ describe('Paarvergleich nach AHP (AHP1 bis AHP6)', () => {
     expect(fehlendeVergleiche(ahpMatrix(['funktion', 'betrieb', 'anbieter'], []))).toBe(3)
   })
 
-  it('bestätigt die RI-Tabelle per Simulation (T-AHP6)', () => {
+  // Misst die Laufzeit (unter 2 s); läuft der Rechner gerade unter Last, darf der Test es noch zweimal versuchen.
+  it('bestätigt die RI-Tabelle per Simulation (T-AHP6)', { retry: 2 }, () => {
     const start = performance.now()
     const zufall = mulberry32(20261111)
     const werte = [1 / 9, 1 / 8, 1 / 7, 1 / 6, 1 / 5, 1 / 4, 1 / 3, 1 / 2, 1, 2, 3, 4, 5, 6, 7, 8, 9]

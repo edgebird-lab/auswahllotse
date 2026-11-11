@@ -2,7 +2,7 @@
 
 Vom Prozessmodell zu Lastenheft und begründeter Softwareentscheidung. Der Auswahl-Lotse liest ein Projekt des Prozesslotsen, leitet daraus ein Lastenheft mit MoSCoW-Prioritäten und Abnahmekriterien ab, gewichtet Kriterien direkt oder per Paarvergleich (AHP), prüft K.-o.-Kriterien und bewertet Angebote per Nutzwertanalyse. Läuft im Browser, ohne KI und ohne Server; später auch als Windows-Programm.
 
-> **Stand:** in Arbeit. Fertig und getestet ist die Fachlogik der Phasen 0 bis 5: Einlesen, Lastenheft, Prüfungen, Gewichtung mit AHP, Nutzwert, Sensitivität, Kosten und Begründungsentwurf. Oberfläche und Vorlagen folgen. Einzelheiten in [docs/stand.md](docs/stand.md).
+> **Stand:** in Arbeit, noch keine Version 0.1.0. Fachlogik und Oberfläche mit allen sieben Schritten, Druckvorlagen und CSV-Fragebogen sind fertig und getestet; es fehlen README-Bilder und die Durchsicht. Einzelheiten in [docs/stand.md](docs/stand.md).
 
 ## Was es kann (Ziel für Version 0.1)
 

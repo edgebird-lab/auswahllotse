@@ -5,11 +5,13 @@ import { neuesAngebot, neuesProjekt } from './projekt'
 import {
   alsJson,
   ladeAusBrowser,
+  ladeDokumentInfo,
   ladeEinstellungen,
   Ladefehler,
   leereBrowserSpeicher,
   leseProjektText,
   projektDateiname,
+  speichereDokumentInfo,
   speichereEinstellungen,
   speichereImBrowser,
 } from './speicher'
@@ -175,5 +177,31 @@ describe('Browser-Speicher', () => {
     vi.stubGlobal('localStorage', s)
     s.setItem('auswahllotse:projekt', '{"app":"auswahllotse"}')
     expect(ladeAusBrowser()).toBeNull()
+  })
+})
+
+describe('Dokumentinfo im Browser', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
+  function speicher() {
+    const daten = new Map<string, string>()
+    return {
+      getItem: (k: string) => daten.get(k) ?? null,
+      setItem: (k: string, v: string) => void daten.set(k, v),
+      removeItem: (k: string) => void daten.delete(k),
+    }
+  }
+
+  it('merkt sich Dateiname und ungespeicherte Änderungen', () => {
+    vi.stubGlobal('localStorage', speicher())
+    expect(ladeDokumentInfo()).toEqual({ name: null, ungespeichert: false })
+    expect(speichereDokumentInfo({ name: 'Neue Warenwirtschaft.auswahllotse', ungespeichert: true })).toBe(true)
+    expect(ladeDokumentInfo()).toEqual({ name: 'Neue Warenwirtschaft.auswahllotse', ungespeichert: true })
+    leereBrowserSpeicher()
+    expect(ladeDokumentInfo()).toEqual({ name: null, ungespeichert: false })
+    vi.stubGlobal('localStorage', undefined)
+    expect(speichereDokumentInfo({ name: null, ungespeichert: false })).toBe(false)
   })
 })

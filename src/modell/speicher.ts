@@ -28,7 +28,6 @@ import {
   type Bewertung,
   type Einstellungen,
   type Gewichtung,
-
   type Kosten,
   type Kostenposition,
   type Paarurteil,
@@ -41,6 +40,7 @@ import {
 
 const PROJEKT_SCHLUESSEL = 'auswahllotse:projekt'
 const EINSTELLUNGEN_SCHLUESSEL = 'auswahllotse:einstellungen'
+const DOKUMENT_SCHLUESSEL = 'auswahllotse:dokument'
 
 /** Die Projektdatei kann nicht geladen werden; `message` ist für Benutzer formuliert. */
 export class Ladefehler extends Error {}
@@ -379,6 +379,7 @@ export function leereBrowserSpeicher(): boolean {
   try {
     globalThis.localStorage.removeItem(PROJEKT_SCHLUESSEL)
     globalThis.localStorage.removeItem(EINSTELLUNGEN_SCHLUESSEL)
+    globalThis.localStorage.removeItem(DOKUMENT_SCHLUESSEL)
     return true
   } catch {
     return false
@@ -409,4 +410,29 @@ export function speichereEinstellungen(e: Einstellungen): boolean {
   } catch {
     return false
   }
+}
+
+/** Name der zugehörigen Datei und ob es seitdem Änderungen gibt (für den Punkt im Titel nach dem Neuladen). */
+export interface DokumentInfo {
+  name: string | null
+  ungespeichert: boolean
+}
+
+export function speichereDokumentInfo(info: DokumentInfo): boolean {
+  try {
+    globalThis.localStorage.setItem(DOKUMENT_SCHLUESSEL, JSON.stringify(info))
+    return true
+  } catch {
+    return false
+  }
+}
+
+export function ladeDokumentInfo(): DokumentInfo {
+  try {
+    const daten: unknown = JSON.parse(globalThis.localStorage.getItem(DOKUMENT_SCHLUESSEL) ?? 'null')
+    if (istObj(daten)) return { name: typeof daten.name === 'string' ? daten.name : null, ungespeichert: daten.ungespeichert === true }
+  } catch {
+    // ohne Angaben: kein Dateiname
+  }
+  return { name: null, ungespeichert: false }
 }
