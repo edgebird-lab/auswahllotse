@@ -26,7 +26,7 @@ import { VorlagenSchritt } from './ui/schritte/VorlagenSchritt'
 import { sperreVon } from './ui/sperren'
 import { istGeaendert, reduziere, SCHRITTE, startZustand, type Schritt, type Zustand } from './zustand'
 
-export const VERSION = '0.0.0'
+export const VERSION = '0.1.0'
 
 /** Zustand beim Start aus dem Browser-Speicher; dazu die Meldung, falls das gesicherte Projekt unlesbar war. */
 function erstStart(): { zustand: Zustand; fehler: string | null } {

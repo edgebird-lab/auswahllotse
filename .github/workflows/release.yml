@@ -1,8 +1,11 @@
 name: Version vorbereiten
 
-# Bei einem Tag wie v0.1.0 entsteht ein Release-Entwurf mit Installer.
-# Veröffentlicht wird nichts: Der Entwurf bleibt unsichtbar, und das Repo bleibt privat,
-# bis Robin beides ausdrücklich freigibt.
+# Bei einem Tag wie v0.1.0 entsteht ein Release-Entwurf mit Installer, dazu eine Kopie
+# mit festem Namen (Auswahl-Lotse-Setup.exe) für den Download-Link
+# https://github.com/edgebird-lab/auswahllotse/releases/latest/download/Auswahl-Lotse-Setup.exe.
+# Veröffentlicht wird der Entwurf erst nach Prüfung von Hand:
+# gh release edit <tag> --draft=false --latest
+
 on:
   push:
     tags: ['v*']
@@ -20,6 +23,14 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - name: Version passt zum Tag
+        shell: bash
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          test "$(node -p "require('./package.json').version")" = "$version"
+          grep -q "^version = \"$version\"$" src-tauri/Cargo.toml
+          grep -q "^export const VERSION = '$version'$" src/App.tsx
+          echo "Version $version in package.json, Cargo.toml und App.tsx"
       - uses: dtolnay/rust-toolchain@stable
       - uses: swatinem/rust-cache@v2
         with:
@@ -34,6 +45,30 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: Auswahl-Lotse ${{ github.ref_name }}
-          releaseBody: Installer für Windows (pro Benutzer, ohne Admin-Rechte). Noch nicht signiert; SmartScreen fragt beim ersten Start nach.
+          releaseBody: |
+            Vom Prozessmodell zu Lastenheft und begründeter Softwareentscheidung: Der Auswahl-Lotse liest ein Projekt des Prozesslotsen, leitet ein Lastenheft ab, gewichtet Kriterien, bewertet Angebote per Nutzwertanalyse, vergleicht die Kosten über mehrere Jahre und schreibt eine druckbare Entscheidungsvorlage. Ohne KI und ohne Server; alle Daten bleiben auf dem Rechner.
+
+            **Herunterladen:** `Auswahl-Lotse-Setup.exe` (unten unter „Assets“). Die Datei mit der Versionsnummer im Namen ist derselbe Installer.
+
+            **Voraussetzungen und Installation**
+            - Windows 10 oder 11 (64 Bit) mit Microsoft Edge WebView2. Windows 11 bringt es mit; fehlt es, lädt der Installer es von Microsoft nach (dafür ist eine Internetverbindung nötig).
+            - Installation pro Benutzer ohne Admin-Rechte nach `%LOCALAPPDATA%\Auswahl-Lotse`, mit Startmenü-Eintrag und Desktop-Verknüpfung. `.auswahllotse`-Dateien öffnen sich per Doppelklick.
+            - Der Installer ist nicht signiert. Windows SmartScreen kann beim ersten Start warnen: „Weitere Informationen“ > „Trotzdem ausführen“.
+            - Keine automatischen Updates: Eine neue Version einfach über die alte installieren. Entfernen über Einstellungen > Apps.
+
+            Einzelheiten, Fallbeispiel und Grenzen: [README](https://github.com/edgebird-lab/auswahllotse#readme).
+
+            © 2026 Robin Olbricht – olbricht-digital. Alle Rechte vorbehalten. Die Programme dürfen kostenlos genutzt werden; eine offene Lizenz ist noch nicht gewählt. Fremdbestandteile stehen unter ihren eigenen Lizenzen, siehe [docs/fremdlizenzen.md](https://github.com/edgebird-lab/auswahllotse/blob/main/docs/fremdlizenzen.md).
           releaseDraft: true
           prerelease: false
+      - name: Kopie mit festem Namen anhängen (Auswahl-Lotse-Setup.exe)
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          shopt -s nullglob
+          setups=(src-tauri/target/release/bundle/nsis/Auswahl-Lotse_*-setup.exe)
+          test "${#setups[@]}" -eq 1 || { echo "Erwartet genau einen Installer, gefunden: ${setups[*]}"; exit 1; }
+          cp "${setups[0]}" Auswahl-Lotse-Setup.exe
+          gh release upload "$GITHUB_REF_NAME" Auswahl-Lotse-Setup.exe --clobber --repo "$GITHUB_REPOSITORY"
+          ls -l "${setups[0]}" Auswahl-Lotse-Setup.exe

@@ -2,9 +2,23 @@
 
 Vom Prozessmodell zu Lastenheft und begründeter Softwareentscheidung. Der Auswahl-Lotse liest ein Projekt des Prozesslotsen, leitet daraus ein Lastenheft mit MoSCoW-Prioritäten und Abnahmekriterien ab, gewichtet Kriterien direkt oder per Paarvergleich (AHP), prüft K.-o.-Kriterien, bewertet Angebote per Nutzwertanalyse, vergleicht die Kosten über mehrere Jahre und schreibt eine druckbare Entscheidungsvorlage. Läuft im Browser oder als Windows-Programm, ohne KI und ohne Server.
 
-> **Stand 11.11.2026:** in Arbeit, noch keine Version 0.1.0. Fachlogik und Oberfläche mit allen sieben Schritten, Druckvorlagen und CSV-Fragebogen sind fertig, getestet und kritisch gegen die Spezifikation geprüft. Das Windows-Programm (Phase 9) ist gebaut und getestet. Es fehlen die Durchsicht an einem echten Fall und der Tag `v0.1.0`. Einzelheiten unter [Stand](#stand) und in [docs/stand.md](docs/stand.md).
+**[Für Windows herunterladen (Auswahl-Lotse-Setup.exe)](https://github.com/edgebird-lab/auswahllotse/releases/latest/download/Auswahl-Lotse-Setup.exe)** · Version 0.1.0 · [alle Versionen](https://github.com/edgebird-lab/auswahllotse/releases) · [Projektseite](https://olbricht-digital.de/software/auswahl-lotse)
+
+> **Version 0.1.0 vom 11.11.2026:** die erste veröffentlichte Version. Alle sieben Schritte, Druckvorlagen, CSV-Fragebogen und das Windows-Programm sind fertig, getestet und gegen die Spezifikation geprüft. Eine Durchsicht an einem echten Auswahlverfahren steht noch aus. Fehler und Wünsche gern als [Issue](https://github.com/edgebird-lab/auswahllotse/issues).
 
 ![Ergebnis des Fallbeispiels: Empfehlung, K.-o.-Prüfung und Nutzwert als gestapelte Balken](docs/bilder/ergebnis.png)
+
+## Installieren
+
+- **Voraussetzung:** Windows 10 oder 11 (64 Bit) mit der Microsoft Edge WebView2 Runtime. Windows 11 bringt sie mit; fehlt sie (ältere Windows-10-Rechner), lädt der Installer sie von Microsoft nach. Dafür braucht er eine Internetverbindung, das Programm selbst nicht.
+- **Pro Benutzer, ohne Admin-Rechte:** [`Auswahl-Lotse-Setup.exe`](https://github.com/edgebird-lab/auswahllotse/releases/latest/download/Auswahl-Lotse-Setup.exe) (etwa 1,3 MB) ausführen. Das Programm landet unter `%LOCALAPPDATA%\Auswahl-Lotse`, mit Eintrag im Startmenü und Verknüpfung „Auswahl-Lotse“ auf dem Desktop; `.auswahllotse`-Dateien öffnen sich per Doppelklick.
+- **Nicht signiert:** Der Installer trägt noch keine Code-Signatur. Windows SmartScreen kann deshalb beim ersten Start warnen („Der Computer wurde durch Windows geschützt“); über „Weitere Informationen“ > „Trotzdem ausführen“ geht es weiter.
+- **Aktualisieren und entfernen:** Es gibt keine automatischen Updates. Eine neue Version installiert man einfach über die alte; Projektdateien bleiben erhalten. Entfernen über Einstellungen > Apps.
+- **Ohne Installation:** Die gleiche Oberfläche läuft auch im Browser, gebaut aus dem Quelltext (siehe [Aus dem Quelltext starten](#aus-dem-quelltext-starten)).
+
+## Zusammenspiel mit dem Prozesslotsen
+
+Der Auswahl-Lotse baut auf dem **Prozesslotsen** auf, einer weiteren App von olbricht-digital, mit der man Geschäftsprozesse über geführte Fragen modelliert. Er liest dessen Projekte (`.prozesslotse` oder `.json`, Formate 1 bis 3) und BPMN-Dateien mit eingebettetem Projekt. Aus Aufgaben, Rollen, Medienbrüchen und Mengen des Modells schlägt er Anforderungen, Prioritäten und Kostenannahmen vor. Die Prozesslotse-Datei bleibt dabei unverändert. Ohne Prozessmodell geht es auch: Dann beginnt das Lastenheft mit dem Katalog und eigenen Anforderungen. Zum Ausprobieren öffnet „Beispiel laden“ ein fertiges Fallbeispiel.
 
 ## Was es kann
 
@@ -85,7 +99,7 @@ Prozesslotse-Dateien werden im Schritt „Prozess“ eingelesen, nicht über „
 
 Zahlen versteht die App deutsch geschrieben: „1.234,50“, „1234,5“ und „90.000“ (Punkte in Dreiergruppen sind Tausendertrennzeichen). Ein einzelner Punkt ohne Dreiergruppe gilt als Dezimalpunkt („2.5“ ist 2,5). Nach Beginn der Bewertung zählt jede Änderung an Gewichten, Anforderungen oder Regel einmal, auch wenn man Ziffer für Ziffer tippt; die Entscheidungsvorlage nennt die Zahl.
 
-## Start
+## Aus dem Quelltext starten
 
 Voraussetzung: Node 24. Keine globalen Installationen nötig.
 
@@ -98,13 +112,13 @@ npm run preview    # gebaute App auf http://localhost:4183 (fester Port)
 
 Im Browser „Beispiel laden“ öffnet das Fallbeispiel; ein eigenes Prozessmodell liest man im Schritt „Prozess“ ein (`.prozesslotse`, `.json` oder `.bpmn` mit eingebettetem Projekt).
 
-Als Windows-Programm: einmal `npm run desktop:build`, dann den Installer `Auswahl-Lotse_<Version>_x64-setup.exe` aus `…/release/bundle/nsis/` ausführen (pro Benutzer, ohne Admin-Rechte). Gestartet wird über die Verknüpfung „Auswahl-Lotse“ auf dem Desktop, über das Startmenü oder per Doppelklick auf eine `.auswahllotse`-Datei. Einzelheiten unter [Windows-Programm](#windows-programm).
+Den Installer selbst bauen: einmal `npm run desktop:build` (dazu Rust stable), dann `Auswahl-Lotse_<Version>_x64-setup.exe` aus `…/release/bundle/nsis/` ausführen. Fertige Installer stehen unter [Releases](https://github.com/edgebird-lab/auswahllotse/releases). Einzelheiten unter [Windows-Programm](#windows-programm).
 
 ## Windows-Programm
 
 Der Auswahl-Lotse läuft auch als Windows-Programm (Tauri 2 mit WebView2, App-ID `de.olbricht-digital.auswahllotse`). Gleiche Oberfläche, dazu:
 
-- **Installation pro Benutzer ohne Admin-Rechte:** Der Installer (NSIS, deutsch, etwa 1,3 MB; WebView2 bringt Windows 11 mit) legt das Programm unter `%LOCALAPPDATA%\Auswahl-Lotse` ab, mit Eintrag im Startmenü und Verknüpfung „Auswahl-Lotse“ auf dem Desktop. Entfernen über Einstellungen > Apps. Noch nicht signiert: Bei einem heruntergeladenen Installer fragt SmartScreen beim ersten Start nach.
+- **Installation pro Benutzer ohne Admin-Rechte:** Der Installer (NSIS, deutsch) legt das Programm unter `%LOCALAPPDATA%\Auswahl-Lotse` ab, mit Eintrag im Startmenü und Verknüpfung „Auswahl-Lotse“ auf dem Desktop (siehe [Installieren](#installieren)). Bei einem Tag `v*` baut die CI den Installer und hängt ihn an einen Release-Entwurf, zusätzlich als `Auswahl-Lotse-Setup.exe` mit festem Namen für den Download-Link (`.github/workflows/release.yml`).
 - **Dateien:** `.auswahllotse` öffnet sich per Doppelklick. Ein zweiter Doppelklick landet im laufenden Programm (eine Instanz). `.prozesslotse` und `.bpmn` werden nicht zugeordnet; man liest sie über den Dialog ein. Dateien lassen sich auch ins Fenster ziehen: Projekte werden geöffnet, Prozessmodelle eingelesen.
 - **Menü „Datei“:** Neu, Öffnen, Prozessmodell einlesen, Speichern, Speichern unter, Anbieterfragebogen als CSV, Beispiel laden, Beenden. Beim Schließen mit ungespeicherten Änderungen fragt das Programm nach; „Nicht speichern“ verwirft sie auch für den nächsten Start.
 - **PDF ohne Druckdialog:** In beiden Vorlagen schreibt „Als PDF speichern …“ die angezeigte Vorlage direkt über WebView2 als PDF (A4, 20 mm Rand). „Drucken …“ öffnet den Druckdialog.
@@ -143,12 +157,12 @@ Aufbau: Fachlogik ohne React in `src/prozessdatei`, `src/modell`, `src/lastenhef
 
 | Phase | Stand |
 | --- | --- |
-| 0 Einrichten | fertig; privates Repo und CI seit 11.11.2026 |
+| 0 Einrichten | fertig; Repo und CI seit 11.11.2026 |
 | 1 bis 7 Datenmodell, Einlesen, Lastenheft, Gewichtung, Kosten, Oberfläche, Vorlagen | fertig und getestet |
-| 8 Qualität | Browsertests, Barrierefreiheit und Tastatur fertig; die kritische Prüfung vom 11.11.2026 hat elf Fehler und Schwächen gefunden und behoben (Liste in [docs/stand.md](docs/stand.md)). Offen: Durchsicht mit Robin an einem echten Fall (8.3), danach Tag `v0.1.0` (8.4) |
-| 9 Windows-Programm mit Tauri | fertig (auf Robins Wunsch vorgezogen): Plattformschicht, Installer pro Benutzer, Zuordnung `.auswahllotse`, Einlese-Dialog, eine Instanz, atomares Speichern, PDF beider Vorlagen, Desktop-Test, Windows-Job in der CI |
+| 8 Qualität | Browsertests, Barrierefreiheit und Tastatur fertig; die kritische Prüfung vom 11.11.2026 hat elf Fehler und Schwächen gefunden und behoben (Liste in [docs/stand.md](docs/stand.md)). Version 0.1.0 am 11.11.2026 veröffentlicht (8.4); die Durchsicht an einem echten Fall (8.3) folgt |
+| 9 Windows-Programm mit Tauri | fertig: Plattformschicht, Installer pro Benutzer, Zuordnung `.auswahllotse`, Einlese-Dialog, eine Instanz, atomares Speichern, PDF beider Vorlagen, Desktop-Test, Windows-Job und Release in der CI |
 
-Offene Fragen der Spezifikation (Kataloginhalte, Festlegungen, Lizenz) gelten als Annahmen, bis Robin entscheidet: [docs/entscheidungen.md](docs/entscheidungen.md).
+Offene Fragen der Spezifikation (Kataloginhalte, Festlegungen) gelten als Annahmen, bis Robin entscheidet: [docs/entscheidungen.md](docs/entscheidungen.md).
 
 ## Grenzen
 
@@ -161,3 +175,9 @@ Offene Fragen der Spezifikation (Kataloginhalte, Festlegungen, Lizenz) gelten al
 - Ein auf „final“ gesetzter Status bleibt stehen, wenn später Fehler hinzukommen; die App warnt dann, setzt ihn aber nicht selbst zurück.
 - Im Browser: PDF nur über den Druckdialog, keine Rückfrage beim Schließen des Tabs (das Projekt liegt ohnehin im Browser-Speicher), kein Ablegen von Dateien per Ziehen.
 - Windows-Programm: nicht signiert, keine automatischen Updates; nach einem Neustart kennt es den Pfad der zuletzt bearbeiteten Datei nicht mehr, Strg+S fragt dann einmal nach dem Ort.
+
+## Rechte
+
+© 2026 Robin Olbricht – olbricht-digital. Alle Rechte vorbehalten. Die Programme dürfen kostenlos genutzt werden; eine offene Lizenz ist noch nicht gewählt. Fremdbestandteile stehen unter ihren eigenen Lizenzen, siehe [docs/fremdlizenzen.md](docs/fremdlizenzen.md).
+
+Die Namen im Fallbeispiel (Betrieb, Anbieter, Produkte) sind erfunden. Rechtliche Hinweise im Katalog sind keine Rechtsberatung.
