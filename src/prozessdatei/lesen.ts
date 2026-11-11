@@ -137,7 +137,9 @@ function projiziereBlock(x: unknown, wo: string, ctx: Kontext, tiefe: number, be
       return projiziereAufgabe(x, id, wo, ctx)
     case 'warten': {
       fordere(istText(x.name) && istZahl(x.dauerMin) && (x.art === 'zeit' || x.art === 'nachricht') && istVerweis(x.von), `${wo}: Warten unvollständig.`)
-      return { typ: 'warten', id, name: x.name, art: x.art, dauerMin: x.dauerMin, von: verweis(ctx, x.von, ctx.teilnehmer, wo, 'Teilnehmer', 'hinweis', id) }
+      // Ein Absender gehört nur zu Nachrichten (wie im Prozesslotsen seit Commit 2fac3a3)
+      const von = x.art === 'nachricht' ? verweis(ctx, x.von, ctx.teilnehmer, wo, 'Teilnehmer', 'hinweis', id) : null
+      return { typ: 'warten', id, name: x.name, art: x.art, dauerMin: x.dauerMin, von }
     }
     case 'entscheidung': {
       // Format 1 kennt keine Art; dort ist jede Entscheidung eine Daten-Entscheidung.
@@ -246,7 +248,13 @@ function projiziereZweig(z: unknown, wo: string, ctx: Kontext, tiefe: number, be
     melde(ctx, 'warnung', 'E8', `${wo} („${x.bezeichnung}“): Rücksprung ins Leere; der Ausgang endet ohne Ergebnis.`, seq.id)
   }
   const ev: PlZweigEreignis | null =
-    ereignis === null ? null : { art: ereignis.art as PlZweigEreignis['art'], dauerMin: ereignis.dauerMin as number, von: verweis(ctx, ereignis.von, ctx.teilnehmer, wo, 'Teilnehmer', 'hinweis', seq.id) }
+    ereignis === null
+      ? null
+      : {
+          art: ereignis.art as PlZweigEreignis['art'],
+          dauerMin: ereignis.dauerMin as number,
+          von: ereignis.art === 'nachricht' ? verweis(ctx, ereignis.von, ctx.teilnehmer, wo, 'Teilnehmer', 'hinweis', seq.id) : null,
+        }
   return { id: seq.id, bezeichnung: x.bezeichnung, anteil: x.anteil, schritte: seq.schritte, ende: x.ende, zurueckZu, ereignis: ev }
 }
 
@@ -296,7 +304,7 @@ function projiziereProzess(x: unknown, wo: string, version: number, befunde: Bef
     ausloeser: {
       art: x.ausloeser.art as PlAusloeserArt,
       text: x.ausloeser.text,
-      von: verweis(ctx, x.ausloeser.von, ctx.teilnehmer, `${wo}, Auslöser`, 'Teilnehmer', 'hinweis', x.id),
+      von: x.ausloeser.art === 'nachricht' ? verweis(ctx, x.ausloeser.von, ctx.teilnehmer, `${wo}, Auslöser`, 'Teilnehmer', 'hinweis', x.id) : null,
     },
     ergebnis: x.ergebnis,
     vorgaengeProTag: x.vorgaengeProTag,

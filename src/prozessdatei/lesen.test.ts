@@ -232,6 +232,19 @@ describe('Prozesslotse-Dateien lesen (E1 bis E8)', () => {
     expect(befunde).toEqual([])
   })
 
+  it('übernimmt Absender nur bei Nachrichten (wie der Prozesslotse)', () => {
+    const d = daten(TEXTE.onlinebestellung)
+    d.ist.ausloeser.art = 'manuell'
+    // Ausgang „7 Tage ohne Antwort“ ist ein Zeitereignis mit übrig gebliebenem Absender
+    d.ist.ablauf.schritte[0].koerper.schritte[1].zweige[1].schritte[1].zweige[2].ereignis.von = 'tln_kunde'
+    const { projekt, befunde } = leseProzessJson(JSON.stringify(d))
+    expect(projekt.ist.ausloeser.von).toBeNull()
+    const antwort = (projekt.ist.ablauf.schritte[0] as { koerper: PlSequenz }).koerper.schritte[1]
+    const ereignis = antwort.typ === 'entscheidung' ? antwort.zweige[1].schritte[1] : null
+    expect(ereignis?.typ === 'entscheidung' && ereignis.zweige.map((z) => z.ereignis?.von ?? null)).toEqual(['tln_kunde', 'tln_kunde', null])
+    expect(befunde).toEqual([])
+  })
+
   it('liest JSON mit Byte-Order-Mark', () => {
     expect(leseProzessJson(`﻿${TEXTE.lieferdienst}`).projekt.ist.name).toBe('Bestellung bis Rechnung (Lieferdienst)')
   })

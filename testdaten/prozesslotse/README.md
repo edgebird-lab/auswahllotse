@@ -30,6 +30,12 @@ Die Zahlen der Beispiele sind laut `beispiel.ts` „ausgedacht, aber plausibel�
 | `kein-xml.bpmn` | abgeschnittenes XML | „Die Datei ist kein gültiges XML.“ |
 | `html.bpmn` | Wurzel `<html>` | „Die Datei ist keine BPMN-2.0-Datei.“ |
 
+## Spätere Stände des Prozesslotsen
+
+| Commit | Datum | Format | Wirkung auf den Auswahl-Lotsen |
+| --- | --- | --- | --- |
+| `2fac3a3` | 11.11.2026 | 3 (unverändert) | Beim Laden entfernt der Prozesslotse Absender („von“) an Auslösern, Warten und Ereignissen, die keine Nachricht sind. Der Leser des Auswahl-Lotsen macht das ebenso; die Testdateien bleiben gültig. |
+
 ## Neues Format des Prozesslotsen
 
 Ein neues Format braucht einen eigenen Arbeitsschritt (Spezifikation 4.3): `Pl`-Typen in `src/prozessdatei/format.ts` ergänzen, Umstellung im Leser, neue Testdatei aus dem Prozesslotsen hier ablegen und diese Tabelle um Commit und Datum ergänzen.
