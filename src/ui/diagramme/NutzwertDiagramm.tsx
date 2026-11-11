@@ -31,7 +31,8 @@ export function NutzwertDiagramm({
   gewichte: Partial<Record<Gruppe, number>>
   haupt: readonly Gruppe[]
 }) {
-  const clipPraefix = useId().replace(/:/g, '')
+  // Nur Buchstaben und Ziffern: useId liefert je nach React-Version „:r0:“ oder „«r0»“, url(#…) braucht eine schlichte Kennung
+  const clipPraefix = `nw${useId().replace(/[^a-zA-Z0-9]/g, '')}`
   const serien = serienVon(haupt)
   const nachId = new Map(angebote.map((a) => [a.id, a]))
   // gültige nach Rang, dann ausgeschiedene

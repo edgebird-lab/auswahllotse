@@ -45,7 +45,11 @@ export function ErgebnisSchritt() {
       <section className="karte" aria-labelledby="kosten-titel">
         <h2 id="kosten-titel">Kosten</h2>
         <Lernhinweis thema="gesamtkosten" />
-        <KostenDiagramm ergebnisse={w.ergebnisse} angebote={p.angebote} budget={p.wirtschaftlichkeit.budgetEuro} titel={kostenbasisText(p)} />
+        {w.ergebnisse.some((r) => r.kostenbasis > 0) ? (
+          <KostenDiagramm ergebnisse={w.ergebnisse} angebote={p.angebote} budget={p.wirtschaftlichkeit.budgetEuro} titel={kostenbasisText(p)} />
+        ) : (
+          <p className="leer-hinweis">Noch keine Kosten erfasst (Schritt 5, Reiter „Kosten“).</p>
+        )}
         <KostenTabelle />
       </section>
 
