@@ -23,7 +23,7 @@ foreach ($fremd in '.prozesslotse', '.bpmn') {
   $standard = (Get-ItemProperty "HKCU:\Software\Classes\$fremd" -ErrorAction SilentlyContinue).'(default)'
   if ($standard -like 'AuswahlLotse*') { throw "$fremd darf nicht dem Auswahl-Lotsen gehören" }
   $mit = Get-ItemProperty "HKCU:\Software\Classes\$fremd\OpenWithProgids" -ErrorAction SilentlyContinue
-  if ($mit -and ($mit.PSObject.Properties.Name -like 'AuswahlLotse*')) { throw "$fremd darf nicht unter „Öffnen mit“ stehen" }
+  if ($mit -and ($mit.PSObject.Properties.Name -like 'AuswahlLotse*')) { throw "$fremd darf nicht unter 'Öffnen mit' stehen" }
 }
 
 # Verknüpfungen im Startmenü und auf dem Desktop (die stille Installation legt beide an)
