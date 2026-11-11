@@ -79,10 +79,13 @@ export const CR_GRENZE = 0.1
 /**
  * AHP5: Zufallsindex RI(n) nach Saaty (1987), „The analytic hierarchy
  * process—what it is and how it is used“, Mathematical Modelling 9(3–5),
- * S. 161–176. Die Primärquelle war nicht abrufbar; die Werte sind die
- * verbreitete Tabelle und durch eine eigene Simulation bestätigt
- * (Test T-AHP6 in ahp.test.ts: Abweichung höchstens 0,08 bei n = 3,
- * sonst höchstens 0,05).
+ * S. 161–176. Die Tabelle selbst war am 11.11.2026 nicht abrufbar; die Werte
+ * sind die verbreitete Saaty-Tabelle. Gegenprobe: Simulationswerte nach
+ * Bozóki und Rapcsák (2008), zitiert bei Csató und Petróczy (2021),
+ * arXiv:2102.10558, Tabelle für n = 4 bis 10: 0,884; 1,109; 1,249; 1,341;
+ * 1,404; 1,451; 1,486 (Abweichung höchstens 0,03). Dazu die eigene
+ * Simulation in Test T-AHP6 (ahp.test.ts): Abweichung höchstens 0,08 bei
+ * n = 3, sonst höchstens 0,05.
  */
 export const RI: Readonly<Record<number, number>> = { 3: 0.58, 4: 0.9, 5: 1.12, 6: 1.24, 7: 1.32, 8: 1.41, 9: 1.45, 10: 1.49 }
 /** Höchstzahl der Hauptkriterien im Paarvergleich (neun Gruppen, Spezifikation 2.3). */

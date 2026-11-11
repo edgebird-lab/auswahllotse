@@ -1,0 +1,396 @@
+{
+  "app": "auswahllotse",
+  "formatVersion": 1,
+  "id": "beispiel-abc",
+  "angelegtAm": "2026-11-11T10:00:00.000Z",
+  "geaendertAm": "2026-11-11T10:00:00.000Z",
+  "rahmen": {
+    "vorhaben": "Beispiel ABC",
+    "betrieb": "Musterbetrieb",
+    "ersteller": "",
+    "softwareart": "erp",
+    "personenbezogen": "ja",
+    "steuerrelevant": "ja",
+    "betriebsform": "offen",
+    "verbraucherverkauf": "nein",
+    "kleinstunternehmen": "offen",
+    "betriebstageProJahr": 250,
+    "spitzenfaktor": 2,
+    "richtwerte": {
+      "antwortzeitSek": 2,
+      "aufbewahrungJahre": 10,
+      "wiederherstellungStunden": 24,
+      "verfuegbarkeitProzent": 99.5,
+      "reaktionStunden": 4,
+      "referenzen": 2,
+      "einfuehrungWochen": 12
+    }
+  },
+  "prozess": null,
+  "umfang": null,
+  "anforderungen": [
+    {
+      "id": "eigene:f-01",
+      "nummer": "F-01",
+      "gruppe": "funktion",
+      "titel": "Aufträge erfassen",
+      "text": "Die Software sollte Aufträge mit allen Positionen erfassen.",
+      "abnahme": "Vorführung mit Beispieldaten des Betriebs.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "eigene",
+        "bezuege": [],
+        "katalogId": null
+      },
+      "begruendung": "Eigene Anforderung.",
+      "quelle": null,
+      "punkte": 2,
+      "bearbeitet": {
+        "text": true,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "eigene:f-02",
+      "nummer": "F-02",
+      "gruppe": "funktion",
+      "titel": "Auswertungen drucken",
+      "text": "Die Software kann Auswertungen drucken.",
+      "abnahme": "Vorführung mit Beispieldaten des Betriebs.",
+      "prioritaet": "kann",
+      "prioritaetVorschlag": "kann",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "eigene",
+        "bezuege": [],
+        "katalogId": null
+      },
+      "begruendung": "Eigene Anforderung.",
+      "quelle": null,
+      "punkte": 1,
+      "bearbeitet": {
+        "text": true,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "eigene:f-03",
+      "nummer": "F-03",
+      "gruppe": "funktion",
+      "titel": "Rechnungen erzeugen",
+      "text": "Die Software muss aus Aufträgen Rechnungen erzeugen.",
+      "abnahme": "Vorführung mit Beispieldaten des Betriebs.",
+      "prioritaet": "muss",
+      "prioritaetVorschlag": "muss",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "eigene",
+        "bezuege": [],
+        "katalogId": null
+      },
+      "begruendung": "Eigene Anforderung.",
+      "quelle": null,
+      "punkte": 0,
+      "bearbeitet": {
+        "text": true,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "eigene:b-01",
+      "nummer": "B-01",
+      "gruppe": "betrieb",
+      "titel": "Support",
+      "text": "Der Anbieter sollte Support auf Deutsch bieten.",
+      "abnahme": "Vorführung mit Beispieldaten des Betriebs.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "eigene",
+        "bezuege": [],
+        "katalogId": null
+      },
+      "begruendung": "Eigene Anforderung.",
+      "quelle": null,
+      "punkte": 2,
+      "bearbeitet": {
+        "text": true,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    },
+    {
+      "id": "eigene:a-01",
+      "nummer": "A-01",
+      "gruppe": "anbieter",
+      "titel": "Referenzen",
+      "text": "Der Anbieter sollte zwei Referenzbetriebe nennen.",
+      "abnahme": "Vorführung mit Beispieldaten des Betriebs.",
+      "prioritaet": "soll",
+      "prioritaetVorschlag": "soll",
+      "status": "aktiv",
+      "herkunft": {
+        "art": "eigene",
+        "bezuege": [],
+        "katalogId": null
+      },
+      "begruendung": "Eigene Anforderung.",
+      "quelle": null,
+      "punkte": 2,
+      "bearbeitet": {
+        "text": true,
+        "prioritaet": false,
+        "status": false
+      },
+      "notiz": ""
+    }
+  ],
+  "naechsteNummer": {
+    "funktion": 4,
+    "betrieb": 2,
+    "anbieter": 2
+  },
+  "gewichtung": {
+    "methode": "direkt",
+    "direktProzent": {
+      "funktion": 50,
+      "betrieb": 30,
+      "anbieter": 20
+    },
+    "paare": [],
+    "festgelegtAm": "2026-11-11T10:00:00.000Z",
+    "aenderungenNachBewertung": 0
+  },
+  "angebote": [
+    {
+      "id": "angebot-a",
+      "anbieter": "Anbieter A",
+      "produkt": "Produkt A",
+      "betriebsform": "cloud",
+      "angebotsdatum": "2026-11-10",
+      "notiz": "",
+      "bewertungen": {
+        "eigene:f-03": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "eigene:f-01": {
+          "ko": null,
+          "punkte": 8,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "eigene:f-02": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "eigene:b-01": {
+          "ko": null,
+          "punkte": 6,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "eigene:a-01": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        }
+      },
+      "kosten": {
+        "einmalig": [
+          {
+            "id": "a-einrichtung",
+            "art": "einrichtung",
+            "bezeichnung": "Einrichtung",
+            "betragEuro": 6000
+          },
+          {
+            "id": "a-daten",
+            "art": "datenuebernahme",
+            "bezeichnung": "Datenübernahme",
+            "betragEuro": 2000
+          },
+          {
+            "id": "a-schulung",
+            "art": "schulung",
+            "bezeichnung": "Schulung",
+            "betragEuro": 1500
+          }
+        ],
+        "laufendJahr": [
+          {
+            "id": "a-support",
+            "art": "support",
+            "bezeichnung": "Support",
+            "betragEuro": 600
+          }
+        ],
+        "preisJeBenutzerMonatEuro": 39,
+        "internEinfuehrungTage": 10,
+        "internSchulungStundenJeBenutzer": 4,
+        "internBetriebStundenMonat": 2
+      }
+    },
+    {
+      "id": "angebot-b",
+      "anbieter": "Anbieter B",
+      "produkt": "Produkt B",
+      "betriebsform": "cloud",
+      "angebotsdatum": "2026-11-10",
+      "notiz": "",
+      "bewertungen": {
+        "eigene:f-03": {
+          "ko": "erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "eigene:f-01": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "eigene:f-02": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "eigene:b-01": {
+          "ko": null,
+          "punkte": 4,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "eigene:a-01": {
+          "ko": null,
+          "punkte": 5,
+          "fundstelle": "",
+          "notiz": ""
+        }
+      },
+      "kosten": {
+        "einmalig": [
+          {
+            "id": "b-einmalig",
+            "art": "einrichtung",
+            "bezeichnung": "Einführung",
+            "betragEuro": 8000
+          }
+        ],
+        "laufendJahr": [
+          {
+            "id": "b-abo",
+            "art": "abo",
+            "bezeichnung": "Abo",
+            "betragEuro": 4600
+          }
+        ],
+        "preisJeBenutzerMonatEuro": 0,
+        "internEinfuehrungTage": 0,
+        "internSchulungStundenJeBenutzer": 0,
+        "internBetriebStundenMonat": 0
+      }
+    },
+    {
+      "id": "angebot-c",
+      "anbieter": "Anbieter C",
+      "produkt": "Produkt C",
+      "betriebsform": "cloud",
+      "angebotsdatum": "2026-11-10",
+      "notiz": "",
+      "bewertungen": {
+        "eigene:f-03": {
+          "ko": "nicht_erfuellt",
+          "punkte": null,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "eigene:f-01": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "eigene:f-02": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "eigene:b-01": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        },
+        "eigene:a-01": {
+          "ko": null,
+          "punkte": 10,
+          "fundstelle": "",
+          "notiz": ""
+        }
+      },
+      "kosten": {
+        "einmalig": [
+          {
+            "id": "c-einmalig",
+            "art": "einrichtung",
+            "bezeichnung": "Einführung",
+            "betragEuro": 5000
+          }
+        ],
+        "laufendJahr": [
+          {
+            "id": "c-abo",
+            "art": "abo",
+            "bezeichnung": "Abo",
+            "betragEuro": 3000
+          }
+        ],
+        "preisJeBenutzerMonatEuro": 0,
+        "internEinfuehrungTage": 0,
+        "internSchulungStundenJeBenutzer": 0,
+        "internBetriebStundenMonat": 0
+      }
+    }
+  ],
+  "bewertungBegonnenAm": "2026-11-11T10:00:00.000Z",
+  "wirtschaftlichkeit": {
+    "jahre": 5,
+    "benutzer": 7,
+    "internerStundensatzEuro": 45,
+    "stundenProPersonentag": 8,
+    "preissteigerungProzent": 0,
+    "zinsProzent": null,
+    "kostenbasis": "nominal",
+    "nutzenProJahrEuro": null,
+    "budgetEuro": null,
+    "budgetAlsKo": false
+  },
+  "entscheidung": {
+    "regel": "nutzwert",
+    "mindestNutzwert": 5,
+    "gewaehltId": null,
+    "begruendung": "",
+    "risiken": [],
+    "status": "entwurf",
+    "datum": null
+  }
+}

@@ -2,7 +2,7 @@
 
 Checkliste aller Phasen und Schritte aus [spezifikation.md](spezifikation.md), Abschnitt 11. Nach jedem Schritt aktualisieren, damit ein Nachfolger hier weitermachen kann. Annahmen stehen in [entscheidungen.md](entscheidungen.md).
 
-Letzte Aktualisierung: 11.11.2026
+Letzte Aktualisierung: 11.11.2026, nach Phase 4
 
 ## Phase 0 – Einrichten
 
@@ -36,17 +36,17 @@ Letzte Aktualisierung: 11.11.2026
 
 ## Phase 4 – Gewichtung und Nutzwert
 
-- [ ] **4.1** Hauptkriterien, direkte Gewichte, Unterpunkte, Änderungszähler G1 bis G5 (T-G1 bis T-G4)
-- [ ] **4.2** AHP mit Eigenvektor, λmax, CR, widersprüchlichstem Urteil (T-AHP1 bis T-AHP5)
-- [ ] **4.3** RI-Tabelle und Simulationstest (T-AHP6)
-- [ ] **4.4** K.-o.-Prüfung, Budget, Nutzwert, Rang, „vorläufig“ N1 bis N7 (T-N1 bis T-N6)
-- [ ] **4.5** Sensitivität für beide Regeln S1 bis S6 (T-S1 bis T-S5)
+- [x] **4.1** `bewertung/gewichte.ts` (G1 bis G4, größter Rest), `bewertung/operationen.ts` und `zaehler.ts` (G5: Festlegen, Zähler nach Bewertungsbeginn, Bewertung setzen) (T-G1 bis T-G4 grün; Satz 8 des Entwurfs aus T-G4 folgt mit 5.3)
+- [x] **4.2** `bewertung/ahp.ts`: Matrix, Potenzmethode, λmax, CI, CR, widersprüchlichstes Urteil (T-AHP1 bis T-AHP5 grün)
+- [x] **4.3** RI-Tabelle mit Quelle in `schwellen.ts` (Saaty 1987; Gegenprobe Bozóki/Rapcsák 2008 über arXiv:2102.10558, Primärtabelle nicht abrufbar); Simulation mit 5.000 Matrizen je n, Startwert 20261111: Abweichung 0,058 bei n = 3, sonst höchstens 0,028, Laufzeit etwa 0,6 s (T-AHP6 grün)
+- [x] **4.4** `bewertung/nutzwert.ts` (N1 bis N4, N6, N7, Kostenbasis K8), `entscheidung/regel.ts` (Rang N5, Regeln D1 bis D3), Gesamtauswertung `bewertung/auswertung.ts`; Testdatei `testdaten/bewertung-abc.auswahllotse` (T-N1 bis T-N6 grün, dazu T-R2 bis T-R4)
+- [x] **4.5** `bewertung/sensitivitaet.ts` für beide Regeln mit Text „Funktionen: 0,0 bis 51,6 %, heute 50,0 %“ (T-S1 bis T-S5 grün)
 
 ## Phase 5 – Kosten und Entscheidung
 
-- [ ] **5.1** Gesamtkosten K1 bis K4 (T-K1, T-K2)
+- [ ] **5.1** Gesamtkosten K1 bis K4 (T-K1, T-K2). Hinweis: `werteAus(projekt, kosten)` erwartet die Kosten je Angebot als Map; die ABC-Tests nutzen bis dahin von Hand gerechnete Werte (`testhilfen/abc.ts`), die `kosten.ts` dann aus `testdaten/bewertung-abc.auswahllotse` nachrechnen soll. K8 (Kostenbasis, „Zins fehlt“) steht schon in `nutzwert.ts`.
 - [ ] **5.2** Barwert, Kapitalwert, Amortisation, Prüfungen, Vorschläge K5 bis K10 (T-K3 bis T-K7)
-- [ ] **5.3** Entscheidungsregeln und Begründungsentwurf 6.12, 6.13 (T-R1 bis T-R5)
+- [ ] **5.3** Entscheidungsregeln und Begründungsentwurf 6.12, 6.13 (T-R1 bis T-R5). **Teilweise:** D1 bis D3 stehen in `entscheidung/regel.ts`, T-R2 bis T-R4 grün. Offen: D4, D5, `begruendung.ts` (6.13), T-R1, T-R5, Satz 8 aus T-G4.
 - [ ] **5.4** Fallbeispiel „Lieferdienst sucht Warenwirtschaft“ mit drei erfundenen Angeboten (T-B1)
 
 ## Phase 6 – Oberfläche
@@ -80,3 +80,11 @@ Letzte Aktualisierung: 11.11.2026
 - [ ] **9.3** Dateizuordnung, Import-Dialog, Single-Instance, atomares Speichern
 - [ ] **9.4** PDF über WebView2
 - [ ] **9.5** Test in der Windows Sandbox, Windows-Job in der CI
+
+## Hinweise für den nächsten Durchgang
+
+- **Repo:** Lokal liegen alle Commits auf `main`. Das private GitHub-Repo `edgebird-lab/auswahllotse` ist noch nicht angelegt, weil die Rechteprüfung der Sitzung `gh repo create` abgelehnt hat. Sobald Robin es anlegt oder freigibt: `gh repo create edgebird-lab/auswahllotse --private --source . --remote origin` und `git push -u origin main`; danach den ersten CI-Lauf prüfen (Schritt 0.3).
+- **Prüfen vor jedem Commit:** `npm run lint`, `npm test`, `npm run build`, `npm run e2e` (Edge, Port 4183 fest).
+- **Nächster Schritt:** Phase 5. `src/kosten/kosten.ts` mit K1 bis K10 schreiben und in `werteAus` einspeisen (Map je Angebot); `testhilfen/abc.ts` → `abcKosten()` durch die echte Rechnung ersetzen. Danach `entscheidung/begruendung.ts` (6.13) und das Fallbeispiel (5.4).
+- **Bausteine der Fachlogik:** Einlesen `prozessdatei/einlesen.ts` → `lastenheft/abgleich.ts` (`liesProzessEin`, `ohneProzessmodell`, `gleicheAb`) → Prüfungen `lastenheft/pruefung.ts` → Bewertung `bewertung/auswertung.ts` (`werteAus`). Alle Funktionen sind rein und geben neue Objekte zurück; die Oberfläche (Phase 6) braucht nur noch Zustand, Plattform und Darstellung.
+- **Testhilfen:** `src/testhilfen/` (Testdateien per `?raw`, Testprozesse, Projekte mit Rahmen L, Beispiel ABC).
