@@ -22,6 +22,7 @@ describe('Sprung zur Ursache (5.7)', () => {
     expect(zielVonBefund(befund('K9', 'angebot-a'), angebote)).toEqual({ schritt: 'angebote', anker: 'angebot-kosten', angebotId: 'angebot-a', reiter: 'kosten' })
     expect(zielVonBefund(befund('K8'), angebote)).toEqual({ schritt: 'angebote', anker: 'annahmen', reiter: 'kosten' })
     expect(zielVonBefund(befund('D4', 'angebot-a'), angebote)).toMatchObject({ schritt: 'vorlagen', vorlage: 'entscheidung' })
+    expect(zielVonBefund(befund('D5'), angebote)).toEqual({ schritt: 'vorlagen', anker: 'entscheidung-bedienung', vorlage: 'entscheidung' })
     expect(zielVonBefund(befund('U2', 'auf_x'), angebote)).toEqual({ schritt: 'prozess', anker: 'aufgabe-auf_5fx' })
     expect(zielVonBefund(befund('E8'), angebote)).toEqual({ schritt: 'prozess', anker: 'prozess-karte' })
     expect(zielVonBefund(befund('S6'), angebote)).toEqual({ schritt: 'ergebnis', anker: 'empfehlung' })

@@ -74,7 +74,7 @@ const herkunft = (art: Herkunft['art'], bezuege: (string | null)[], katalogId: s
   katalogId,
 })
 
-const minuten = (m: number) => mitEinheit(m, zahl(m, 2), 'Minute', 'Minuten')
+const minuten = (m: number) => mitEinheit(zahl(m, 2), 'Minute', 'Minuten')
 
 // ── A2 Funktion je Aufgabe im Umfang ───────────────────────────────────────
 
@@ -157,7 +157,7 @@ function schnittstelle(mb: Medienbruch, pl: PlProjekt, umfang: Umfang, rahmen: R
     prioritaet,
     status: mb.fall === 'D' ? 'vorschlag' : 'aktiv',
     herkunft: herkunft('medienbruch', [mb.quelleId, mb.zielId, ...mb.aufgaben]),
-    begruendung: `Heute ${proTag(mb.uebertragungenProTag)} Übertragungen und ${proTag(mb.minutenProTag)} Minuten pro Tag (${euro(mb.euroProTag)} pro Tag).${zusatz}`,
+    begruendung: `Heute ${mitEinheit(proTag(mb.uebertragungenProTag), 'Übertragung', 'Übertragungen')} und ${mitEinheit(proTag(mb.minutenProTag), 'Minute', 'Minuten')} pro Tag (${euro(mb.euroProTag)} pro Tag).${zusatz}`,
   })
 }
 
@@ -264,17 +264,18 @@ function ausDemModell(pl: PlProjekt, umfang: Umfang, rahmen: Rahmen): Anforderun
 
   // A8 Mengengerüst
   const w = rahmen.richtwerte
+  const vorgaenge = mitEinheit(zahl(v, 1), 'Vorgang', 'Vorgänge')
   liste.push(
     abgeleitet({
       id: 'menge:vorgaenge',
       gruppe: 'menge',
       titel: 'Vorgänge pro Tag',
-      text: `Die Software ${modalverb('muss')} ${zahl(v, 1)} Vorgänge pro Tag im Mittel und ${zahl(mg.vorgaengeSpitze, 0)} an starken Tagen verarbeiten (${zahl(mg.vorgaengeProJahr, 0)} pro Jahr).`,
+      text: `Die Software ${modalverb('muss')} ${vorgaenge} pro Tag im Mittel und ${zahl(mg.vorgaengeSpitze, 0)} an starken Tagen verarbeiten (${zahl(mg.vorgaengeProJahr, 0)} pro Jahr).`,
       abnahme: 'Referenzbetrieb mit ähnlicher Menge oder Lasttest in der Teststellung.',
       prioritaet: 'muss',
       status: 'aktiv',
       herkunft: herkunft('mengengeruest', []),
-      begruendung: `Aus dem Prozessmodell: ${zahl(v, 1)} Vorgänge pro Tag, an starken Tagen ${zahl(rahmen.spitzenfaktor, 1)}-mal so viele, ${zahl(rahmen.betriebstageProJahr, 0)} Betriebstage im Jahr.`,
+      begruendung: `Aus dem Prozessmodell: ${vorgaenge} pro Tag, an starken Tagen ${zahl(rahmen.spitzenfaktor, 1)}-mal so viele, ${zahl(rahmen.betriebstageProJahr, 0)} Betriebstage im Jahr.`,
     }),
   )
   if (mg.benutzer > 0) {
@@ -294,7 +295,7 @@ function ausDemModell(pl: PlProjekt, umfang: Umfang, rahmen: Rahmen): Anforderun
       }),
     )
   }
-  const sek = mitEinheit(w.antwortzeitSek, zahl(w.antwortzeitSek, 1), 'Sekunde', 'Sekunden')
+  const sek = mitEinheit(zahl(w.antwortzeitSek, 1), 'Sekunde', 'Sekunden')
   liste.push(
     abgeleitet({
       id: 'menge:antwortzeit',
@@ -309,18 +310,18 @@ function ausDemModell(pl: PlProjekt, umfang: Umfang, rahmen: Rahmen): Anforderun
     }),
   )
   const bestand = zahl(Math.round(mg.datenbestand), 0)
-  const jahre = mitEinheit(w.aufbewahrungJahre, zahl(w.aufbewahrungJahre, 1), 'Jahr', 'Jahren')
+  const jahre = mitEinheit(zahl(w.aufbewahrungJahre, 1), 'Jahr', 'Jahren')
   liste.push(
     abgeleitet({
       id: 'menge:datenbestand',
       gruppe: 'menge',
       titel: 'Datenbestand',
-      text: `Die Software ${modalverb('soll')} den Datenbestand von ${jahre} vorhalten, rund ${bestand} Vorgänge, und dabei die Antwortzeit einhalten.`,
-      abnahme: `Der Anbieter bestätigt die Antwortzeit bei ${bestand} Vorgängen schriftlich.`,
+      text: `Die Software ${modalverb('soll')} den Datenbestand von ${jahre} vorhalten, rund ${mitEinheit(bestand, 'Vorgang', 'Vorgänge')}, und dabei die Antwortzeit einhalten.`,
+      abnahme: `Der Anbieter bestätigt die Antwortzeit bei ${mitEinheit(bestand, 'Vorgang', 'Vorgängen')} schriftlich.`,
       prioritaet: 'soll',
       status: 'aktiv',
       herkunft: herkunft('mengengeruest', []),
-      begruendung: `${zahl(mg.vorgaengeProJahr, 0)} Vorgänge pro Jahr über die Aufbewahrungsdauer (längste Frist nach § 147 Abs. 3 AO).`,
+      begruendung: `${mitEinheit(zahl(mg.vorgaengeProJahr, 0), 'Vorgang', 'Vorgänge')} pro Jahr über die Aufbewahrungsdauer (längste Frist nach § 147 Abs. 3 AO).`,
     }),
   )
   return liste

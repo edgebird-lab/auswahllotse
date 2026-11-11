@@ -5,6 +5,7 @@ import { neuesAngebot, neuesProjekt } from './projekt'
 import {
   alsJson,
   ladeAusBrowser,
+  ladeBrowserStand,
   ladeDokumentInfo,
   ladeEinstellungen,
   Ladefehler,
@@ -14,6 +15,7 @@ import {
   speichereDokumentInfo,
   speichereEinstellungen,
   speichereImBrowser,
+  unlesbarerStand,
 } from './speicher'
 import type { Anforderung, AuswahlProjekt } from './typen'
 
@@ -172,11 +174,24 @@ describe('Browser-Speicher', () => {
     expect(ladeEinstellungen()).toEqual({ lernmodus: true, farbschema: 'system' })
   })
 
-  it('verwirft ein beschädigtes Projekt im Speicher', () => {
+  it('lädt ein beschädigtes Projekt nicht, behält aber eine Kopie und nennt den Grund', () => {
     const s = speicher()
     vi.stubGlobal('localStorage', s)
+    expect(unlesbarerStand()).toBeNull()
     s.setItem('auswahllotse:projekt', '{"app":"auswahllotse"}')
     expect(ladeAusBrowser()).toBeNull()
+    // Das neue Projekt überschreibt gleich den Speicherplatz; die Kopie bleibt
+    expect(ladeBrowserStand()).toEqual({ projekt: null, fehler: 'Die Datei enthält kein Auswahl-Lotse-Projekt.' })
+    speichereImBrowser(neuesProjekt())
+    expect(unlesbarerStand()).toBe('{"app":"auswahllotse"}')
+    expect(ladeBrowserStand().fehler).toBeNull()
+    // „Browser-Speicher leeren“ entfernt auch die Kopie
+    leereBrowserSpeicher()
+    expect(unlesbarerStand()).toBeNull()
+    // ohne Speicher: kein Absturz, keine Meldung
+    vi.stubGlobal('localStorage', undefined)
+    expect(ladeBrowserStand()).toEqual({ projekt: null, fehler: null })
+    expect(unlesbarerStand()).toBeNull()
   })
 })
 

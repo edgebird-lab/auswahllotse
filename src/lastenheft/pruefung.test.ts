@@ -116,6 +116,14 @@ describe('Prüfungen der Anforderungen (P1 bis P10)', () => {
     expect(leer.mussAnteil).toBeNull()
   })
 
+  it('meldet P8 nur, wenn die Gruppe wirklich ein Muss-Kriterium hat (nicht bei „Nicht“ allein)', () => {
+    // „Nicht“ ist weder K.-o. noch Teil des Nutzwerts; „wirkt nur als K.-o.“ wäre falsch
+    const nurNicht = [anf('Die Software muss faxen.', { id: 'eigene:n', gruppe: 'betrieb', prioritaet: 'nicht' }), anf('Die Software sollte drucken.', { id: 'eigene:s', prioritaet: 'soll' })]
+    expect(pruefeAnforderungen(nurNicht).befunde.filter((b) => b.code === 'P8')).toEqual([])
+    const mitMuss = [...nurNicht, anf('Die Software muss sichern.', { id: 'eigene:m', gruppe: 'betrieb', prioritaet: 'muss' })]
+    expect(pruefeAnforderungen(mitMuss).befunde.filter((b) => b.code === 'P8').map((b) => b.bezug)).toEqual(['gruppe:betrieb'])
+  })
+
   it('prüft die abgeleiteten Texte des Lieferdienstes: nur R-01 ist lang', () => {
     const p = lieferdienstAuswahl()
     // Die Rollen-Anforderung nach A5 zählt alle Rollen mit Aufgaben auf (44 Wörter).

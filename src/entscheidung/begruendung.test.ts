@@ -155,6 +155,23 @@ describe('Wahl und Status der Entscheidung (D4, D5)', () => {
     expect(setzeEntscheidungsStatus(final, 'entwurf', gesamt.final, 'x').entscheidung).toMatchObject({ status: 'entwurf', datum: null })
   })
 
+  it('warnt, wenn eine finale Entscheidung später Fehler bekommt (D5)', () => {
+    const ok = abcProjekt()
+    const final = setzeEntscheidungsStatus(ok, 'final', berechneGesamt(ok).final, '2026-11-12T08:00:00.000Z')
+    expect(berechneGesamt(final).befunde.filter((b) => b.code === 'D5')).toEqual([])
+    // danach ändert jemand die Gewichte: Summe 90 % ist ein Fehler, „final“ gilt nicht mehr
+    const spaeter = { ...final, gewichtung: { ...final.gewichtung, direktProzent: { funktion: 50, betrieb: 30, anbieter: 10 } } }
+    const g = berechneGesamt(spaeter)
+    expect(g.befunde.filter((b) => b.code === 'D5')).toEqual([
+      {
+        schwere: 'warnung',
+        code: 'D5',
+        text: 'Die Entscheidung steht auf „final“, aber das Projekt hat inzwischen Fehler. Bitte die Fehler beheben oder den Status auf „Entwurf“ zurücksetzen.',
+        bezug: null,
+      },
+    ])
+  })
+
   it('verwaltet Risiken mit Maßnahmen', () => {
     const { projekt, id } = neuesRisiko(abcProjekt(), 'Datenübernahme dauert länger')
     const mit = setzeRisiko(projekt, id, { massnahme: 'Probeübernahme vor Vertragsschluss' })

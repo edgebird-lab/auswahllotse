@@ -44,7 +44,11 @@ export function liste(teile: readonly string[]): string {
   return `${teile.slice(0, -1).join(', ')} und ${teile[teile.length - 1]}`
 }
 
-/** Zahl mit Einheit in Einzahl oder Mehrzahl, z. B. „1 Minute“, „1,5 Minuten“. */
-export function mitEinheit(wert: number, text: string, einzahl: string, mehrzahl: string): string {
-  return `${text} ${wert === 1 ? einzahl : mehrzahl}`
+/**
+ * Angezeigte Zahl mit Einheit in Einzahl oder Mehrzahl: „1 Minute“, „1,5
+ * Minuten“, „0 Minuten“. Maßgeblich ist der Text, wie er dasteht: 1,04
+ * Referenzbetriebe gerundet auf „1“ ergeben „1 Referenzbetrieb“.
+ */
+export function mitEinheit(text: string, einzahl: string, mehrzahl: string): string {
+  return `${text} ${text === '1' ? einzahl : mehrzahl}`
 }

@@ -66,7 +66,7 @@ function EntscheidungBedienung() {
   const e = p.entscheidung
   const w = g.auswertung
   const empfohlen = p.angebote.find((a) => a.id === w.empfehlungId)
-  const warnungen = g.befunde.filter((b) => b.code === 'D4' || b.code === 'D6')
+  const warnungen = g.befunde.filter((b) => b.code === 'D4' || b.code === 'D5' || b.code === 'D6')
   return (
     <section className="karte bedienung" id="entscheidung-bedienung" aria-labelledby="entscheidung-titel">
       <h2 id="entscheidung-titel">Entscheidung festhalten</h2>

@@ -41,6 +41,8 @@ import {
 const PROJEKT_SCHLUESSEL = 'auswahllotse:projekt'
 const EINSTELLUNGEN_SCHLUESSEL = 'auswahllotse:einstellungen'
 const DOKUMENT_SCHLUESSEL = 'auswahllotse:dokument'
+/** Kopie eines gesicherten Projekts, das sich nicht mehr lesen ließ (sonst überschriebe es das neue Projekt sofort). */
+const UNLESBAR_SCHLUESSEL = 'auswahllotse:projekt-unlesbar'
 
 /** Die Projektdatei kann nicht geladen werden; `message` ist für Benutzer formuliert. */
 export class Ladefehler extends Error {}
@@ -365,10 +367,45 @@ export function speichereImBrowser(p: AuswahlProjekt): boolean {
   }
 }
 
-export function ladeAusBrowser(): AuswahlProjekt | null {
+export interface BrowserStand {
+  projekt: AuswahlProjekt | null
+  /** Warum ein gesichertes Projekt nicht gelesen werden konnte; sein Text liegt dann als Kopie bereit (`unlesbarerStand`). */
+  fehler: string | null
+}
+
+/**
+ * Liest das zuletzt gesicherte Projekt. Ist es unlesbar (beschädigt oder
+ * aus einer anderen Version), bleibt sein Text als Kopie erhalten, bevor das
+ * neue Projekt den Speicherplatz belegt; der Grund geht an die Oberfläche.
+ */
+export function ladeBrowserStand(): BrowserStand {
+  let text: string | null
   try {
-    const text = globalThis.localStorage.getItem(PROJEKT_SCHLUESSEL)
-    return text ? leseProjektText(text) : null
+    text = globalThis.localStorage.getItem(PROJEKT_SCHLUESSEL)
+  } catch {
+    return { projekt: null, fehler: null }
+  }
+  if (!text) return { projekt: null, fehler: null }
+  try {
+    return { projekt: leseProjektText(text), fehler: null }
+  } catch (e) {
+    try {
+      globalThis.localStorage.setItem(UNLESBAR_SCHLUESSEL, text)
+    } catch {
+      // ohne Kopie: die Meldung erscheint trotzdem
+    }
+    return { projekt: null, fehler: e instanceof Error ? e.message : String(e) }
+  }
+}
+
+export function ladeAusBrowser(): AuswahlProjekt | null {
+  return ladeBrowserStand().projekt
+}
+
+/** Text des zuletzt unlesbaren Projekts, z. B. zum Herunterladen; null, wenn es keinen gibt. */
+export function unlesbarerStand(): string | null {
+  try {
+    return globalThis.localStorage.getItem(UNLESBAR_SCHLUESSEL)
   } catch {
     return null
   }
@@ -380,6 +417,7 @@ export function leereBrowserSpeicher(): boolean {
     globalThis.localStorage.removeItem(PROJEKT_SCHLUESSEL)
     globalThis.localStorage.removeItem(EINSTELLUNGEN_SCHLUESSEL)
     globalThis.localStorage.removeItem(DOKUMENT_SCHLUESSEL)
+    globalThis.localStorage.removeItem(UNLESBAR_SCHLUESSEL)
     return true
   } catch {
     return false

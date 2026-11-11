@@ -12,28 +12,37 @@ function format(min: number, max: number): Intl.NumberFormat {
   const schluessel = `${min}-${max}`
   let f = formate.get(schluessel)
   if (!f) {
-    f = new Intl.NumberFormat('de-DE', { minimumFractionDigits: min, maximumFractionDigits: max })
+    // „negative“: Ein Minus nur, wenn nach dem Runden etwas übrig bleibt (−0,04 → „0,0“, nicht „-0,0“)
+    f = new Intl.NumberFormat('de-DE', { minimumFractionDigits: min, maximumFractionDigits: max, signDisplay: 'negative' })
     formate.set(schluessel, f)
   }
   return f
 }
 
-/** −0 wird zu 0, damit nie „-0“ erscheint. */
-const ohneMinusNull = (x: number) => (Object.is(x, -0) ? 0 : x)
+/**
+ * Gleitkommafehler vor dem Runden entfernen: 0,35 · 3 / 12 ergibt im Rechner
+ * 0,08749999… statt 0,0875 und erschiene sonst als 8,7 % statt 8,8 %.
+ * 15 gültige Stellen sind genauer als jede Anzeige der App; −0 wird zu 0.
+ */
+export function genau(x: number): number {
+  if (!Number.isFinite(x) || x === 0) return x === 0 ? 0 : x
+  return Number(x.toPrecision(15))
+}
 
 /** Zahl mit höchstens `max` Nachkommastellen, z. B. 1,5 oder 30.000. */
 export function zahl(x: number, max = 2): string {
-  return format(0, max).format(ohneMinusNull(x))
+  return format(0, max).format(genau(x))
 }
 
 /** Zahl mit genau `stellen` Nachkommastellen, z. B. 7,30. */
 export function fest(x: number, stellen: number): string {
-  return format(stellen, stellen).format(ohneMinusNull(x))
+  return format(stellen, stellen).format(genau(x))
 }
 
 /** Häufigkeit pro Tag: ab 10 ganzzahlig, darunter höchstens 1 Nachkommastelle („6,7“, „2“). */
 export function proTag(x: number): string {
-  return Math.abs(x) >= 10 ? fest(Math.round(x), 0) : zahl(x, 1)
+  const y = genau(x)
+  return Math.abs(y) >= 10 ? fest(Math.round(y), 0) : zahl(y, 1)
 }
 
 /** Euro ohne Nachkommastellen mit geschütztem Leerzeichen: „39.140 €“. */

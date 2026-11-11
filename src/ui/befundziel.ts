@@ -34,7 +34,7 @@ export function zielVonBefund(b: Befund, angebotIds: readonly Id[]): Ziel {
   if (c === 'K8' || c === 'K9' || c === 'N2') {
     return angebot ? { schritt: 'angebote', anker: 'angebot-kosten', angebotId: angebot, reiter: 'kosten' } : { schritt: 'angebote', anker: 'annahmen', reiter: 'kosten' }
   }
-  if (c === 'D4' || c === 'D6') return { schritt: 'vorlagen', anker: 'entscheidung-bedienung', vorlage: 'entscheidung' }
+  if (c === 'D4' || c === 'D5' || c === 'D6') return { schritt: 'vorlagen', anker: 'entscheidung-bedienung', vorlage: 'entscheidung' }
   if (c.startsWith('E') || c.startsWith('U') || c.startsWith('M') || c.startsWith('H')) {
     return { schritt: 'prozess', anker: bezug ? domId('aufgabe', bezug) : 'prozess-karte' }
   }

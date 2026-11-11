@@ -11,6 +11,7 @@ import { grundlageVon } from '../prozessdatei/struktur'
 import { mengengeruestVon, kostenProVorgang } from '../prozessdatei/mengengeruest'
 import { CR_GRENZE } from '../regeln/schwellen'
 import { istKo } from '../bewertung/gewichte'
+import { mitEinheit } from '../lastenheft/texte'
 import { dateiname } from './dateiname'
 
 /** 5.8: Softwareart im Satz „{Betrieb} sucht {…} für den Prozess …“ */
@@ -37,10 +38,15 @@ export function ausgangslageText(p: AuswahlProjekt, m: Mengengeruest | null = me
   const art = SOFTWAREART_TEXT[p.rahmen.softwareart]
   if (!p.prozess || !p.umfang || !m) return `${betrieb} sucht ${art}.`
   const basis = grundlageVon(p.prozess.projekt, p.umfang.grundlage)
-  const saetze = [`${betrieb} sucht ${art}${basis.name ? ` für den Prozess „${basis.name}“` : ''}.`, `Heute laufen ${zahl(m.vorgaengeProTag, 1)} Vorgänge pro Tag.`]
+  const v = zahl(m.vorgaengeProTag, 1)
+  const saetze = [`${betrieb} sucht ${art}${basis.name ? ` für den Prozess „${basis.name}“` : ''}.`, v === '1' ? 'Heute läuft 1 Vorgang pro Tag.' : `Heute laufen ${v} Vorgänge pro Tag.`]
   const n = m.medienbrueche.reduce((s, b) => s + b.uebertragungenProTag, 0)
   const minuten = m.medienbrueche.reduce((s, b) => s + b.minutenProTag, 0)
-  if (n > 0) saetze.push(`Dabei werden täglich ${proTag(n)} Datensätze von Hand übertragen (${zahl(minuten / 60, 1)} Stunden).`)
+  if (n > 0) {
+    const stunden = mitEinheit(zahl(minuten / 60, 1), 'Stunde', 'Stunden')
+    const anzahl = proTag(n)
+    saetze.push(anzahl === '1' ? `Dabei wird täglich 1 Datensatz von Hand übertragen (${stunden}).` : `Dabei werden täglich ${anzahl} Datensätze von Hand übertragen (${stunden}).`)
+  }
   return saetze.join(' ')
 }
 
@@ -63,8 +69,10 @@ export function ausgangslagePunkte(p: AuswahlProjekt, m: Mengengeruest | null = 
   const minuten = m.medienbrueche.reduce((s, b) => s + b.minutenProTag, 0)
   const kosten = arbeitszeitkostenProJahr(p)!
   return [
-    `Prozess „${basis.name || 'ohne Namen'}“ (${p.umfang.grundlage === 'soll' ? 'Soll-Prozess' : 'Ist-Prozess'} als Grundlage), ${zahl(m.vorgaengeProTag, 1)} Vorgänge pro Tag.`,
-    n > 0 ? `Medienbrüche: ${proTag(n)} Übertragungen von Hand pro Tag, zusammen ${zahl(minuten / 60, 1)} Stunden.` : 'Keine Medienbrüche im Modell.',
+    `Prozess „${basis.name || 'ohne Namen'}“ (${p.umfang.grundlage === 'soll' ? 'Soll-Prozess' : 'Ist-Prozess'} als Grundlage), ${mitEinheit(zahl(m.vorgaengeProTag, 1), 'Vorgang', 'Vorgänge')} pro Tag.`,
+    n > 0
+      ? `Medienbrüche: ${mitEinheit(proTag(n), 'Übertragung', 'Übertragungen')} von Hand pro Tag, zusammen ${mitEinheit(zahl(minuten / 60, 1), 'Stunde', 'Stunden')}.`
+      : 'Keine Medienbrüche im Modell.',
     `Arbeitszeitkosten des Prozesses: ${euro(kosten.ist)} pro Jahr im Ist${kosten.soll !== null ? `, ${euro(kosten.soll)} im Soll` : ''}.`,
   ]
 }

@@ -132,10 +132,10 @@ export function pruefeAnforderungen(anforderungen: readonly Anforderung[]): Prue
     hinweis('P7', `${prozent(anteil)} % Muss. Empfohlen sind höchstens etwa 60 % (MoSCoW nach Aufwand; hier nach Anzahl).`, null, 'warnung')
   }
 
-  // P8: Gruppe nur mit Muss (und Nicht) wirkt nur als K.-o.
+  // P8: Gruppe mit Muss, aber ohne Soll und Kann wirkt nur als K.-o. (nur „Nicht“ wirkt gar nicht)
   for (const g of GRUPPEN_REIHENFOLGE) {
     const inGruppe = aktive.filter((a) => a.gruppe === g)
-    if (inGruppe.length > 0 && !inGruppe.some((a) => a.prioritaet === 'soll' || a.prioritaet === 'kann')) {
+    if (inGruppe.some((a) => a.prioritaet === 'muss') && !inGruppe.some((a) => a.prioritaet === 'soll' || a.prioritaet === 'kann')) {
       hinweis('P8', `„${gruppenName(g)}“ hat keine Soll- oder Kann-Anforderung und wirkt nur als K.-o.`, `gruppe:${g}`)
     }
   }

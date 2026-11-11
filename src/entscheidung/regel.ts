@@ -43,6 +43,17 @@ export function alphabetisch(namen: ReadonlyMap<Id, Angebot>) {
   }
 }
 
+const UEBER_BUDGET = 'über Budget'
+
+/** D3: Grund, warum kein Angebot gültig ist; mit Budget als K.-o. kann auch das Budget alle ausschließen. */
+function ohneGueltigesText(ergebnisse: readonly AngebotsErgebnis[]): string {
+  const budget = ergebnisse.some((r) => r.ausschluss.includes(UEBER_BUDGET))
+  const muss = ergebnisse.some((r) => r.ausschluss.some((g) => g !== UEBER_BUDGET))
+  if (budget && !muss) return 'Kein Angebot liegt im Budget.'
+  if (budget) return 'Kein Angebot erfüllt alle Muss-Kriterien und liegt zugleich im Budget.'
+  return 'Kein Angebot erfüllt alle Muss-Kriterien.'
+}
+
 export function rangfolge(ergebnisse: readonly AngebotsErgebnis[], angebote: readonly Angebot[], regel: Entscheidungsregel, mindestNutzwert: number): Rangfolge {
   const befunde: Befund[] = []
   const nachId = new Map(angebote.map((a) => [a.id, a]))
@@ -66,7 +77,7 @@ export function rangfolge(ergebnisse: readonly AngebotsErgebnis[], angebote: rea
   const empfohlen = [...spitze].sort((a, b) => a.kostenbasis - b.kostenbasis || alphabetisch(nachId)(a.angebotId, b.angebotId))[0]
 
   if (!ergebnisse.some((r) => r.gueltig)) {
-    if (ergebnisse.length > 0) befunde.push({ schwere: 'fehler', code: 'D3', text: 'Kein Angebot erfüllt alle Muss-Kriterien.', bezug: null })
+    if (ergebnisse.length > 0) befunde.push({ schwere: 'fehler', code: 'D3', text: ohneGueltigesText(ergebnisse), bezug: null })
   } else if (zulaessig.length === 0) {
     befunde.push({ schwere: 'warnung', code: 'D2', text: 'Kein Angebot erreicht den Mindestnutzwert.', bezug: null })
   }

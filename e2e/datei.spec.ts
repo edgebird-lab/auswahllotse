@@ -41,6 +41,25 @@ test('speichern, neu laden und öffnen ergibt denselben Inhalt (E6)', async ({ p
   expect({ ...wieder, geaendertAm: null }).toEqual({ ...gespeichert, geaendertAm: null })
 })
 
+test('überschreibt einen unlesbaren Stand im Browser nicht still, sondern meldet ihn und bietet eine Kopie an', async ({ page }) => {
+  await page.goto('/')
+  await ladeBeispiel(page)
+  // Der gesicherte Stand ist beschädigt (z. B. abgeschnitten)
+  const kaputt = '{"app":"auswahllotse","formatVersion":1,"id":"abc"'
+  await page.evaluate((text) => localStorage.setItem('auswahllotse:projekt', text), kaputt)
+  await page.reload()
+  const meldung = page.getByRole('alert')
+  await expect(meldung).toContainText('Das zuletzt im Browser gesicherte Projekt lässt sich nicht laden: Die Datei ist kein gültiges JSON.')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('1 · Rahmen')
+  const [kopie] = await Promise.all([page.waitForEvent('download'), meldung.getByRole('button', { name: 'Kopie herunterladen' }).click()])
+  expect(kopie.suggestedFilename()).toBe('Unlesbarer Stand.auswahllotse')
+  expect((await inhalt(kopie)).toString('utf8')).toBe(kaputt)
+  // Das neue Projekt belegt den Speicherplatz, die Kopie bleibt bis „Browser-Speicher leeren“
+  expect(await page.evaluate(() => localStorage.getItem('auswahllotse:projekt-unlesbar'))).toBe(kaputt)
+  await meldung.getByRole('button', { name: 'Meldung schließen' }).click()
+  await expect(page.getByRole('alert')).toHaveCount(0)
+})
+
 test('fragt vor dem Verwerfen ungespeicherter Änderungen nach', async ({ page }) => {
   await page.goto('/')
   await page.getByLabel('Wie heißt das Vorhaben?').fill('Ungespeichert')

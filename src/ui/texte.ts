@@ -25,11 +25,20 @@ export function kostenbasisText(p: AuswahlProjekt): string {
   return w.kostenbasis === 'barwert' && w.zinsProzent !== null ? `Barwert über ${jahre} bei ${zahl(w.zinsProzent, 2)} % Zins` : `Gesamtkosten über ${jahre}`
 }
 
-/** Deutsche Zahl lesen: „1.234,5“ und „1234,5“; „1.5“ ohne Komma gilt als 1,5. */
+/** Punkte als Tausendertrennzeichen ohne Komma: „12.000“, „1.234.567“ (erste Gruppe ohne führende Null). */
+const TAUSENDERGRUPPEN = /^[+-]?[1-9]\d{0,2}(?:\.\d{3})+$/
+
+/**
+ * Deutsche Zahl lesen: „1.234,5“, „1234,5“ und „12.000“ (Punkte als
+ * Tausendertrennzeichen, wie man Beträge in Deutschland schreibt). Ohne
+ * Komma und ohne Dreiergruppen gilt der Punkt als Dezimalzeichen: „1.5“
+ * ist 1,5 und „0.125“ ist 0,125. Leer oder ungültig ergibt null.
+ */
 export function leseZahl(text: string): number | null {
-  let sauber = text.replace(/\s/g, '').replace(/€|%/g, '')
+  let sauber = text.replace(/\s/g, '').replace(/€|%/g, '').replace(/−/g, '-')
   if (sauber.includes(',')) sauber = sauber.replace(/\./g, '').replace(',', '.')
-  if (sauber === '' || sauber === '-' || sauber === '−') return null
-  const n = Number(sauber.replace('−', '-'))
+  else if (TAUSENDERGRUPPEN.test(sauber)) sauber = sauber.replace(/\./g, '')
+  if (sauber === '' || sauber === '-' || sauber === '+') return null
+  const n = Number(sauber)
   return Number.isFinite(n) ? n : null
 }

@@ -2,8 +2,10 @@ import { describe, expect, it } from 'vitest'
 import { beispielProjekt } from '../beispiel/beispiel'
 import { berechneGesamt } from '../entscheidung/gesamt'
 import { normalisiereLeerraum } from '../modell/zahlformat'
+import { liesProzessEin } from '../lastenheft/abgleich'
 import { abcProjekt } from '../testhilfen/abc'
-import { lieferdienstAuswahl, rahmenLProjekt } from '../testhilfen/projekte'
+import { aufgabe, projekt, prozess } from '../testhilfen/bausteine'
+import { JETZT, lieferdienstAuswahl, quelleAus, rahmenLProjekt } from '../testhilfen/projekte'
 import { arbeitszeitkostenProJahr, ausgangslagePunkte, ausgangslageText, druckTitel, vorgehenPunkte } from './vorlagen'
 
 const n = normalisiereLeerraum
@@ -18,6 +20,31 @@ describe('Texte der Vorlagen (5.8)', () => {
     ohne.rahmen.betrieb = ''
     ohne.rahmen.softwareart = 'dms'
     expect(ausgangslageText(ohne)).toBe('Der Betrieb sucht ein Dokumentenmanagementsystem.')
+  })
+
+  it('schreibt bei einem einzigen Vorgang und Datensatz in der Einzahl', () => {
+    // Kleinbetrieb: 1 Auftrag am Tag, 60 Minuten Abtippen vom Zettel ins Altsystem
+    const pl = projekt(
+      prozess([aufgabe('auf_erfassen', { name: 'Auftrag erfassen', rolleId: 'rol_buero', mediumId: 'med_alt', bearbeitungMin: 60, uebertragung: { quelleMediumId: 'med_zettel', minuten: 60 } })], {
+        vorgaengeProTag: 1,
+        rollen: [{ id: 'rol_buero', name: 'Büro', stundensatz: 40, personen: 1, verfuegbarProzent: 100 }],
+        medien: [
+          { id: 'med_alt', name: 'Altsystem', art: 'erp' },
+          { id: 'med_zettel', name: 'Zettel', art: 'papier' },
+        ],
+      }),
+    )
+    const p = liesProzessEin(rahmenLProjekt(), quelleAus(pl), JETZT).projekt
+    expect(ausgangslageText(p)).toBe(
+      'Lieferdienst Nord sucht ein ERP-System für den Prozess „Testprozess“. Heute läuft 1 Vorgang pro Tag. Dabei wird täglich 1 Datensatz von Hand übertragen (1 Stunde).',
+    )
+    expect(ausgangslagePunkte(p).map(n).slice(0, 2)).toEqual([
+      'Prozess „Testprozess“ (Ist-Prozess als Grundlage), 1 Vorgang pro Tag.',
+      'Medienbrüche: 1 Übertragung von Hand pro Tag, zusammen 1 Stunde.',
+    ])
+    const anf = (id: string) => p.anforderungen.find((a) => a.id === id)!
+    expect(anf('menge:vorgaenge').text).toBe('Die Software muss 1 Vorgang pro Tag im Mittel und 2 an starken Tagen verarbeiten (250 pro Jahr).')
+    expect(n(anf('medienbruch:med_zettel>med_alt').begruendung)).toBe('Heute 1 Übertragung und 60 Minuten pro Tag (40 € pro Tag).')
   })
 
   it('nennt die Arbeitszeitkosten des Prozesses pro Jahr (M5)', () => {

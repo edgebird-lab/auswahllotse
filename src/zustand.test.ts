@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { setzeBudget, setzeMindestNutzwert } from './bewertung/operationen'
 import { setzeRahmen } from './lastenheft/aenderungen'
 import { neuesProjekt, standardEinstellungen } from './modell/projekt'
 import type { AuswahlProjekt } from './modell/typen'
@@ -76,5 +77,48 @@ describe('Zustand mit Rückgängig und Wiederholen', () => {
     expect(z.schritt).toBe('vorlagen')
     expect(z.vergangenheit).toEqual([])
     expect(schrittNummer('vorlagen')).toBe(7)
+  })
+})
+
+describe('Änderungszähler G5 beim Tippen', () => {
+  // Bewertung hat begonnen, Budget 80.000 €; jede Budgetänderung zählt nach G5
+  const bewertet = () => startZustand({ ...neuesProjekt(JETZT), bewertungBegonnenAm: JETZT, wirtschaftlichkeit: { ...neuesProjekt(JETZT).wirtschaftlichkeit, budgetEuro: 80_000 } }, standardEinstellungen())
+  const budget = (z: Zustand, wert: number | null, zeit: number) => reduziere(z, { typ: 'aendern', aenderung: (p) => setzeBudget(p, wert), zeit, gruppe: 'budget' })
+  const zaehler = (z: Zustand) => z.projekt.gewichtung.aenderungenNachBewertung
+
+  it('zählt das Eintippen von „90000“ (fünf Tastendrücke) als eine Änderung', () => {
+    let z = bewertet()
+    // Feld leeren, dann Ziffer für Ziffer: jede Eingabe ändert das Budget
+    for (const [i, wert] of [null, 9, 90, 900, 9000, 90_000].entries()) z = budget(z, wert, 1000 + i * 100)
+    expect(z.projekt.wirtschaftlichkeit.budgetEuro).toBe(90_000)
+    expect(zaehler(z)).toBe(1)
+    expect(z.vergangenheit).toHaveLength(1)
+    // Rückgängig nimmt Eingabe und Zählung zusammen zurück
+    z = reduziere(z, { typ: 'rueckgaengig' })
+    expect(z.projekt.wirtschaftlichkeit.budgetEuro).toBe(80_000)
+    expect(zaehler(z)).toBe(0)
+  })
+
+  it('zählt nicht, wenn am Ende der Eingabe wieder der Ausgangswert steht', () => {
+    let z = bewertet()
+    for (const [i, wert] of [8, 80, 800, 8000, 80_000].entries()) z = budget(z, wert, 1000 + i * 100)
+    expect(z.projekt.wirtschaftlichkeit.budgetEuro).toBe(80_000)
+    expect(zaehler(z)).toBe(0)
+  })
+
+  it('zählt getrennte Eingaben einzeln', () => {
+    let z = bewertet()
+    z = budget(z, 70_000, 1000)
+    z = budget(z, 60_000, 1000 + GRUPPE_MS + 1)
+    expect(zaehler(z)).toBe(2)
+    // eine andere Gruppe (anderes Feld) direkt danach zählt auch
+    z = reduziere(z, { typ: 'aendern', aenderung: (p) => setzeMindestNutzwert(p, 6), zeit: 1000 + GRUPPE_MS + 50, gruppe: 'mindestnutzwert' })
+    expect(zaehler(z)).toBe(3)
+  })
+
+  it('lässt den Zähler vor Beginn der Bewertung unberührt', () => {
+    let z = startZustand(neuesProjekt(JETZT), standardEinstellungen())
+    for (const [i, wert] of [5, 50, 500].entries()) z = budget(z, wert, 1000 + i * 100)
+    expect(zaehler(z)).toBe(0)
   })
 })

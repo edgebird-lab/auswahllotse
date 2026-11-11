@@ -38,13 +38,24 @@ export function berechneGesamt(p: AuswahlProjekt): Gesamt {
   const pruefung = pruefeAnforderungen(p.anforderungen)
   const auswertung = werteAus(p)
   const gewaehltId = gewaehlteId(p, auswertung)
-  const befunde = nachSchwere([
+  const alle: Befund[] = [
     ...(p.prozess ? befundeDerQuelle(p.prozess) : []),
     ...(mengengeruest?.befunde ?? []),
     ...pruefung.befunde,
     ...auswertung.befunde,
     ...pruefeEntscheidung(p, auswertung),
-  ])
+  ]
+  const final = finalMoeglich(alle, gewaehltId)
+  // D5 gilt auch nach dem Festlegen: Kommen später Fehler hinzu, ist „final“ nicht mehr gedeckt
+  if (p.entscheidung.status === 'final' && !final.moeglich) {
+    alle.push({
+      schwere: 'warnung',
+      code: 'D5',
+      text: 'Die Entscheidung steht auf „final“, aber das Projekt hat inzwischen Fehler. Bitte die Fehler beheben oder den Status auf „Entwurf“ zurücksetzen.',
+      bezug: null,
+    })
+  }
+  const befunde = nachSchwere(alle)
   return {
     mengengeruest,
     pruefung,
@@ -53,6 +64,6 @@ export function berechneGesamt(p: AuswahlProjekt): Gesamt {
     vorschlaege: kostenVorschlaege(p, mengengeruest),
     gewaehltId,
     befunde,
-    final: finalMoeglich(befunde, gewaehltId),
+    final,
   }
 }

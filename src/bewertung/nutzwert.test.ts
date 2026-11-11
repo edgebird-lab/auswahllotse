@@ -153,6 +153,21 @@ describe('Entscheidungsregeln (D1 bis D3)', () => {
     expect(w.stabilitaet).toEqual([])
   })
 
+  it('nennt beim Ausschluss über das Budget den richtigen Grund (D3 mit Budget als K.-o.)', () => {
+    // C erfüllt F-03, alle drei liegen über 10.000 €: nur das Budget schließt aus
+    const p = mitBewertung(abcProjekt(), 'angebot-c', 'eigene:f-03', { ko: 'erfuellt' })
+    p.wirtschaftlichkeit.budgetEuro = 10_000
+    p.wirtschaftlichkeit.budgetAlsKo = true
+    expect(werteAus(p).befunde.find((b) => b.code === 'D3')).toMatchObject({ schwere: 'fehler', text: 'Kein Angebot liegt im Budget.' })
+    // C scheitert an F-03 (und liegt mit 20.000 € genau im Budget), A und B am Budget: beides zusammen
+    const gemischt = abcProjekt()
+    gemischt.wirtschaftlichkeit.budgetEuro = 20_000
+    gemischt.wirtschaftlichkeit.budgetAlsKo = true
+    const w = werteAus(gemischt)
+    expect(w.ergebnisse.map((r) => r.ausschluss)).toEqual([['über Budget'], ['über Budget'], ['Muss-Kriterium F-03 nicht erfüllt']])
+    expect(w.befunde.find((b) => b.code === 'D3')!.text).toBe('Kein Angebot erfüllt alle Muss-Kriterien und liegt zugleich im Budget.')
+  })
+
   it('gibt bei fehlerhaften Gewichten keine Empfehlung', () => {
     const p = abcProjekt()
     p.gewichtung.direktProzent = { funktion: 50, betrieb: 30, anbieter: 10 }

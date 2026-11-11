@@ -4,6 +4,7 @@
  * reine Funktionen aus der Fachlogik (lastenheft/, bewertung/, kosten/,
  * entscheidung/); der Reducer führt nur Verlauf und Dokument.
  */
+import { zaehleEingabeEinmal } from './bewertung/zaehler'
 import type { AuswahlProjekt, Einstellungen } from './modell/typen'
 
 export type Schritt = 'rahmen' | 'prozess' | 'anforderungen' | 'gewichtung' | 'angebote' | 'ergebnis' | 'vorlagen'
@@ -80,9 +81,11 @@ export function istGeaendert(z: Pick<Zustand, 'projekt' | 'dokument'>): boolean 
 
 function mitVerlauf(z: Zustand, projekt: AuswahlProjekt, zeit: number, gruppe?: string): Zustand {
   const zusammenfassen = gruppe !== undefined && z.gruppe === gruppe && zeit - z.gruppeZeit < GRUPPE_MS
+  // G5: Eine zusammengefasste Eingabe zählt wie ein Rückgängig-Schritt nur einmal (Stand davor: letzter Eintrag im Verlauf)
+  const basis = zusammenfassen ? z.vergangenheit[z.vergangenheit.length - 1] : undefined
   return {
     ...z,
-    projekt,
+    projekt: basis ? zaehleEingabeEinmal(basis, projekt) : projekt,
     vergangenheit: zusammenfassen ? z.vergangenheit : [...z.vergangenheit.slice(-(MAX_VERLAUF - 1)), z.projekt],
     zukunft: [],
     gruppe: gruppe ?? null,

@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState, type ChangeEvent } from 'react'
 import { berechneGesamt } from './entscheidung/gesamt'
 import { neuesArbeitsprojekt } from './lastenheft/aenderungen'
-import { ladeAusBrowser, ladeDokumentInfo, ladeEinstellungen, speichereDokumentInfo, speichereEinstellungen, speichereImBrowser } from './modell/speicher'
+import { ladeBrowserStand, ladeDokumentInfo, ladeEinstellungen, speichereDokumentInfo, speichereEinstellungen, speichereImBrowser, unlesbarerStand } from './modell/speicher'
 import type { AuswahlProjekt, Einstellungen } from './modell/typen'
 import { plattform } from './plattform'
 import type { Ziel } from './ui/befundziel'
@@ -24,17 +24,22 @@ import { ProzessSchritt } from './ui/schritte/ProzessSchritt'
 import { RahmenSchritt } from './ui/schritte/RahmenSchritt'
 import { VorlagenSchritt } from './ui/schritte/VorlagenSchritt'
 import { sperreVon } from './ui/sperren'
-import { istGeaendert, reduziere, SCHRITTE, startZustand, type Schritt } from './zustand'
+import { istGeaendert, reduziere, SCHRITTE, startZustand, type Schritt, type Zustand } from './zustand'
 
 export const VERSION = '0.0.0'
 
-function erstZustand() {
-  const gespeichert = ladeAusBrowser()
+/** Zustand beim Start aus dem Browser-Speicher; dazu die Meldung, falls das gesicherte Projekt unlesbar war. */
+function erstStart(): { zustand: Zustand; fehler: string | null } {
+  const stand = ladeBrowserStand()
+  const gespeichert = stand.projekt
   const info = ladeDokumentInfo()
   const projekt = gespeichert ?? neuesArbeitsprojekt()
   // Wiederhergestellt: Dateiname merken; ungespeicherte Änderungen bleiben als „geändert“ markiert
   const z = startZustand(projekt, ladeEinstellungen(), gespeichert ? { name: info.name, gespeichert: info.ungespeichert ? null : projekt } : {})
-  return gespeichert ? { ...z, schritt: startSchritt(projekt) } : z
+  const fehler = stand.fehler
+    ? `Das zuletzt im Browser gesicherte Projekt lässt sich nicht laden: ${stand.fehler} Es beginnt ein neues Projekt. Der alte Stand bleibt als Kopie erhalten und lässt sich herunterladen.`
+    : null
+  return { zustand: gespeichert ? { ...z, schritt: startSchritt(projekt) } : z, fehler }
 }
 
 const FARBSCHEMA_TEXT: Record<Einstellungen['farbschema'], string> = { system: 'wie System', hell: 'hell', dunkel: 'dunkel' }
@@ -48,9 +53,12 @@ export default function App() {
 }
 
 function Hauptfenster() {
-  const [z, dispatch] = useReducer(reduziere, undefined, erstZustand)
+  const [start] = useState(erstStart)
+  const [z, dispatch] = useReducer(reduziere, start.zustand)
   const [meldung, setMeldung] = useState('')
-  const [fehler, setFehler] = useState<string | null>(null)
+  const [fehler, setFehler] = useState<string | null>(start.fehler)
+  // Ein unlesbarer Stand aus dem Browser lässt sich herunterladen, solange seine Meldung steht
+  const [kopieAnbieten, setKopieAnbieten] = useState(start.fehler !== null)
   const [ansicht, setAnsicht] = useState<Ansicht>({ angebotId: null, angebotReiter: 'bewertung', vorlage: 'lastenheft' })
   const [lesebefunde, setzeLesebefunde] = useState<Lesebefunde | null>(null)
   const [sprung, setSprung] = useState(0)
@@ -72,7 +80,12 @@ function Hauptfenster() {
   const nichtSichern = useCallback((p: AuswahlProjekt) => {
     nichtSichernRef.current = p
   }, [])
-  const befehle = useDateiBefehle({ z, dispatch, aendere, melde, zeigeFehler: setFehler, frage, setzeLesebefunde, nichtSichern })
+  // Jede neue Meldung (oder ihr Ende) ersetzt die Meldung beim Start samt Angebot der Kopie
+  const zeigeFehler = useCallback((text: string | null) => {
+    setFehler(text)
+    setKopieAnbieten(false)
+  }, [])
+  const befehle = useDateiBefehle({ z, dispatch, aendere, melde, zeigeFehler, frage, setzeLesebefunde, nichtSichern })
   const setzeAnsicht = useCallback((teil: Partial<Ansicht>) => setAnsicht((a) => ({ ...a, ...teil })), [])
   const springeZu = useCallback((ziel: Ziel) => {
     anker.current = ziel.anker
@@ -243,7 +256,12 @@ function Hauptfenster() {
         {fehler && (
           <div className="banner banner-fehler fehler-banner" role="alert">
             <p>{fehler}</p>
-            <button type="button" className="knopf knopf-klein" onClick={() => setFehler(null)}>
+            {kopieAnbieten && (
+              <button type="button" className="knopf knopf-klein" onClick={() => void plattform.speichernUnter('Unlesbarer Stand.auswahllotse', unlesbarerStand() ?? '', 'projekt')}>
+                Kopie herunterladen
+              </button>
+            )}
+            <button type="button" className="knopf knopf-klein" onClick={() => zeigeFehler(null)}>
               Meldung schließen
             </button>
           </div>

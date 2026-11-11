@@ -1,6 +1,7 @@
 import { useRef, type ChangeEvent } from 'react'
 import { setzeAufgabeImUmfang, setzeGrundlage, setzeMediumStatus } from '../../lastenheft/aenderungen'
 import { findeMedium } from '../../lastenheft/schnittstellen'
+import { mitEinheit } from '../../lastenheft/texte'
 import { alleMedien, standardStatus, statusVon } from '../../lastenheft/umfang'
 import type { MediumStatus } from '../../modell/typen'
 import { datum, proTag, zahl } from '../../modell/zahlformat'
@@ -123,8 +124,9 @@ function ModellKarte() {
         <div>
           <dt>Inhalt</dt>
           <dd>
-            {pl.soll ? 'Ist- und Soll-Prozess' : 'nur Ist-Prozess'} · {aufgabenVon(basis).length} Aufgaben, {basis.rollen.length} Rollen, {basis.medien.length} Systeme · {zahl(basis.vorgaengeProTag, 1)} Vorgänge pro
-            Tag
+            {pl.soll ? 'Ist- und Soll-Prozess' : 'nur Ist-Prozess'} · {mitEinheit(String(aufgabenVon(basis).length), 'Aufgabe', 'Aufgaben')},{' '}
+            {mitEinheit(String(basis.rollen.length), 'Rolle', 'Rollen')}, {mitEinheit(String(basis.medien.length), 'System', 'Systeme')} ·{' '}
+            {mitEinheit(zahl(basis.vorgaengeProTag, 1), 'Vorgang', 'Vorgänge')} pro Tag
           </dd>
         </div>
       </dl>

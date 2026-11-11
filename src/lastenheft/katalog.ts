@@ -365,11 +365,11 @@ export function fuelleText(text: string, prioritaet: Prioritaet, r: Rahmen): str
   const w = r.richtwerte
   return text
     .replace('{verb}', modalverb(prioritaet))
-    .replace('{wiederherstellung}', mitEinheit(w.wiederherstellungStunden, zahl(w.wiederherstellungStunden, 1), 'Stunde', 'Stunden'))
+    .replace('{wiederherstellung}', mitEinheit(zahl(w.wiederherstellungStunden, 1), 'Stunde', 'Stunden'))
     .replace('{verfuegbarkeit}', zahl(w.verfuegbarkeitProzent, 2))
-    .replace('{reaktion}', mitEinheit(w.reaktionStunden, zahl(w.reaktionStunden, 1), 'Stunde', 'Stunden'))
-    .replace('{referenzbetriebe}', mitEinheit(w.referenzen, zahl(w.referenzen, 0), 'Referenzbetrieb', 'Referenzbetriebe'))
-    .replace('{einfuehrung}', mitEinheit(w.einfuehrungWochen, zahl(w.einfuehrungWochen, 1), 'Woche', 'Wochen'))
+    .replace('{reaktion}', mitEinheit(zahl(w.reaktionStunden, 1), 'Stunde', 'Stunden'))
+    .replace('{referenzbetriebe}', mitEinheit(zahl(w.referenzen, 0), 'Referenzbetrieb', 'Referenzbetriebe'))
+    .replace('{einfuehrung}', mitEinheit(zahl(w.einfuehrungWochen, 1), 'Woche', 'Wochen'))
 }
 
 /** Herleitung eines Katalogeintrags in Klartext. */
