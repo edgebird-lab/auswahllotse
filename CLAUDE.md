@@ -1,6 +1,7 @@
 # Auswahl-Lotse – Hinweise für die Arbeit am Projekt
 
-- Portfolio-Projekt von Robin (Wirtschaftsinformatik, olbricht-digital). Repo `edgebird-lab/auswahllotse` ist **privat**; öffentlich erst nach Robins ausdrücklicher Freigabe. Keine GitHub Pages, keine veröffentlichten Releases, nichts bereitstellen (`release.yml` legt bei einem Tag `v*` nur einen Entwurf an).
+- Portfolio-Projekt von Robin (Wirtschaftsinformatik, olbricht-digital). Repo `edgebird-lab/auswahllotse`; Robin hat am 11.11.2026 die Veröffentlichung freigegeben (Release mit Windows-Installer, vorerst keine Lizenz: alle Rechte vorbehalten, siehe README „Rechte“). Keine GitHub Pages, keine Geheimnisse ins Repo.
+- Releases: Tag `v*` → `release.yml` legt einen Entwurf mit Installer und Kopie `Auswahl-Lotse-Setup.exe` an; erst nach Prüfung veröffentlichen (`gh release edit <tag> --draft=false --latest`). Den Namen `Auswahl-Lotse-Setup.exe` nie ändern: Die Website verlinkt `https://github.com/edgebird-lab/auswahllotse/releases/latest/download/Auswahl-Lotse-Setup.exe`. Neue Version: Schritte in `docs/stand.md` („Neue Version“).
 - Spezifikation: `docs/spezifikation.md` (lang, in Teilen lesen). Fortschritt mit Häkchen: `docs/stand.md`, nach jedem Schritt aktualisieren. Annahmen bis zu Robins Entscheidung: `docs/entscheidungen.md`.
 - Sprache: Oberfläche, Bezeichner (deutsch in ASCII: `ae`, `oe`, `ue`, `ss`), Doku und Commit-Nachrichten auf Deutsch. Keine KI-Funktionen, kein Server, Daten bleiben lokal.
 - Fachlogik in `src/prozessdatei`, `src/modell`, `src/lastenheft`, `src/bewertung`, `src/kosten`, `src/entscheidung`, `src/export` ohne React und vollständig getestet; Konstanten mit Quelle in `src/regeln/schwellen.ts`; Oberfläche in `src/ui`.
