@@ -1,0 +1,150 @@
+/* Auswahl-Lotse – Farben, Abstände, Grundbausteine der Oberfläche */
+
+:root {
+  color-scheme: light;
+  --flaeche: #f9f9f7;
+  --karte: #fcfcfb;
+  --karte-2: #f1f0ec;
+  --linie: #e1e0d9;
+  --linie-stark: #c3c2b7;
+  --text: #0b0b0b;
+  --text-2: #52514e;
+  --text-3: #6b6a65;
+  --akzent: #0f6e5a;
+  --akzent-text: #0f6e5a;
+  --akzent-hauch: #e6f3ef;
+  --knopf-haupt: #0f6e5a;
+  --knopf-haupt-hover: #0c5a4a;
+  --fokus: #1a8f76;
+  --schatten: 0 1px 2px rgba(11, 11, 11, 0.06), 0 6px 16px rgba(11, 11, 11, 0.04);
+  --radius: 10px;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--flaeche);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --flaeche: #0d0d0d;
+    --karte: #1a1a19;
+    --karte-2: #242422;
+    --linie: #2c2c2a;
+    --linie-stark: #4a4945;
+    --text: #f0efec;
+    --text-2: #c3c2b7;
+    --text-3: #a3a29a;
+    --akzent: #4fc2a4;
+    --akzent-text: #6dd3b8;
+    --akzent-hauch: #0f2a24;
+    --knopf-haupt: #1a7f69;
+    --knopf-haupt-hover: #156b58;
+    --fokus: #6dd3b8;
+    --schatten: none;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --flaeche: #0d0d0d;
+  --karte: #1a1a19;
+  --karte-2: #242422;
+  --linie: #2c2c2a;
+  --linie-stark: #4a4945;
+  --text: #f0efec;
+  --text-2: #c3c2b7;
+  --text-3: #a3a29a;
+  --akzent: #4fc2a4;
+  --akzent-text: #6dd3b8;
+  --akzent-hauch: #0f2a24;
+  --knopf-haupt: #1a7f69;
+  --knopf-haupt-hover: #156b58;
+  --fokus: #6dd3b8;
+  --schatten: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--flaeche);
+  color: var(--text);
+}
+
+:focus-visible {
+  outline: 2px solid var(--fokus);
+  outline-offset: 2px;
+}
+
+.kopf {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--linie);
+  background: var(--karte);
+}
+
+.marke {
+  font-weight: 650;
+  color: var(--akzent-text);
+}
+
+.kopf-hinweis {
+  color: var(--text-3);
+  font-size: 0.9rem;
+}
+
+.seite {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: 1.8rem;
+  line-height: 1.2;
+}
+
+h2 {
+  margin: 0 0 12px;
+  font-size: 1.15rem;
+}
+
+.einleitung {
+  margin: 0 0 24px;
+  color: var(--text-2);
+  max-width: 62ch;
+}
+
+.karte {
+  background: var(--karte);
+  border: 1px solid var(--linie);
+  border-radius: var(--radius);
+  box-shadow: var(--schatten);
+  padding: 20px 24px;
+}
+
+.schrittliste {
+  margin: 0 0 12px;
+  padding-left: 1.4em;
+}
+
+.leise {
+  margin: 0;
+  color: var(--text-3);
+}
+
+@media (max-width: 600px) {
+  .kopf,
+  .seite {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
