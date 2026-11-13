@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Befund } from '../modell/ergebnisse'
+import type { Befund } from './ergebnisse'
 import { domId, zielVonBefund } from './befundziel'
 
 const befund = (code: string, bezug: string | null = null): Befund => ({ schwere: 'hinweis', code, text: '', bezug })

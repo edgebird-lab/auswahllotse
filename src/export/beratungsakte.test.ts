@@ -108,9 +108,9 @@ describe('Beratungsakte aus dem Fallbeispiel „Lieferdienst sucht Warenwirtscha
   it('enthält die Befunde der Ergebnisliste, den Ausschluss von Süd und die Risiken', () => {
     const akte = akteDesBeispiels()
     expect(akte.befunde.map((b) => [b.kennung, b.schwere])).toEqual([
-      ['P5:rollen', 'niedrig'],
-      ['P8:gruppe:benutzer', 'niedrig'],
-      ['N2:angebot-west', 'niedrig'],
+      ['P5:rollen', 'hinweis'],
+      ['P8:gruppe:benutzer', 'hinweis'],
+      ['N2:angebot-west', 'hinweis'],
       ['ausschluss:angebot-sued', 'hoch'],
       ['risiko:risiko-datenuebernahme', 'mittel'],
       ['risiko:risiko-doppelarbeit', 'mittel'],
@@ -148,7 +148,7 @@ describe('Beratungsakte aus dem Fallbeispiel „Lieferdienst sucht Warenwirtscha
 
 describe('Abbildung der Stufen', () => {
   it('bildet jede Schwere der App ab', () => {
-    expect(SCHWERE_IN_AKTE).toEqual({ fehler: 'hoch', warnung: 'mittel', hinweis: 'niedrig' })
+    expect(SCHWERE_IN_AKTE).toEqual({ fehler: 'hoch', warnung: 'mittel', hinweis: 'hinweis' })
   })
 
   it('Fehler (G2) wird „hoch“; ohne Gewichte fehlen Nutzwert und Rang', () => {

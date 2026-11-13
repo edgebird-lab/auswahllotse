@@ -17,7 +17,7 @@ import { gruppenName, type Gruppe, type Paarurteil, type Staerke } from '../../m
 import { datum, fest } from '../../modell/zahlformat'
 import { CR_GRENZE } from '../../regeln/schwellen'
 import { BefundListe } from '../Befunde'
-import { domId } from '../befundziel'
+import { domId } from '../../modell/befundziel'
 import { Auswahl, Feld, ZahlEingabe } from '../Eingaben'
 import { GeheZu } from '../GeheZu'
 import { jetzt, useApp } from '../kontext'

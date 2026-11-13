@@ -16,7 +16,7 @@ import { GRUPPEN, gruppenName, PRIORITAETEN, type Anforderung, type Anforderungs
 import { prozent } from '../../modell/zahlformat'
 import { MUSS_ANTEIL_GRENZE } from '../../regeln/schwellen'
 import { BefundListe } from '../Befunde'
-import { domId } from '../befundziel'
+import { domId } from '../../modell/befundziel'
 import { Auswahl, Feld, type Option } from '../Eingaben'
 import { GeheZu } from '../GeheZu'
 import { useApp } from '../kontext'

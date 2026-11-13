@@ -1,7 +1,8 @@
 import type { Befund, Schwere } from '../modell/ergebnisse'
-import { zielVonBefund } from './befundziel'
+import { zielVonBefund } from '../modell/befundziel'
 import { useApp } from './kontext'
-import { befundMitAnforderung, SCHWERE_TEXT } from './texte'
+import { befundMitAnforderung } from '../modell/texte'
+import { SCHWERE_TEXT } from './texte'
 
 const SYMBOL: Record<Schwere, string> = { fehler: '✕', warnung: '!', hinweis: 'i' }
 

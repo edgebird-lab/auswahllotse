@@ -1,9 +1,10 @@
 /**
  * „Sprung zur Ursache“ (Spezifikation 5.7): Zu jedem Befund der Schritt und
- * die Stelle, an der man ihn beheben kann.
+ * die Stelle, an der man ihn beheben kann. Ohne React; die Oberfläche springt
+ * damit zur Stelle, der Export nennt den Schritt als Fundstelle.
  */
-import type { Befund } from '../modell/ergebnisse'
-import type { Id } from '../modell/typen'
+import type { Befund } from './ergebnisse'
+import type { Id } from './typen'
 import type { Schritt } from '../zustand'
 
 export interface Ziel {

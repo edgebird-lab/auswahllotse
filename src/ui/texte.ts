@@ -1,23 +1,10 @@
 /**
  * Kleine Texte der Oberfläche, die mehrere Schritte und Vorlagen teilen.
+ * Texte, die auch der Export braucht, stehen in `modell/texte.ts`.
  */
-import { jahreFuerRechnung } from '../kosten/kosten'
-import type { Befund, MedienbruchFall, Schwere } from '../modell/ergebnisse'
-import type { Anforderung, AuswahlProjekt } from '../modell/typen'
-import { zahl } from '../modell/zahlformat'
+import type { MedienbruchFall, Schwere } from '../modell/ergebnisse'
 
 export const SCHWERE_TEXT: Record<Schwere, string> = { fehler: 'Fehler', warnung: 'Warnung', hinweis: 'Hinweis' }
-
-/**
- * Befund mit der Anforderung davor, für Listen ohne Zusammenhang (Schritt
- * Ergebnis): „R-01: Der Text hat 44 Wörter; bitte aufteilen.“ Ohne Nummer
- * steht der Titel da; Befunde ohne Anforderung bleiben unverändert.
- */
-export function befundMitAnforderung(b: Befund, anforderungen: readonly Anforderung[]): string {
-  const a = b.bezug === null ? undefined : anforderungen.find((x) => x.id === b.bezug)
-  if (!a) return b.text
-  return `${a.nummer ?? `„${a.titel || 'ohne Titel'}“`}: ${b.text}`
-}
 
 /** Medienbruch-Fälle nach U4 (6.4). */
 export const FALL_TEXT: Record<MedienbruchFall, string> = {
@@ -26,14 +13,6 @@ export const FALL_TEXT: Record<MedienbruchFall, string> = {
   C: 'Erfassung an der Quelle',
   D: 'Schnittstelle als Vorschlag',
   E: 'außerhalb des Umfangs',
-}
-
-/** „Gesamtkosten über 5 Jahre“ oder „Barwert über 5 Jahre bei 5 % Zins“. */
-export function kostenbasisText(p: AuswahlProjekt): string {
-  const w = p.wirtschaftlichkeit
-  const t = jahreFuerRechnung(w.jahre)
-  const jahre = t === 1 ? '1 Jahr' : `${t} Jahre`
-  return w.kostenbasis === 'barwert' && w.zinsProzent !== null ? `Barwert über ${jahre} bei ${zahl(w.zinsProzent, 2)} % Zins` : `Gesamtkosten über ${jahre}`
 }
 
 /** Punkte als Tausendertrennzeichen ohne Komma: „12.000“, „1.234.567“ (erste Gruppe ohne führende Null). */

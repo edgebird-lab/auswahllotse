@@ -13,7 +13,7 @@ import { datum, euro, nutzwert } from '../../modell/zahlformat'
 import { NutzwertDiagramm } from '../diagramme/NutzwertDiagramm'
 import { useApp } from '../kontext'
 import { KostenTabelle, KoTabelle, NutzwertTabelle } from '../schritte/ErgebnisSchritt'
-import { kostenbasisText } from '../texte'
+import { kostenbasisText } from '../../modell/texte'
 
 export function Entscheidungsvorlage() {
   const { z, g } = useApp()

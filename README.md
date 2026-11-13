@@ -42,10 +42,10 @@ Dazu: Rückgängig und Wiederholen, Lernmodus mit kurzen Erklärungen der Method
 
 ## Export im offenen Format Beratungsakte v1
 
-Im Schritt „Vorlagen“ speichert „Für die Beratungsakte speichern“ das Ergebnis der Auswahl als JSON-Datei im offenen Format Beratungsakte v1 (`analyse.art` = `softwareauswahl`). Ein kleiner Dialog fragt nach dem Mandanten (vorbelegt mit dem Betrieb aus dem Schritt „Rahmen“) und optional nach einer Mandantennummer und zeigt, was die Datei enthält. Im Browser ist das ein Download, im Windows-Programm der Speichern-Dialog.
+Im Schritt „Vorlagen“ speichert „Für die Beratungsakte speichern“ das Ergebnis der Auswahl als JSON-Datei im offenen Format Beratungsakte v1 (`analyse.art` = `softwareauswahl`). Ein kleiner Dialog fragt nach dem Mandanten (vorbelegt mit dem Betrieb aus dem Schritt „Rahmen“) und optional nach einer Mandantennummer und zeigt, was die Datei enthält, mit dem Hinweis, dass die Datei unverschlüsselt ist und Daten des Mandanten enthält. Im Browser ist das ein Download, im Windows-Programm der Speichern-Dialog.
 
 - **Kennzahlen:** aktive Anforderungen mit Muss, Soll und Kann, Muss-Anteil, Zahl der Angebote und der gültigen; je Angebot K.-o.-Prüfung, Nutzwert, Rang, einmalige Kosten, Gesamtkosten, Kapitalwert, Amortisation und € je Nutzwertpunkt (soweit berechnet); je Hauptkriterium der stabile Bereich des Gewichts.
-- **Befunde:** die Befunde aus dem Schritt „Ergebnis“ mit Fundstelle (Fehler → `hoch`, Warnung → `mittel`, Hinweis → `niedrig`), dazu ausgeschiedene Angebote (`hoch`), knappe stabile Bereiche, eine vorläufige Empfehlung und die erfassten Risiken (je `mittel`).
+- **Befunde:** die Befunde aus dem Schritt „Ergebnis“ mit Fundstelle (Fehler → `hoch`, Warnung → `mittel`, Hinweis → `hinweis`), dazu ausgeschiedene Angebote (`hoch`), knappe stabile Bereiche, eine vorläufige Empfehlung und die erfassten Risiken (je `mittel`).
 - **Maßnahmen:** die Wahl des Angebots (Priorität `hoch`, Aufwand mit den Kosten) und die Maßnahmen zu den Risiken (`mittel`, mit Bezug auf das Risiko).
 - **Dateiname:** `<Mandant>-auswahllotse-<Datum>.beratungsakte.json`, z. B. `Lieferdienst-Beispiel-GmbH-auswahllotse-2026-11-13.beratungsakte.json`.
 
@@ -131,7 +131,7 @@ Der Auswahl-Lotse läuft auch als Windows-Programm (Tauri 2 mit WebView2, App-ID
 
 - **Installation pro Benutzer ohne Admin-Rechte:** Der Installer (NSIS, deutsch) legt das Programm unter `%LOCALAPPDATA%\Auswahl-Lotse` ab, mit Eintrag im Startmenü und Verknüpfung „Auswahl-Lotse“ auf dem Desktop (siehe [Installieren](#installieren)). Bei einem Tag `v*` baut die CI den Installer und hängt ihn an einen Release-Entwurf, zusätzlich als `Auswahl-Lotse-Setup.exe` mit festem Namen für den Download-Link (`.github/workflows/release.yml`).
 - **Dateien:** `.auswahllotse` öffnet sich per Doppelklick. Ein zweiter Doppelklick landet im laufenden Programm (eine Instanz). `.prozesslotse` und `.bpmn` werden nicht zugeordnet; man liest sie über den Dialog ein. Dateien lassen sich auch ins Fenster ziehen: Projekte werden geöffnet, Prozessmodelle eingelesen.
-- **Speichern-Dialog** auch für die Beratungsakte (Filter „Beratungsakte (*.beratungsakte.json)“; fehlt die Endung, wird sie angehängt).
+- **Speichern-Dialog** auch für die Beratungsakte (Filter „Beratungsakte (*.beratungsakte.json)“; fehlt die Endung, wird sie angehängt; aus „x.json“ wird „x.beratungsakte.json“).
 - **Menü „Datei“:** Neu, Öffnen, Prozessmodell einlesen, Speichern, Speichern unter, Anbieterfragebogen als CSV, Beispiel laden, Beenden. Beim Schließen mit ungespeicherten Änderungen fragt das Programm nach; „Nicht speichern“ verwirft sie auch für den nächsten Start.
 - **PDF ohne Druckdialog:** In beiden Vorlagen schreibt „Als PDF speichern …“ die angezeigte Vorlage direkt über WebView2 als PDF (A4, 20 mm Rand). „Drucken …“ öffnet den Druckdialog.
 - Programmdaten (zuletzt bearbeitetes Projekt, Einstellungen) liegen unter `%LOCALAPPDATA%\de.olbricht-digital.auswahllotse`.
@@ -156,7 +156,7 @@ npm test           # Unit-Tests der Fachlogik (Vitest)
 npm run e2e        # Browsertests mit Playwright und axe (lokal Edge, Port 4183 fest)
 ```
 
-- **283 Unit-Tests in 29 Dateien:** alle Testwerte der Spezifikation (Abschnitt 9.1, von Hand nachgerechnet), dazu Randfälle wie Tausenderpunkt, Rundung an Halbwerten, doppelte Kennungen und unlesbarer Browser-Speicher. Das Fallbeispiel prüft auch die Zahlen dieser README; der Export der Beratungsakte prüft Inhalt, Stufen, Bezüge und die Kopie der Bibliothek.
+- **283 Unit-Tests in 30 Dateien:** alle Testwerte der Spezifikation (Abschnitt 9.1, von Hand nachgerechnet), dazu Randfälle wie Tausenderpunkt, Rundung an Halbwerten, doppelte Kennungen und unlesbarer Browser-Speicher. Das Fallbeispiel prüft auch die Zahlen dieser README; der Export der Beratungsakte prüft Inhalt, Stufen, Bezüge und die Kopie der Bibliothek.
 - **26 Browsertests:** E1 bis E11 der Spezifikation, axe in allen Schritten und Reitern hell und dunkel, ganzer Durchlauf nur mit Tastatur, Speichern und Öffnen, beschädigter Browser-Speicher, Zahleneingabe mit Änderungszähler, Sprung von Befunden zur Ursache und Export der Beratungsakte (Dialog, Download, axe hell und dunkel).
 - **Windows-Programm:** 7 Rust-Tests und der Desktop-Test mit 51 Prüfungen am echten Programm (siehe [Windows-Programm](#windows-programm)).
 - Vor jedem Commit laufen lint, Unit-Tests, Build und Browsertests. Der Port 4183 muss frei sein; ein laufender Vorschau-Server lässt `npm run e2e` abbrechen.

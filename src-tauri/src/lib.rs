@@ -78,7 +78,9 @@ fn schreibe(p: &Path, inhalt: &str) -> Result<(), String> {
 /// Hängt die Endung an, wenn der gewählte Name keine der erlaubten hat. Angehängt, nicht
 /// ersetzt: „Version 2.0“ wird zu „Version 2.0.auswahllotse“, und eine Datei mit fremder
 /// Endung (etwa ein Prozesslotse-Projekt) wird so nie überschrieben. Endungen dürfen aus
-/// mehreren Teilen bestehen („beratungsakte.json“).
+/// mehreren Teilen bestehen („beratungsakte.json“). Hat der Name schon den letzten Teil
+/// einer solchen Endung, wird nur der Rest davor eingefügt: „x.json“ wird zu
+/// „x.beratungsakte.json“, nicht zu „x.json.beratungsakte.json“.
 fn mit_endung(p: PathBuf, erlaubt: &[&str], standard: &str) -> PathBuf {
     let name = p.file_name().and_then(OsStr::to_str).unwrap_or("").to_ascii_lowercase();
     let passt = erlaubt.iter().any(|x| {
@@ -87,6 +89,15 @@ fn mit_endung(p: PathBuf, erlaubt: &[&str], standard: &str) -> PathBuf {
     });
     if passt {
         return p;
+    }
+    if let Some((vorn, letzter)) = standard.rsplit_once('.') {
+        let endung = format!(".{}", letzter.to_ascii_lowercase());
+        if name.len() > endung.len() && name.ends_with(&endung) {
+            let datei = p.file_name().and_then(OsStr::to_str).unwrap_or("");
+            // Die Endung ist ASCII; der Schnitt liegt deshalb auf einer Zeichengrenze.
+            let stamm = &datei[..datei.len() - endung.len()];
+            return p.with_file_name(format!("{stamm}.{vorn}.{letzter}"));
+        }
     }
     let mut s = p.into_os_string();
     s.push(".");
@@ -454,7 +465,12 @@ mod tests {
         assert_eq!(mit_endung(p(name), akte, akte[0]), p("Muster-GmbH-auswahllotse-2026-11-13.beratungsakte.json"));
         assert_eq!(mit_endung(p("a.beratungsakte.json"), akte, akte[0]), p("a.beratungsakte.json"));
         assert_eq!(mit_endung(p("a.BERATUNGSAKTE.JSON"), akte, akte[0]), p("a.BERATUNGSAKTE.JSON"));
-        assert_eq!(mit_endung(p("a.json"), akte, akte[0]), p("a.json.beratungsakte.json"));
+        // „.json“ wird ergänzt, nicht verdoppelt
+        assert_eq!(mit_endung(p("a.json"), akte, akte[0]), p("a.beratungsakte.json"));
+        assert_eq!(mit_endung(p("x.JSON"), akte, akte[0]), p("x.beratungsakte.json"));
+        assert_eq!(mit_endung(p("Akte 2.0.json"), akte, akte[0]), p("Akte 2.0.beratungsakte.json"));
+        assert_eq!(mit_endung(p(r"C:\Akten\x.json"), akte, akte[0]), p(r"C:\Akten\x.beratungsakte.json"));
+        assert_eq!(mit_endung(p(".json"), akte, akte[0]), p(".json.beratungsakte.json"));
         assert_eq!(mit_endung(p("a.auswahllotse"), akte, akte[0]), p("a.auswahllotse.beratungsakte.json"));
     }
 }

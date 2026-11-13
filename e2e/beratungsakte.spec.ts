@@ -43,6 +43,7 @@ test('Dialog: Vorbelegung, Pflichtfeld, Abbrechen, Escape und Fokus; Speichern l
   await expect(mandant).toBeFocused()
   await expect(mandant).toHaveValue('Lieferdienst Beispiel GmbH')
   await expect(dialog).toContainText('Enthält: 39 Kennzahlen, 6 Befunde, 3 Maßnahmen')
+  await expect(dialog).toContainText('Die Datei ist unverschlüsselt und enthält Daten des Mandanten.')
   await expect(dialog).toContainText(`Lieferdienst-Beispiel-GmbH-auswahllotse-${heute()}.beratungsakte.json`)
   await page.keyboard.press('Escape')
   await expect(dialog).toBeHidden()

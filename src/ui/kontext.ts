@@ -3,7 +3,7 @@ import type { Gesamt } from '../entscheidung/gesamt'
 import type { Befund } from '../modell/ergebnisse'
 import type { AuswahlProjekt, Id } from '../modell/typen'
 import type { Aktion, Zustand } from '../zustand'
-import type { Ziel } from './befundziel'
+import type { Ziel } from '../modell/befundziel'
 import type { Befehle } from './datei'
 
 /** Was die Oberfläche zusätzlich zum Projekt zeigt (nicht rückgängig machbar, nicht gespeichert). */

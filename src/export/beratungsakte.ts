@@ -20,7 +20,7 @@
  * | --------------------------------------- | -------------------- |
  * | Befund `fehler`                         | `hoch`               |
  * | Befund `warnung`                        | `mittel`             |
- * | Befund `hinweis`                        | `niedrig`            |
+ * | Befund `hinweis`                        | `hinweis`            |
  * | Angebot scheidet aus (K.-o., Budget)    | `hoch`               |
  * | stabiler Bereich „knapp“                | `mittel`             |
  * | Empfehlung „vorläufig“                  | `mittel`             |
@@ -39,11 +39,11 @@ import { stabilitaetText } from '../bewertung/sensitivitaet'
 import { berechneGesamt, type Gesamt } from '../entscheidung/gesamt'
 import { jahreFuerRechnung } from '../kosten/kosten'
 import type { Befund, Schwere } from '../modell/ergebnisse'
+import { zielVonBefund } from '../modell/befundziel'
+import { befundMitAnforderung, kostenbasisText } from '../modell/texte'
 import { gruppenName, type AuswahlProjekt, type Gruppe, type Prioritaet } from '../modell/typen'
 import { euro, nutzwert } from '../modell/zahlformat'
 import { MUSS_ANTEIL_GRENZE } from '../regeln/schwellen'
-import { zielVonBefund } from '../ui/befundziel'
-import { befundMitAnforderung, kostenbasisText } from '../ui/texte'
 import { VERSION } from '../version'
 import { SCHRITTE, schrittNummer, type Schritt } from '../zustand'
 import { REGEL_NAME } from './vorlagen'
@@ -53,7 +53,7 @@ export const APP_KENNUNG = 'auswahllotse'
 export const SCHWERE_IN_AKTE: Record<Schwere, AkteSchwere> = {
   fehler: 'hoch',
   warnung: 'mittel',
-  hinweis: 'niedrig',
+  hinweis: 'hinweis',
 }
 
 export interface AkteAngaben {
