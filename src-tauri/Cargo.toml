@@ -1,6 +1,6 @@
 [package]
 name = "auswahllotse"
-version = "0.1.0"
+version = "0.2.0"
 description = "Auswahl-Lotse: vom Prozessmodell zu Lastenheft und begründeter Softwareentscheidung"
 authors = ["Robin Olbricht"]
 edition = "2024"

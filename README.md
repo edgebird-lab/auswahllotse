@@ -2,9 +2,9 @@
 
 Vom Prozessmodell zu Lastenheft und begründeter Softwareentscheidung. Der Auswahl-Lotse liest ein Projekt des Prozesslotsen, leitet daraus ein Lastenheft mit MoSCoW-Prioritäten und Abnahmekriterien ab, gewichtet Kriterien direkt oder per Paarvergleich (AHP), prüft K.-o.-Kriterien, bewertet Angebote per Nutzwertanalyse, vergleicht die Kosten über mehrere Jahre und schreibt eine druckbare Entscheidungsvorlage. Läuft im Browser oder als Windows-Programm, ohne KI und ohne Server.
 
-**[Für Windows herunterladen (Auswahl-Lotse-Setup.exe)](https://github.com/edgebird-lab/auswahllotse/releases/latest/download/Auswahl-Lotse-Setup.exe)** · Version 0.1.0 · [alle Versionen](https://github.com/edgebird-lab/auswahllotse/releases) · [Projektseite](https://olbricht-digital.de/software/auswahl-lotse)
+**[Für Windows herunterladen (Auswahl-Lotse-Setup.exe)](https://github.com/edgebird-lab/auswahllotse/releases/latest/download/Auswahl-Lotse-Setup.exe)** · Version 0.2.0 · [alle Versionen](https://github.com/edgebird-lab/auswahllotse/releases) · [Projektseite](https://olbricht-digital.de/software/auswahl-lotse)
 
-> **Version 0.1.0 vom 11.11.2026:** die erste veröffentlichte Version. Alle sieben Schritte, Druckvorlagen, CSV-Fragebogen und das Windows-Programm sind fertig, getestet und gegen die Spezifikation geprüft. Eine Durchsicht an einem echten Auswahlverfahren steht noch aus. Fehler und Wünsche gern als [Issue](https://github.com/edgebird-lab/auswahllotse/issues).
+> **Version 0.2.0 vom 13.11.2026:** neu ist der Export „Für die Beratungsakte speichern“ im offenen Format Beratungsakte v1 (siehe unten), dazu kleine Korrekturen. Version 0.1.0 vom 11.11.2026 war die erste veröffentlichte Version. Alle sieben Schritte, Druckvorlagen, CSV-Fragebogen und das Windows-Programm sind fertig, getestet und gegen die Spezifikation geprüft. Eine Durchsicht an einem echten Auswahlverfahren steht noch aus. Fehler und Wünsche gern als [Issue](https://github.com/edgebird-lab/auswahllotse/issues).
 
 ![Ergebnis des Fallbeispiels: Empfehlung, K.-o.-Prüfung und Nutzwert als gestapelte Balken](docs/bilder/ergebnis.png)
 
@@ -171,7 +171,7 @@ Aufbau: Fachlogik ohne React in `src/prozessdatei`, `src/modell`, `src/lastenhef
 | --- | --- |
 | 0 Einrichten | fertig; Repo und CI seit 11.11.2026 |
 | 1 bis 7 Datenmodell, Einlesen, Lastenheft, Gewichtung, Kosten, Oberfläche, Vorlagen | fertig und getestet |
-| 8 Qualität | Browsertests, Barrierefreiheit und Tastatur fertig; die kritische Prüfung vom 11.11.2026 hat elf Fehler und Schwächen gefunden und behoben (Liste in [docs/stand.md](docs/stand.md)). Version 0.1.0 am 11.11.2026 veröffentlicht (8.4); die Durchsicht an einem echten Fall (8.3) folgt |
+| 8 Qualität | Browsertests, Barrierefreiheit und Tastatur fertig; die kritische Prüfung vom 11.11.2026 hat elf Fehler und Schwächen gefunden und behoben (Liste in [docs/stand.md](docs/stand.md)). Version 0.1.0 am 11.11.2026 veröffentlicht (8.4), Version 0.2.0 mit dem Export Beratungsakte am 13.11.2026; die Durchsicht an einem echten Fall (8.3) folgt |
 | 9 Windows-Programm mit Tauri | fertig: Plattformschicht, Installer pro Benutzer, Zuordnung `.auswahllotse`, Einlese-Dialog, eine Instanz, atomares Speichern, PDF beider Vorlagen, Desktop-Test, Windows-Job und Release in der CI |
 
 Offene Fragen der Spezifikation (Kataloginhalte, Festlegungen) gelten als Annahmen, bis Robin entscheidet: [docs/entscheidungen.md](docs/entscheidungen.md).

@@ -2,7 +2,7 @@
 
 Checkliste aller Phasen und Schritte aus [spezifikation.md](spezifikation.md), Abschnitt 11. Nach jedem Schritt aktualisieren, damit ein Nachfolger hier weitermachen kann. Annahmen stehen in [entscheidungen.md](entscheidungen.md).
 
-Letzte Aktualisierung: 13.11.2026, Export im offenen Format Beratungsakte v1 (B.1, Nacharbeit B.2); davor 11.11.2026 Version 0.1.0 veröffentlicht
+Letzte Aktualisierung: 13.11.2026, Version 0.2.0 (B.3) mit dem Export im offenen Format Beratungsakte v1 (B.1, Nacharbeit B.2); davor 11.11.2026 Version 0.1.0 veröffentlicht
 
 ## Phase 0 – Einrichten
 
@@ -89,6 +89,7 @@ Auf Robins ausdrücklichen Wunsch am 11.11.2026 vorgezogen („richtige Software
 
 - [x] **B.1** Export „Für die Beratungsakte speichern“ im Schritt „Vorlagen“ (13.11.2026): Abbildung in `src/export/beratungsakte.ts` (Annahme U64), Dialog `src/ui/BeratungsakteDialog.tsx`, Befehl `beratungsakte` in `ui/datei.ts`, Dateiart `beratungsakte` in der Plattformschicht und in `speichern_unter` (zweiteilige Endung `.beratungsakte.json`). Kopie der Bibliothek 1.0.1 in `src/beratungsakte/`, Beispiele in `testdaten/beratungsakte/`. Version an einer Stelle in `src/version.ts` (der Release-Lauf prüft sie dort). Tests: 25 Unit-Tests, 4 Browsertests, 1 Rust-Test, 3 Prüfungen im Desktop-Test.
 - [x] **B.2** Nacharbeit (13.11.2026): Hinweise werden `hinweis` statt `niedrig`; Hinweis im Dialog, dass die Datei unverschlüsselt ist und Daten des Mandanten enthält; `mit_endung` macht aus „x.json“ „x.beratungsakte.json“ statt „x.json.beratungsakte.json“ (Rust-Test); die reinen Hilfen `befundziel.ts` und `befundMitAnforderung`/`kostenbasisText` liegen jetzt in `src/modell/` statt in `src/ui/`.
+- [x] **B.3** Version 0.2.0 (13.11.2026): Version in `package.json`, `Cargo.toml` und `src/version.ts`, `docs/fremdlizenzen.md` neu erzeugt. Geprüft: Lint, Unit-Tests, Build, Browsertests (`--workers=2`), `cargo test`, Debug-Build und `npm run desktop:test`. Tag `v0.2.0`, Release-Entwurf von `release.yml`, nach Prüfung veröffentlicht.
 
 ## Prüfung vom 11.11.2026
 
