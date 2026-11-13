@@ -1,3 +1,4 @@
+import { useRef, useState } from 'react'
 import { angebotsname } from '../../bewertung/nutzwert'
 import { begruendungsEntwurf } from '../../entscheidung/begruendung'
 import { loescheRisiko, neuesRisiko, setzeBegruendung, setzeEntscheidungsStatus, setzeRisiko, waehleAngebot } from '../../entscheidung/entscheidung'
@@ -8,29 +9,46 @@ import { Feld, Reiter, ReiterFlaeche } from '../Eingaben'
 import { jetzt, useApp } from '../kontext'
 import type { Vorlage } from '../datei'
 import { plattform } from '../../plattform'
+import type { Beratungsakte } from '../../beratungsakte/beratungsakte'
+import { BeratungsakteDialog } from '../BeratungsakteDialog'
 
 export function VorlagenSchritt() {
   const { z, ansicht, setzeAnsicht, befehle } = useApp()
   const praefix = 'vorlage'
   const p = z.projekt
+  const [akteOffen, setAkteOffen] = useState(false)
+  const akteKnopf = useRef<HTMLButtonElement>(null)
+  const schliesseAkte = () => {
+    setAkteOffen(false)
+    requestAnimationFrame(() => akteKnopf.current?.focus())
+  }
+  const speichereAkte = (akte: Beratungsakte) => {
+    schliesseAkte()
+    void befehle.beratungsakte(akte)
+  }
   return (
     <div className="schritt">
       <div className="bedienung">
         <h1 id="schritt-titel" tabIndex={-1}>
           7 · Vorlagen
         </h1>
-        <p className="einleitung">Lastenheft und Entscheidungsvorlage zum Drucken oder Speichern als PDF. Dazu der Anbieterfragebogen als CSV und das Projekt als Datei.</p>
+        <p className="einleitung">Lastenheft und Entscheidungsvorlage zum Drucken oder Speichern als PDF. Dazu der Anbieterfragebogen als CSV, das Ergebnis für die Beratungsakte und das Projekt als Datei.</p>
         <section className="karte" aria-labelledby="export-titel">
           <h2 id="export-titel">Exporte</h2>
           <div className="knopfreihe">
             <button type="button" className="knopf" onClick={() => void befehle.fragebogen()} disabled={!p.anforderungen.some((a) => a.status === 'aktiv')}>
               Anbieterfragebogen (CSV)
             </button>
+            <button type="button" className="knopf" ref={akteKnopf} onClick={() => setAkteOffen(true)}>
+              Für die Beratungsakte speichern
+            </button>
             <button type="button" className="knopf" onClick={() => void befehle.speichern()}>
               Projekt speichern
             </button>
           </div>
           <p className="feld-hilfe">Der Fragebogen enthält alle aktiven Anforderungen mit leeren Spalten für die Antworten der Anbieter (Semikolon, UTF-8, für Excel geeignet).</p>
+          <p className="feld-hilfe">Die Beratungsakte fasst Kennzahlen, Befunde und Maßnahmen der Auswahl in einer JSON-Datei im offenen Format Beratungsakte v1 zusammen.</p>
+          {akteOffen && <BeratungsakteDialog onSpeichern={speichereAkte} onSchliessen={schliesseAkte} />}
         </section>
         <Reiter
           label="Vorlage"

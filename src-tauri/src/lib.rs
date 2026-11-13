@@ -77,9 +77,14 @@ fn schreibe(p: &Path, inhalt: &str) -> Result<(), String> {
 
 /// Hängt die Endung an, wenn der gewählte Name keine der erlaubten hat. Angehängt, nicht
 /// ersetzt: „Version 2.0“ wird zu „Version 2.0.auswahllotse“, und eine Datei mit fremder
-/// Endung (etwa ein Prozesslotse-Projekt) wird so nie überschrieben.
+/// Endung (etwa ein Prozesslotse-Projekt) wird so nie überschrieben. Endungen dürfen aus
+/// mehreren Teilen bestehen („beratungsakte.json“).
 fn mit_endung(p: PathBuf, erlaubt: &[&str], standard: &str) -> PathBuf {
-    let passt = p.extension().and_then(OsStr::to_str).is_some_and(|e| erlaubt.iter().any(|x| x.eq_ignore_ascii_case(e)));
+    let name = p.file_name().and_then(OsStr::to_str).unwrap_or("").to_ascii_lowercase();
+    let passt = erlaubt.iter().any(|x| {
+        let endung = format!(".{}", x.to_ascii_lowercase());
+        name.len() > endung.len() && name.ends_with(&endung)
+    });
     if passt {
         return p;
     }
@@ -182,6 +187,8 @@ async fn speichern_unter(app: AppHandle, vorschlag: String, inhalt: String, art:
     let (filter, endungen, titel): (&str, &[&str], &str) = match art.as_str() {
         "projekt" => ("Auswahl-Lotse-Projekt", &["auswahllotse", "json"], "Speichern unter"),
         "csv" => ("CSV-Datei (Excel)", &["csv"], "Anbieterfragebogen speichern"),
+        // Export im offenen Format Beratungsakte v1; die Endung hat zwei Teile
+        "beratungsakte" => ("Beratungsakte (*.beratungsakte.json)", &["beratungsakte.json"], "Für die Beratungsakte speichern"),
         _ => return Err(format!("Unbekannte Dateiart: {art}")),
     };
     let wahl = test_speicherort(&vorschlag).unwrap_or_else(|| {
@@ -436,5 +443,18 @@ mod tests {
         assert_eq!(mit_endung(p("modell.prozesslotse"), projekt, "auswahllotse"), p("modell.prozesslotse.auswahllotse"));
         assert_eq!(mit_endung(p("bogen"), &["csv"], "csv"), p("bogen.csv"));
         assert_eq!(mit_endung(p("vorlage.pdf"), &["pdf"], "pdf"), p("vorlage.pdf"));
+        assert_eq!(mit_endung(p(".auswahllotse"), projekt, "auswahllotse"), p(".auswahllotse.auswahllotse"));
+    }
+
+    #[test]
+    fn haengt_die_zweiteilige_endung_der_beratungsakte_an() {
+        let p = |s: &str| PathBuf::from(s);
+        let akte: &[&str] = &["beratungsakte.json"];
+        let name = "Muster-GmbH-auswahllotse-2026-11-13";
+        assert_eq!(mit_endung(p(name), akte, akte[0]), p("Muster-GmbH-auswahllotse-2026-11-13.beratungsakte.json"));
+        assert_eq!(mit_endung(p("a.beratungsakte.json"), akte, akte[0]), p("a.beratungsakte.json"));
+        assert_eq!(mit_endung(p("a.BERATUNGSAKTE.JSON"), akte, akte[0]), p("a.BERATUNGSAKTE.JSON"));
+        assert_eq!(mit_endung(p("a.json"), akte, akte[0]), p("a.json.beratungsakte.json"));
+        assert_eq!(mit_endung(p("a.auswahllotse"), akte, akte[0]), p("a.auswahllotse.beratungsakte.json"));
     }
 }

@@ -14,7 +14,7 @@ export interface Datei {
   inhalt: string
 }
 
-export type DateiArt = 'projekt' | 'csv'
+export type DateiArt = 'projekt' | 'csv' | 'beratungsakte'
 
 /** Befehle aus dem Programmmenü. */
 export type MenueBefehl = 'neu' | 'oeffnen' | 'importieren' | 'speichern' | 'speichernUnter' | 'fragebogen' | 'beispiel' | 'ueber'

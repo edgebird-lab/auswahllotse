@@ -3,6 +3,7 @@ import type { DateiArt, Plattform } from './typen'
 const MIME: Record<DateiArt, string> = {
   projekt: 'application/vnd.auswahllotse+json',
   csv: 'text/csv',
+  beratungsakte: 'application/json',
 }
 
 /** Bietet Text zum Herunterladen an. */

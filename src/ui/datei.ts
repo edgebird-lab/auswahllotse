@@ -1,12 +1,14 @@
 /**
  * Dateibefehle der Oberfläche: Neu, Öffnen, Speichern, Speichern unter,
- * Beispiel laden, Prozessmodell einlesen, CSV-Fragebogen, Drucken, PDF,
+ * Beispiel laden, Prozessmodell einlesen, CSV-Fragebogen, Beratungsakte,
+ * Drucken, PDF,
  * Browser-Speicher leeren, Rückfrage beim Schließen des Programms.
  * Fehlermeldungen kommen als Text an die Oberfläche zurück; nichts davon
  * bringt die App zum Absturz.
  */
 import { useMemo, type Dispatch } from 'react'
 import { beispielProjekt } from '../beispiel/beispiel'
+import { dateinameBeratungsakte, serialisiereBeratungsakte, type Beratungsakte } from '../beratungsakte/beratungsakte'
 import { anbieterFragebogen, fragebogenDateiname } from '../export/csv'
 import { druckTitel } from '../export/vorlagen'
 import { standardsAusModell } from '../kosten/vorschlaege'
@@ -40,6 +42,8 @@ export interface Befehle {
   leseProzessEin(d: Datei): Promise<boolean>
   ohneProzessmodell(): Promise<void>
   fragebogen(): Promise<void>
+  /** Export im offenen Format Beratungsakte v1; im Browser ein Download */
+  beratungsakte(akte: Beratungsakte): Promise<void>
   drucken(was: Vorlage): Promise<void>
   /** Angezeigte Vorlage als PDF ohne Druckdialog (nur im Programm) */
   alsPdf(was: Vorlage): Promise<void>
@@ -253,6 +257,14 @@ export function useDateiBefehle(d: Abhaengigkeiten): Befehle {
           if (ergebnis) melde(`Fragebogen „${ergebnis.name}“ gespeichert.`)
         } catch (e) {
           zeigeFehler(`Fragebogen nicht gespeichert: ${fehlertext(e)}`)
+        }
+      },
+      async beratungsakte(akte) {
+        try {
+          const ergebnis = await plattform.speichernUnter(dateinameBeratungsakte(akte), serialisiereBeratungsakte(akte), 'beratungsakte')
+          if (ergebnis) melde(`Beratungsakte „${ergebnis.name}“ gespeichert.`)
+        } catch (e) {
+          zeigeFehler(`Beratungsakte nicht gespeichert: ${fehlertext(e)}`)
         }
       },
       async drucken(was) {

@@ -2,7 +2,7 @@
  * Prüft das echte Windows-Programm (Debug-Build) ohne Installation: Start mit
  * der Startseite, Speichern unter, Speichern an den bekannten Pfad, Einlesen
  * einer Prozesslotse-Datei über den Dialog (die Datei bleibt unverändert),
- * CSV-Fragebogen, PDF beider Vorlagen in A4, zweiter Start mit Projekt- und
+ * CSV-Fragebogen, Beratungsakte, PDF beider Vorlagen in A4, zweiter Start mit Projekt- und
  * Prozessdatei (Single-Instance), Öffnen per Dialog, Rechte (kein Schreiben
  * auf fremde Pfade, kein Dialog-Plugin in der Oberfläche), Rückfrage beim
  * Schließen und dass verworfene Änderungen beim nächsten Start fehlen.
@@ -244,6 +244,18 @@ try {
   await warte(() => existsSync(datei(csv)), `CSV „${csv}“ geschrieben`)
   const csvBytes = readFileSync(datei(csv))
   pruefe(csvBytes[0] === 0xef && csvBytes[1] === 0xbb && csvBytes[2] === 0xbf && csvBytes.toString('utf8').includes(';'), 'CSV mit BOM und Semikolon')
+
+  // 6a. Für die Beratungsakte speichern: über speichern_unter mit eigener Dateiart und zweiteiliger Endung
+  await seite.getByRole('button', { name: 'Für die Beratungsakte speichern' }).click()
+  const akteDialog = seite.getByRole('dialog', { name: 'Für die Beratungsakte speichern' })
+  await akteDialog.getByRole('button', { name: 'Speichern' }).click()
+  const d = new Date()
+  const akteName = `Lieferdienst-Beispiel-GmbH-auswahllotse-${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}.beratungsakte.json`
+  await warte(async () => (await status()).includes(`Beratungsakte „${akteName}“ gespeichert`), 'Beratungsakte gespeichert, Meldung nennt den Dateinamen')
+  const akteBytes = readFileSync(datei(akteName))
+  const akte = JSON.parse(akteBytes.toString('utf8'))
+  pruefe(akteBytes[0] === 0x7b && akte.format === 'beratungsakte' && akte.erzeugtVon.app === 'auswahllotse' && akte.mandant.name === 'Lieferdienst Beispiel GmbH', 'die Akte (ohne BOM) nennt Format, App und den vorbelegten Mandanten')
+  pruefe(akte.analyse.titel === TITEL && akte.analyse.quelldatei === 'Neue Warenwirtschaft.auswahllotse', 'Titel und Projektdatei stehen in der Akte')
 
   // 7. PDF beider Vorlagen ohne Druckdialog
   await seite.getByRole('tab', { name: 'Lastenheft' }).click()

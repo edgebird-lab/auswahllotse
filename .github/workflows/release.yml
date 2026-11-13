@@ -29,8 +29,8 @@ jobs:
           version="${GITHUB_REF_NAME#v}"
           test "$(node -p "require('./package.json').version")" = "$version"
           grep -q "^version = \"$version\"$" src-tauri/Cargo.toml
-          grep -q "^export const VERSION = '$version'$" src/App.tsx
-          echo "Version $version in package.json, Cargo.toml und App.tsx"
+          grep -q "^export const VERSION = '$version'$" src/version.ts
+          echo "Version $version in package.json, Cargo.toml und src/version.ts"
       - uses: dtolnay/rust-toolchain@stable
       - uses: swatinem/rust-cache@v2
         with:

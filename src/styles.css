@@ -754,6 +754,26 @@ fieldset {
 .frage-dialog .knopfreihe {
   justify-content: flex-end;
 }
+/* Beratungsakte: Felder untereinander, langer Dateiname bricht um statt überzustehen */
+.akte-dialog {
+  width: min(480px, calc(100vw - 32px));
+}
+.akte-dialog .feld {
+  margin-bottom: 12px;
+}
+.akte-dialog .feld-meldung {
+  margin: 0;
+  color: var(--schlecht-text);
+}
+.akte-dialog .akte-inhalt {
+  margin-top: 16px;
+}
+.akte-datei {
+  display: block;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+  color: var(--text);
+}
 
 /* Lernmodus */
 .lernhinweis {

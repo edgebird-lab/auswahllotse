@@ -2,7 +2,7 @@
 
 Checkliste aller Phasen und Schritte aus [spezifikation.md](spezifikation.md), Abschnitt 11. Nach jedem Schritt aktualisieren, damit ein Nachfolger hier weitermachen kann. Annahmen stehen in [entscheidungen.md](entscheidungen.md).
 
-Letzte Aktualisierung: 11.11.2026, Version 0.1.0 zur Veröffentlichung vorbereitet (Robins Freigabe: Repo öffentlich, Release mit Windows-Installer, vorerst keine Lizenz)
+Letzte Aktualisierung: 13.11.2026, Export im offenen Format Beratungsakte v1 (B.1); davor 11.11.2026 Version 0.1.0 veröffentlicht
 
 ## Phase 0 – Einrichten
 
@@ -85,6 +85,10 @@ Auf Robins ausdrücklichen Wunsch am 11.11.2026 vorgezogen („richtige Software
 
 **Installation auf Robins Rechner (11.11.2026, auf seinen Wunsch):** Release-Build mit `npx tauri build`, Installer still (`/S`) ohne Admin-Rechte ausgeführt, Rückgabewert 0. Programm in `%LOCALAPPDATA%\Auswahl-Lotse\auswahllotse.exe`; Startmenü-Eintrag und Desktop-Verknüpfung „Auswahl-Lotse“ hat der Installer selbst angelegt; `.auswahllotse` zeigt auf `AuswahlLotse.Projekt` (`"…\auswahllotse.exe" "%1"`), `.prozesslotse` und `.bpmn` sind unberührt; Eintrag „Auswahl-Lotse 0.0.0“ unter Apps. Startprobe über die WebView2-Debugschnittstelle: direkter Start zeigt „1 · Rahmen“ mit Titel „Neues Vorhaben – Auswahl-Lotse“; Öffnen einer Kopie von `beispiel-lieferdienst.auswahllotse` über die Dateizuordnung (wie Doppelklick) zeigt „6 · Ergebnis“ mit dem Dateinamen im Titel; beide Male sauber geschlossen. Die dabei angelegten Programmdaten wurden danach entfernt, damit der erste eigene Start leer beginnt. Neue Fassung installieren: Installer erneut ausführen (ersetzt die alte); entfernen über Einstellungen > Apps.
 
+## Export im offenen Format Beratungsakte v1
+
+- [x] **B.1** Export „Für die Beratungsakte speichern“ im Schritt „Vorlagen“ (13.11.2026): Abbildung in `src/export/beratungsakte.ts` (Annahme U64), Dialog `src/ui/BeratungsakteDialog.tsx`, Befehl `beratungsakte` in `ui/datei.ts`, Dateiart `beratungsakte` in der Plattformschicht und in `speichern_unter` (zweiteilige Endung `.beratungsakte.json`). Kopie der Bibliothek 1.0.1 in `src/beratungsakte/`, Beispiele in `testdaten/beratungsakte/`. Version an einer Stelle in `src/version.ts` (der Release-Lauf prüft sie dort). Tests: 25 Unit-Tests, 4 Browsertests, 1 Rust-Test, 3 Prüfungen im Desktop-Test.
+
 ## Prüfung vom 11.11.2026
 
 Kritische Prüfung gegen die Spezifikation für den gebauten Umfang (Phasen 0 bis 8.2). Vorgehen: Fallbeispiel unabhängig in Python nachgerechnet (Nutzwerte 8,52 / 7,70 / 5,49, Gesamtkosten 54.517 / 93.088 / 35.230 €, Kapitalwerte 123.892 / 86.200 €, Amortisation im 1. und 2. Jahr, Funktionen stabil bis 57,1 %: alles wie in App und README), T-K1 bis T-K5 und T-AHP3 von Hand nachgerechnet, Formeln Zeile für Zeile mit 6.2 bis 6.13 verglichen, ODER-Rechnung mit dem Prozesslotsen verglichen, App im Browser durchgeklickt (alle Schritte hell und dunkel, Handy-Breite, beschädigte Projektdateien, Format 4 speichern und neu öffnen, Angebote löschen, anderes Modell neu einlesen, Softwareart wechseln, ohne Modell), PDF-Proben Seite für Seite angesehen.
@@ -110,7 +114,7 @@ Verbleibende Mängel stehen im Bericht der Prüfung und in der README unter „G
 ## Hinweise für den nächsten Durchgang
 
 - **Repo:** `edgebird-lab/auswahllotse`, Zweig `main`. Workflows: „Prüfung“ (jeder Push), „Windows-Programm“ (nur bei Änderungen an `src-tauri`, `src/plattform`, `package*.json` oder von Hand), „Version vorbereiten“ (nur bei Tags `v*`: Release-Entwurf mit Installer und `Auswahl-Lotse-Setup.exe`; nach Prüfung von Hand veröffentlichen mit `gh release edit <tag> --draft=false --latest`). Die Website verlinkt fest `https://github.com/edgebird-lab/auswahllotse/releases/latest/download/Auswahl-Lotse-Setup.exe`; der Name der Kopie darf sich deshalb nie ändern.
-- **Neue Version:** Version in `package.json` (mit `npm version <x.y.z> --no-git-tag-version`), `src-tauri/Cargo.toml` (danach `cargo update --workspace --offline`) und `src/App.tsx` setzen, `node scripts/fremdlizenzen.mjs` laufen lassen, prüfen, committen, `git tag -a v<x.y.z>` pushen, Entwurf prüfen und veröffentlichen.
+- **Neue Version:** Version in `package.json` (mit `npm version <x.y.z> --no-git-tag-version`), `src-tauri/Cargo.toml` (danach `cargo update --workspace --offline`) und `src/version.ts` setzen, `node scripts/fremdlizenzen.mjs` laufen lassen, prüfen, committen, `git tag -a v<x.y.z>` pushen, Entwurf prüfen und veröffentlichen.
 - **Prüfen vor jedem Commit:** `npm run lint`, `npm test`, `npm run build`, `npm run e2e` (Edge, Port 4183 fest). Bei Änderungen am Programmteil zusätzlich `cargo test`, Debug-Build und `npm run desktop:test` (siehe `CLAUDE.md`).
 - **Nächster Schritt:** Durchsicht mit Robin (8.3), am besten gleich im installierten Programm; Befunde als Issues, Korrekturen als 0.1.x. Robins installierte Fassung meldet noch 0.0.0; ein neuer Installer (z. B. der aus dem Release) ersetzt sie.
 - **Oberfläche:** `src/App.tsx` (Gerüst), `src/ui/schritte/*` (sieben Schritte), `src/ui/druck/*` (Vorlagen), `src/ui/diagramme/*` (SVG, Rechnungen in `geometrie.ts`). Alle Zahlen und Befunde liefert `berechneGesamt(projekt)` aus `entscheidung/gesamt.ts`; Änderungen laufen als reine Funktionen über `aendere` (Kontext in `ui/kontext.ts`).

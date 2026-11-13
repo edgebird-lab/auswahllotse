@@ -30,7 +30,7 @@ Ein geführter Assistent in sieben Schritten:
 4. **Gewichtung:** Hauptkriterien direkt in Prozent oder per Paarvergleich auf 17 Stufen mit Konsistenzprüfung (CR) und Hinweis auf das widersprüchlichste Urteil; Punkte innerhalb der Gruppen; Entscheidungsregel und Budget; „Festlegen“ mit Zähler für spätere Änderungen.
 5. **Angebote:** Muss-Kriterien als K.-o. (erfüllt, nicht erfüllt, offen), Soll und Kann mit 0 bis 10 Punkten, Fundstelle und Notiz; Kosten mit einmaligen, laufenden und internen Posten, Vorschläge für Benutzer, Stundensatz und Nutzen aus dem Prozessmodell.
 6. **Ergebnis:** Empfehlung nach „höchster Nutzwert“ oder „bestes Preis-Leistungs-Verhältnis“, K.-o.-Übersicht, Nutzwert und Kosten als Diagramm und Tabelle, Barwert, Kapitalwert und Amortisation, Sensitivität der Gewichte, alle Befunde mit Sprung zur Ursache.
-7. **Vorlagen:** Lastenheft und Entscheidungsvorlage zum Drucken oder als PDF, Begründungsentwurf aus Textbausteinen, Risiken, Status „final“ erst ohne Fehler; Anbieterfragebogen als CSV.
+7. **Vorlagen:** Lastenheft und Entscheidungsvorlage zum Drucken oder als PDF, Begründungsentwurf aus Textbausteinen, Risiken, Status „final“ erst ohne Fehler; Anbieterfragebogen als CSV; Ergebnis als Datei im offenen Format Beratungsakte v1.
 
 Dazu: Rückgängig und Wiederholen, Lernmodus mit kurzen Erklärungen der Methoden, hell und dunkel, vollständig per Tastatur bedienbar.
 
@@ -39,6 +39,17 @@ Dazu: Rückgängig und Wiederholen, Lernmodus mit kurzen Erklärungen der Method
 | ![Schritt Anforderungen mit Muss-Anteil und Karten](docs/bilder/anforderungen.png) | ![Schritt Gewichtung mit direkten Gewichten](docs/bilder/gewichtung.png) |
 | **Sensitivität** | **Entscheidungsvorlage** |
 | ![Stabile Bereiche der Gewichte als kleine Liniendiagramme](docs/bilder/sensitivitaet.png) | ![Entscheidungsvorlage mit Empfehlung im Kasten](docs/bilder/entscheidungsvorlage.png) |
+
+## Export im offenen Format Beratungsakte v1
+
+Im Schritt „Vorlagen“ speichert „Für die Beratungsakte speichern“ das Ergebnis der Auswahl als JSON-Datei im offenen Format Beratungsakte v1 (`analyse.art` = `softwareauswahl`). Ein kleiner Dialog fragt nach dem Mandanten (vorbelegt mit dem Betrieb aus dem Schritt „Rahmen“) und optional nach einer Mandantennummer und zeigt, was die Datei enthält. Im Browser ist das ein Download, im Windows-Programm der Speichern-Dialog.
+
+- **Kennzahlen:** aktive Anforderungen mit Muss, Soll und Kann, Muss-Anteil, Zahl der Angebote und der gültigen; je Angebot K.-o.-Prüfung, Nutzwert, Rang, einmalige Kosten, Gesamtkosten, Kapitalwert, Amortisation und € je Nutzwertpunkt (soweit berechnet); je Hauptkriterium der stabile Bereich des Gewichts.
+- **Befunde:** die Befunde aus dem Schritt „Ergebnis“ mit Fundstelle (Fehler → `hoch`, Warnung → `mittel`, Hinweis → `niedrig`), dazu ausgeschiedene Angebote (`hoch`), knappe stabile Bereiche, eine vorläufige Empfehlung und die erfassten Risiken (je `mittel`).
+- **Maßnahmen:** die Wahl des Angebots (Priorität `hoch`, Aufwand mit den Kosten) und die Maßnahmen zu den Risiken (`mittel`, mit Bezug auf das Risiko).
+- **Dateiname:** `<Mandant>-auswahllotse-<Datum>.beratungsakte.json`, z. B. `Lieferdienst-Beispiel-GmbH-auswahllotse-2026-11-13.beratungsakte.json`.
+
+Die Abbildung steht in `src/export/beratungsakte.ts`. Die Bibliothek des Formats (Erzeugen, Prüfen, Schema) liegt als unveränderte Kopie in `src/beratungsakte/` (Version 1.0.1, siehe `src/beratungsakte/VERSION`), ihre Beispieldateien in `testdaten/beratungsakte/`.
 
 ## Fallbeispiel „Lieferdienst sucht Warenwirtschaft“
 
@@ -120,6 +131,7 @@ Der Auswahl-Lotse läuft auch als Windows-Programm (Tauri 2 mit WebView2, App-ID
 
 - **Installation pro Benutzer ohne Admin-Rechte:** Der Installer (NSIS, deutsch) legt das Programm unter `%LOCALAPPDATA%\Auswahl-Lotse` ab, mit Eintrag im Startmenü und Verknüpfung „Auswahl-Lotse“ auf dem Desktop (siehe [Installieren](#installieren)). Bei einem Tag `v*` baut die CI den Installer und hängt ihn an einen Release-Entwurf, zusätzlich als `Auswahl-Lotse-Setup.exe` mit festem Namen für den Download-Link (`.github/workflows/release.yml`).
 - **Dateien:** `.auswahllotse` öffnet sich per Doppelklick. Ein zweiter Doppelklick landet im laufenden Programm (eine Instanz). `.prozesslotse` und `.bpmn` werden nicht zugeordnet; man liest sie über den Dialog ein. Dateien lassen sich auch ins Fenster ziehen: Projekte werden geöffnet, Prozessmodelle eingelesen.
+- **Speichern-Dialog** auch für die Beratungsakte (Filter „Beratungsakte (*.beratungsakte.json)“; fehlt die Endung, wird sie angehängt).
 - **Menü „Datei“:** Neu, Öffnen, Prozessmodell einlesen, Speichern, Speichern unter, Anbieterfragebogen als CSV, Beispiel laden, Beenden. Beim Schließen mit ungespeicherten Änderungen fragt das Programm nach; „Nicht speichern“ verwirft sie auch für den nächsten Start.
 - **PDF ohne Druckdialog:** In beiden Vorlagen schreibt „Als PDF speichern …“ die angezeigte Vorlage direkt über WebView2 als PDF (A4, 20 mm Rand). „Drucken …“ öffnet den Druckdialog.
 - Programmdaten (zuletzt bearbeitetes Projekt, Einstellungen) liegen unter `%LOCALAPPDATA%\de.olbricht-digital.auswahllotse`.
@@ -144,9 +156,9 @@ npm test           # Unit-Tests der Fachlogik (Vitest)
 npm run e2e        # Browsertests mit Playwright und axe (lokal Edge, Port 4183 fest)
 ```
 
-- **258 Unit-Tests in 28 Dateien:** alle Testwerte der Spezifikation (Abschnitt 9.1, von Hand nachgerechnet), dazu Randfälle wie Tausenderpunkt, Rundung an Halbwerten, doppelte Kennungen und unlesbarer Browser-Speicher. Das Fallbeispiel prüft auch die Zahlen dieser README.
-- **22 Browsertests:** E1 bis E11 der Spezifikation, axe in allen Schritten und Reitern hell und dunkel, ganzer Durchlauf nur mit Tastatur, Speichern und Öffnen, beschädigter Browser-Speicher, Zahleneingabe mit Änderungszähler und Sprung von Befunden zur Ursache.
-- **Windows-Programm:** 6 Rust-Tests und der Desktop-Test mit 48 Prüfungen am echten Programm (siehe [Windows-Programm](#windows-programm)).
+- **283 Unit-Tests in 29 Dateien:** alle Testwerte der Spezifikation (Abschnitt 9.1, von Hand nachgerechnet), dazu Randfälle wie Tausenderpunkt, Rundung an Halbwerten, doppelte Kennungen und unlesbarer Browser-Speicher. Das Fallbeispiel prüft auch die Zahlen dieser README; der Export der Beratungsakte prüft Inhalt, Stufen, Bezüge und die Kopie der Bibliothek.
+- **26 Browsertests:** E1 bis E11 der Spezifikation, axe in allen Schritten und Reitern hell und dunkel, ganzer Durchlauf nur mit Tastatur, Speichern und Öffnen, beschädigter Browser-Speicher, Zahleneingabe mit Änderungszähler, Sprung von Befunden zur Ursache und Export der Beratungsakte (Dialog, Download, axe hell und dunkel).
+- **Windows-Programm:** 7 Rust-Tests und der Desktop-Test mit 51 Prüfungen am echten Programm (siehe [Windows-Programm](#windows-programm)).
 - Vor jedem Commit laufen lint, Unit-Tests, Build und Browsertests. Der Port 4183 muss frei sein; ein laufender Vorschau-Server lässt `npm run e2e` abbrechen.
 
 Bilder und PDF-Proben neu erzeugen: `npm run build`, dann `npx vite preview --port 4183 --strictPort` und `node scripts/readme-bilder.mjs`. Rundgang mit Bildschirmfotos: `node scripts/ansehen.mjs <ordner>`. Das Fallbeispiel neu schreiben: `npx vitest run -u src/beispiel`.
